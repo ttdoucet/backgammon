@@ -3,6 +3,7 @@
    All Rights Reserved.
  */
 
+#include <stdio.h>
 #include "move.h"
 #include <assert.h>
 

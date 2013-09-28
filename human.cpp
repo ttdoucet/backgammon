@@ -2,7 +2,7 @@
 #include "human.h"
 #include "math.h"
 #include "ttydisp.h"
-//#include <stdio.h>
+#include <stdio.h>
 #include "console.h"
 
 void HumanPlayer::chooseMove(const board& fromBoard, move& choice)
