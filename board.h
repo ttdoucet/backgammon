@@ -115,6 +115,7 @@ class board {
 		else if (color == black)
 			return "Black";
 		fatal("illegal color value in colorname");
+		return "";
 	}
 
 
