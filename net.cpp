@@ -25,12 +25,16 @@ static const __m128 b = _mm_set_ss(1065353216);
 
 static inline float squash_sse(const float x)
 {
+#if 1
+	return (float) (1 / (1 + exp(-x)) );
+#else
 	const __m128 y = _mm_max_ss(minx, _mm_min_ss(maxx, _mm_set_ss(x))); // clamp to [-87,87]
 	const __m128 z = _mm_add_ss(_mm_mul_ss(y, c), b);
 	const __m128i i = _mm_cvtps_epi32(z);
 	const float r = _mm_cvtss_f32(_mm_rcp_ss(_mm_add_ss(_mm_load_ps((const float *)&i), one)));
 	// assert(std::abs(1/(1+std::exp(-x)) - r) < 1.48e-2);  // minimum accuracy on floats is 1.48e-2
 	return r;
+#endif
 }
 
 
