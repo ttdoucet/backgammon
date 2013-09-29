@@ -4,10 +4,10 @@ OBJS = train.o hits.o net.o move.o ttydisp.o random.o bdata.o beardll.o playerne
 #CPPFLAGS = -O3 -march=native -mfpmath=sse -Ofast -flto -march=native -funroll-loops -ffast-math -fomit-frame-pointer
 
 #CPPFLAGS = -O3 -march=native -funroll-loops -ffast-math
-CPPFLAGS = -O3 -march=native -funroll-loops -Wno-unused-result
+CPPFLAGS = -O3 -march=native -ffast-math -funroll-loops -Wno-unused-result
 
 #CXX = g++
-#CXX = clang++
+CXX = clang++
 
 BEARGEN_OBJS = beargen.o random.o move.o console.o
 
