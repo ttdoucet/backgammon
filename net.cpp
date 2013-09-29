@@ -25,7 +25,7 @@ static const __m128 b = _mm_set_ss(1065353216);
 
 static inline float squash_sse(const float x)
 {
-#if 1
+#if 0
 	return (float) (1 / (1 + exp(-x)) );
 #else
 	const __m128 y = _mm_max_ss(minx, _mm_min_ss(maxx, _mm_set_ss(x))); // clamp to [-87,87]
