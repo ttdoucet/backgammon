@@ -22,7 +22,6 @@ clean :
 	-rm -f beargen train *.o
 
 distclean : 
-	-rm -f beargen train bearoff.dat *.o $(all)
-
+	-rm -f beargen train bearoff.dat *.o
 
 .PHONY : clean all
