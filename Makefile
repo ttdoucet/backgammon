@@ -17,9 +17,14 @@ train : $(OBJS)
 beargen : $(BEARGEN_OBJS)
 	$(CXX) -o beargen $(BEARGEN_OBJS)
 
+bdata.o : bdata.cpp bearoff.dat
+
+bearoff.dat : beargen
+	./beargen > bearoff.dat
+
 all : beargen train
 
 clean : 
-	-rm -f train beargen *.o $(all)
+	-rm -f train beargen bearoff.dat *.o $(all)
 
 .PHONY : clean all
