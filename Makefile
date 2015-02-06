@@ -1,7 +1,7 @@
 OBJS = train.o hits.o net.o move.o ttydisp.o random.o bdata.o beardll.o playernet.o human.o game.o console.o
 BEARGEN_OBJS = beargen.o random.o move.o console.o
 
-CPPFLAGS = -O3 -march=native -ffast-math -funroll-loops -Wno-unused-result
+CPPFLAGS = -O3
 CXX = clang++
 
 train : $(OBJS)
