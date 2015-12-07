@@ -73,10 +73,8 @@ class net {
 		const int n_inputs;
 		int n_type;
 
-
 		unsigned long seed;
                 const char *filename;
-
 
 			// for learning
 		int we_learn;
@@ -128,7 +126,7 @@ class net {
 
                 inline static float squash(const float f)
                 {
-                    return (float) (1 / (1 + exp(-f)) );
+                    return (float) (1 / (1 + expf(-f)) );
                 }
 
 } ;
@@ -164,12 +162,12 @@ struct net_v4 : public net {
 
 
 #ifndef MAX_EQUITY
-#define MAX_EQUITY 3.0
+#define MAX_EQUITY 3.0f
 #endif
 
 
-#define net_to_equity(n) ((float)( (MAX_EQUITY * 2.0)*(n) - (MAX_EQUITY * 1.0) ))
-#define delta_equity_to_delta_net(de) (float)( (de)/ (MAX_EQUITY * 2.0) )
+#define net_to_equity(n) ((float)( (MAX_EQUITY * 2.0f)*(n) - (MAX_EQUITY * 1.0f) ))
+#define delta_equity_to_delta_net(de) (float)( (de)/ (MAX_EQUITY * 2.0f) )
 
 
 

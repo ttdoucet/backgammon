@@ -103,11 +103,11 @@ void playoffSession(int trials, Player *whitePlayer, Player *blackPlayer)
 		double white_eq = game.playGame(false);
 		whitePoints += white_eq;
 
-		sprintf(buf, "Game %d: %5.2f... ", numGames, white_eq);
-		console << buf;
+				sprintf(buf, "Game %d: %5.2f... ", numGames, white_eq);
+				console << buf;
 		
-		sprintf(buf, "white equity/game = %.3f (total %.2f)\n", whitePoints/numGames, whitePoints);
-		console << buf;
+				sprintf(buf, "white equity/game = %.3f (total %.2f)\n", whitePoints/numGames, whitePoints);
+				console << buf;
 	}
 }
 

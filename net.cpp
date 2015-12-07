@@ -26,7 +26,7 @@ static const __m128 b = _mm_set_ss(1065353216);
 static inline float squash_sse(const float x)
 {
 #if 0
-	return (float) (1 / (1 + exp(-x)) );
+	return (float) (1 / (1 + expf(-x)) );
 #else
 	const __m128 y = _mm_max_ss(minx, _mm_min_ss(maxx, _mm_set_ss(x))); // clamp to [-87,87]
 	const __m128 z = _mm_add_ss(_mm_mul_ss(y, c), b);
@@ -83,18 +83,18 @@ void net::compute_contact(const color_t color, float *ib)
 	int me = netboard.highestChecker(color);
 	int him = opponentPoint(netboard.highestChecker(opponentOf(color)));
 	int contact = me - him;
-	float f = contact < 0 ? 0.0 : (contact / 23.0);
+	float f = contact < 0.0f ? 0.0f : (contact / 23.0f);
 
 	*ib++ = f;
-	*ib++ = (1.0 - f);
+	*ib++ = (1.0f - f);
 }
 
 void net::compute_pip(const color_t color, float *ib)
 {
 	int pdiff = netboard.pipCount(opponentOf(color)) - netboard.pipCount(color);
 
-	ib[0] = squash_sse( ((float) pdiff) / 27.0);
-	ib[1] = 1.0 - ib[0];
+	ib[0] = squash_sse( ((float) pdiff) / 27.0f);
+	ib[1] = 1.0f - ib[0];
 }
 
 void net::compute_hit_danger(const color_t color, float *ib)
@@ -104,22 +104,22 @@ void net::compute_hit_danger(const color_t color, float *ib)
 	int partial = h % (36 / net::METRICS_HIT);
 
 	for (i = 0; i < whole; i++){
-		*ib++ = 1.0;
+		*ib++ = 1.0f;
 	}
 	if (partial){
-		*ib++ = partial * (net::METRICS_HIT / 36.0);
+		*ib++ = partial * (net::METRICS_HIT / 36.0f);
 		i++;
 	}
 	for (; i < net::METRICS_HIT; i++)
-		*ib++ = 0.0;
+		*ib++ = 0;
 }
 
 void net::compute_hit_danger_v3(const color_t color, float *ib)
 {
-	float h = ((float) num_hits(color, netboard)) / 36.0;
+	float h = ((float) num_hits(color, netboard)) / 36.0f;
 
 	ib[0] = h;
-	ib[1] = 1.0 - h;
+	ib[1] = 1.0f - h;
 }
 
 void net::compute_v2_inputs(const color_t color, float *ib)
@@ -145,13 +145,13 @@ void net::compute_crossovers(const color_t color, float *ib)
 	float x_me = (float) crossovers(color);
 	float x_him = (float) crossovers(opponentOf(color));
 
-	ib[0] = x_me / 60.0;	// is 60.0 too high?
-	ib[1] = x_him / 60.0;
+	ib[0] = x_me / 60.0f;	// is 60.0 too high?
+	ib[1] = x_him / 60.0f;
 	
 		// A crossover lead of 5 corresponds to a value of
 		// squash(1), which is about 75 percent.
-	ib[2] = squash_sse( (x_me - x_him) / 5.0);
-	ib[3] = 1.0 - ib[2];
+	ib[2] = squash_sse( (x_me - x_him) / 5.0f);
+	ib[3] = 1.0f - ib[2];
 }
 
 
@@ -369,7 +369,7 @@ net::net(int nhidden, int ninputs)
  	input = new float[n_inputs];
 
 	for (i = 0; i < n_inputs; i++)
-		input[i] = 0.0;
+		input[i] = 0.0f;
 
  	hidden = new float[n_hidden];
  	pre_hidden = new float[n_hidden];
@@ -530,12 +530,12 @@ void net::calcGradient(net *g)
 }
 #endif
 
-#define NO_MOVE_YET -99.0
+#define NO_MOVE_YET -99.0f
 
 void net::init_play()
 {
 	for (int i = 0; i < n_inputs; i++)
-		input[i] = 0.0;
+		input[i] = 0.0f;
 		// This makes future marginal calculations work.
 	feedForward();
 }
@@ -692,7 +692,7 @@ public:
 
 	void operator() (float &f) const {
 		if (portable){
-			if (fprintf(netfp, "%.12f\n", f) <= 0)
+		  if (fprintf(netfp, "%.12f\n", (double) f) <= 0)
 				fatal( "Error writing to network file.");
 		} else {	// nonportable format saves all the bits in intel float format
 			if (fwrite(&f, sizeof(f), 1, netfp) != 1)
@@ -856,7 +856,7 @@ int net::learns()
 class clearFtn {
 	public:
 		void operator() (float &f) const {
-			f = 0.0F;
+		  f = 0.0f;
 		}
 };
 
