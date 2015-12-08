@@ -90,10 +90,8 @@ class net {
 		    delete [ ] weights_1[i];
 		}
 
-
-
 	protected:
-		
+
 		static float net_to_equity(float n)
 		{
 		  return (MAX_EQUITY * 2.0f) * n - MAX_EQUITY;
@@ -137,13 +135,10 @@ class net {
 #endif
 		}
 
-
 		virtual void compute_input(const color_t color, float *inbuf)
 		{
 		  fatal( "compute_input() on illegal net.");
 		}
-
-
 
                 static const char *checker_names_self[];
                 static const char *checker_names_other[];
@@ -206,9 +201,6 @@ class net {
 		  for (i = 0; i < n_hidden; i++)
 		    f( weights_2[i] );
 		}
-
-
-
 
 		float *inbuf;			// n_inputs
 
@@ -353,8 +345,8 @@ class net {
 		void compute_v2_inputs(const color_t color, float *ib);
 		int crossovers(color_t color);
 		void compute_crossovers(const color_t color, float *ib);
-		void compute_v4_inputs(const color_t color, float *ib);
-		void compute_v3_inputs(const color_t color, float *ib);
+//		void compute_v4_inputs(const color_t color, float *ib);
+//		void compute_v3_inputs(const color_t color, float *ib);
 		
 
                 inline static float dot_product(float *vec1, float *vec2, int size)
@@ -374,7 +366,8 @@ class net {
 
 
 
-struct net_v1 : public net {
+struct net_v1 : public net
+{
 	net_v1(int nhidden)  : net(nhidden, inputsForV1)
 	{
 	  console << "allocating net_v1 with " << nhidden << " hidden nodes.\n";
@@ -396,7 +389,8 @@ struct net_v1 : public net {
 	}
 };
 
-struct net_v2 : public net {
+struct net_v2 : public net
+{
 	static const char *v2_names[];
 
 	net_v2(int nhidden)  : net(nhidden, inputsForV2)
@@ -426,15 +420,11 @@ struct net_v2 : public net {
 
 };
 
-struct net_v3 : public net {
+class net_v3 : public net
+{
         static const char *v3_names[];
 
-	net_v3(int nhidden) : net(nhidden, inputsForV3)
-        {
-	  console << "net_v3(hidden=" << nhidden << ")\n";
-	  n_type = 3;
-	}
-
+   public:
 	const char *input_name(int n) const
 	{
 	  if (n < N_CHECK)
@@ -446,7 +436,25 @@ struct net_v3 : public net {
 	  return v3_names[n];
 	}
 
+	net_v3(int nhidden) : net(nhidden, inputsForV3)
+        {
+	  console << "net_v3(hidden=" << nhidden << ")\n";
+	  n_type = 3;
+	}
 
+ protected:
+	void compute_v3_inputs(const color_t color, float *ib)
+	{
+	  // The first two are the same as net_v2.
+	  compute_contact(color, ib);
+	  compute_pip(color, ib + net::METRICS_CONTACT);
+
+	  // Here we represent the hit danger and hit attack differently.
+
+	  compute_hit_danger_v3(color, ib + net::METRICS_CONTACT + net::METRICS_PIP);
+	  compute_hit_danger_v3(opponentOf(color), ib + net::METRICS_CONTACT +
+				net::METRICS_PIP + net::METRICS_HIT_V3);
+	}
 
 	void compute_input(const color_t color, float *inbuf)
 	{
@@ -454,16 +462,34 @@ struct net_v3 : public net {
 	  compute_input_for(opponentOf(color), inbuf + net::N_CHECK);
 	  compute_v3_inputs(color, inbuf + (2 * net::N_CHECK) );
 	}
-
 };
 
-struct net_v4 : public net {
+struct net_v4 : public net
+{
         static const char *v4_names[];
 
 	net_v4(int nhidden)  : net(nhidden, inputsForV4)
 	{
 	  console << "net_v4(hidden=" << nhidden << ")\n";
 	  n_type = 4;
+	}
+
+	void compute_v4_inputs(const color_t color, float *ib)
+	{
+	  // The first two are the same as net_v2.
+	  compute_contact(color, ib);
+	  compute_pip(color, ib + net::METRICS_CONTACT);
+
+	  // Here we represent the hit danger and hit attack
+	  // differently from v2, but the same as v3.
+
+	  compute_hit_danger_v3(color, ib + net::METRICS_CONTACT + net::METRICS_PIP);
+	  compute_hit_danger_v3(opponentOf(color), ib + net::METRICS_CONTACT +
+				net::METRICS_PIP + net::METRICS_HIT_V3);
+
+	  // And we add crossover calculations.
+	  compute_crossovers(color, ib + net::METRICS_CONTACT + net::METRICS_PIP +
+			     net::METRICS_HIT_V3 + net::METRICS_HIT_V3);
 	}
 
 
@@ -485,14 +511,5 @@ struct net_v4 : public net {
 	  n -= N_CHECK;
 	  return v4_names[n];
 	}
-
-
-
 };
-
-
-
-
-
-
 

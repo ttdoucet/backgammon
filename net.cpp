@@ -57,36 +57,6 @@ void net::compute_crossovers(const color_t color, float *ib)
 	ib[3] = 1.0f - ib[2];
 }
 
-void net::compute_v4_inputs(const color_t color, float *ib)
-{
-	// The first two are the same as net_v2.
-	compute_contact(color, ib);
-	compute_pip(color, ib + net::METRICS_CONTACT);
-
-	// Here we represent the hit danger and hit attack
-	// differently from v2, but the same as v3.
-
-	compute_hit_danger_v3(color, ib + net::METRICS_CONTACT + net::METRICS_PIP);
-	compute_hit_danger_v3(opponentOf(color), ib + net::METRICS_CONTACT +
-						  net::METRICS_PIP + net::METRICS_HIT_V3);
-
-	// And we add crossover calculations.
-	compute_crossovers(color, ib + net::METRICS_CONTACT + net::METRICS_PIP +
-					   net::METRICS_HIT_V3 + net::METRICS_HIT_V3);
-}
-
-void net::compute_v3_inputs(const color_t color, float *ib)
-{
-	// The first two are the same as net_v2.
-	compute_contact(color, ib);
-	compute_pip(color, ib + net::METRICS_CONTACT);
-
-	// Here we represent the hit danger and hit attack differently.
-
-	compute_hit_danger_v3(color, ib + net::METRICS_CONTACT + net::METRICS_PIP);
-	compute_hit_danger_v3(opponentOf(color), ib + net::METRICS_CONTACT +
-						  net::METRICS_PIP + net::METRICS_HIT_V3);
-}
 
 const char *net::checker_names_self[] = {
 	"off",
