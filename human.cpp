@@ -103,7 +103,7 @@ void HumanPlayer::getUserBoard(board& bd)
 	console << "You roll " << bd.d1() << " and " << bd.d2() << "> ";
 
 	char userString[80];
-	fgets(userString, sizeof(userString), stdin);
+	char  *ignore = fgets(userString, sizeof(userString), stdin);
 
 	board newBoard;
 	parseUserMove(bd, newBoard, userString);

@@ -5,6 +5,20 @@
 
 #include <math.h>
 
+
+#define delta_equity_to_delta_net(de) (float)( (de)/ (MAX_EQUITY * 2.0f) )
+
+#ifndef MAX_EQUITY
+#define MAX_EQUITY 3.0f
+#endif
+
+
+static const __m128 maxx = _mm_set1_ps(87);
+static const __m128 minx = _mm_set1_ps(-87);
+static const __m128 one = _mm_set_ss(1);
+static const __m128 c = _mm_set_ss(-8388608/0.6931471806);
+static const __m128 b = _mm_set_ss(1065353216);
+
 class net {
         public:
                 static net *read_network(const char *fn);
@@ -29,6 +43,12 @@ class net {
 
 
 	protected:
+		
+		static float net_to_equity(float n)
+		{
+		  return (MAX_EQUITY * 2.0f) * n - MAX_EQUITY;
+		}
+
                 float neuralFeed();
                 virtual void compute_input(const color_t color, float *inbuf);
 
@@ -55,8 +75,46 @@ class net {
                 static void must_have(int ntype, int inputs, int mustval);
                 static void check_input_value(int ntype, int inputs);
 
-                template <class Ftn> inline static void applyToNetworks(const net *p1, const net *p2, Ftn f);
-                template<class Ftn>  inline void applyFunction(Ftn f);
+		template <class Ftn> static void applyToNetworks(const net *p1, const net *p2, Ftn f)
+		{
+		  const int n_hidden = p1->n_hidden;
+		  const int n_inputs = p1->n_inputs;
+		  int i, j;
+	
+		  for (i = 0; i < n_hidden; i++){
+		    float *d = p1->weights_1[i];
+		    float *a = p2->weights_1[i];
+
+		    for (j = 0; j < n_inputs; j++)
+		      f( d[j], a[j] );
+		  }
+
+		  float *d = p1->weights_2;
+		  float *a = p2->weights_2;
+		  for (i = 0; i < n_hidden; i++)
+		    f(d[i], a[i]);
+		}
+
+		/*
+		 * This takes a routine or function object to apply to each weight
+		 * of the network.  The routine or function object is passed a
+		 * pointer to the weight.  Depending on what is passed in, we can
+		 * randomly initialize the network, read the network from a file,
+		 * clear the network, or write the network to a file.
+		 */
+		template<class Ftn> void applyFunction(Ftn f)
+		{
+		  int i, j;
+
+		  for (i = 0; i < n_hidden; i++){
+		    for (j = 0; j < n_inputs; j++)
+		      f( weights_1[i][j] );
+		  }
+		  for (i = 0; i < n_hidden; i++)
+		    f( weights_2[i] );
+		}
+
+
 
 
 		float *inbuf;			// n_inputs
@@ -99,7 +157,40 @@ class net {
 	protected:
 		void learn(float pNew, float pOld);
 		void copy_to_transpose();
-		float feedForward();
+
+
+
+		static inline float squash_sse(const float x)
+		{
+#if 0
+		  return (float) (1 / (1 + expf(-x)) );
+#else
+		  const __m128 y = _mm_max_ss(minx, _mm_min_ss(maxx, _mm_set_ss(x))); // clamp to [-87,87]
+		  const __m128 z = _mm_add_ss(_mm_mul_ss(y, c), b);
+		  const __m128i i = _mm_cvtps_epi32(z);
+		  const float r = _mm_cvtss_f32(_mm_rcp_ss(_mm_add_ss(_mm_load_ps((const float *)&i), one)));
+		  // assert(std::abs(1/(1+std::exp(-x)) - r) < 1.48e-2);  // minimum accuracy on floats is 1.48e-2
+		  return r;
+#endif
+		}
+
+
+		/*
+		 * Have the network evaluate its input.
+		 */
+		float feedForward()
+		{
+		  for (int i = 0; i < n_hidden; i++)
+		    pre_hidden[i] = dot_product(input, weights_1[i], n_inputs);
+
+		  for (int i = 0; i < n_hidden; i++)
+		    hidden[i] = squash_sse(pre_hidden[i]);
+
+		  output = squash_sse(dot_product(hidden, weights_2, n_hidden));
+		  return net_to_equity(output);
+		}
+
+
 		void accumGradient();
 		void calcGradient(net *g);
 		void clearNetwork();
@@ -250,13 +341,8 @@ struct net_v4 : public net {
 };
 
 
-#ifndef MAX_EQUITY
-#define MAX_EQUITY 3.0f
-#endif
 
 
-#define net_to_equity(n) ((float)( (MAX_EQUITY * 2.0f)*(n) - (MAX_EQUITY * 1.0f) ))
-#define delta_equity_to_delta_net(de) (float)( (de)/ (MAX_EQUITY * 2.0f) )
 
 
 

@@ -99,5 +99,5 @@ void randomize_seed()
 
 float random_float(float f)
 {
-	return f * (2.0 * (random_float() - 0.5));
+	return f * (2.0f * (random_float() - 0.5f));
 }
