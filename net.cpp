@@ -187,33 +187,6 @@ void net::compute_v3_inputs(const color_t color, float *ib)
 						  net::METRICS_PIP + net::METRICS_HIT_V3);
 }
 
-void net_v4::compute_input(const color_t color, float *inbuf)
-{
-	compute_input_for(color, inbuf);
-	compute_input_for(opponentOf(color), inbuf + net::N_CHECK);
-	compute_v4_inputs(color, inbuf + (2 * net::N_CHECK) );
-}
-
-void net_v3::compute_input(const color_t color, float *inbuf)
-{
-	compute_input_for(color, inbuf);
-	compute_input_for(opponentOf(color), inbuf + net::N_CHECK);
-	compute_v3_inputs(color, inbuf + (2 * net::N_CHECK) );
-}
-
-void net_v2::compute_input(const color_t color, float *inbuf)
-{
-	compute_input_for(color, inbuf);
-	compute_input_for(opponentOf(color), inbuf + net::N_CHECK);
-	compute_v2_inputs(color, inbuf + (2 * net::N_CHECK) );
-}
-
-void net_v1::compute_input(const color_t color, float *inbuf)
-{
-	compute_input_for(color, inbuf);
-	compute_input_for(opponentOf(color), inbuf + net::N_CHECK);
-}
-
 void net::compute_input(const color_t color, float *inbuf)
 {
 	fatal( "compute_input() on illegal net.");
@@ -308,47 +281,6 @@ const char *net_v4::v4_names[] = {
 	"X-Ahead"
 };
 
-const char *net_v4::input_name(int n)
-{
-	if (n < N_CHECK)
-		return checker_names_self[n];
-	n -= N_CHECK;
-	if (n < N_CHECK)
-		return checker_names_other[n];
-	n -= N_CHECK;
-	return v4_names[n];
-}
-
-const char *net_v3::input_name(int n)
-{
-	if (n < N_CHECK)
-		return checker_names_self[n];
-	n -= N_CHECK;
-	if (n < N_CHECK)
-		return checker_names_other[n];
-	n -= N_CHECK;
-	return v3_names[n];
-}
-
-const char *net_v2::input_name(int n)
-{
-	if (n < N_CHECK)
-		return checker_names_self[n];
-	n -= N_CHECK;
-	if (n < N_CHECK)
-		return checker_names_other[n];
-	n -= N_CHECK;
-	return v2_names[n];
-}
-
-const char *net_v1::input_name(int n)
-{
-	if (n < N_CHECK)
-		return checker_names_self[n];
-	n -= N_CHECK;
-	return checker_names_other[n];
-}
-
 const char *net::input_name(int n)
 {
 	fatal("input_name() on illegal net.");
@@ -377,30 +309,6 @@ net::net(int nhidden, int ninputs)
 
 	we_learn = 0;
 	games_trained = 0;
-}
-
-net_v1::net_v1(int nhidden)  : net(nhidden, inputsForV1)
-{
-	console << "allocating net_v1 with " << nhidden << " hidden nodes.\n";
-	n_type = 1;
-}
-
-net_v2::net_v2(int nhidden)  : net(nhidden, inputsForV2)
-{
-	console << "allocating net_v2 with " << nhidden << " hidden nodes.\n";
-	n_type = 2;
-}
-
-net_v3::net_v3(int nhidden)  : net(nhidden, inputsForV3)
-{
-	console << "net_v3(hidden=" << nhidden << ")\n";
-	n_type = 3;
-}
-
-net_v4::net_v4(int nhidden)  : net(nhidden, inputsForV4)
-{
-	console << "net_v4(hidden=" << nhidden << ")\n";
-	n_type = 4;
 }
 
 net::net() : n_hidden(0), n_inputs(0), we_learn(0)
