@@ -17,69 +17,6 @@
 
 #include "console.h"
 
-
-
-/*
- * Encode the board as the network input.
- * 
- * The input can be divided into three types:
- *	1. Functions of our checker configuration. (N_CHECK inputs)
- *	2. Functions of the opponent's checker configuration. (N_CHECK)
- *	3. Functions of the relationship of the two checker positions. 
- * 
- */
-
-void net::compute_input_for(const color_t color, float *ib)
-{
-	int i, n;
-
-	*ib++ = (float) netboard.checkersOnPoint(color, 0);		/* borne off */
-
-	for (i = 1; i <= 24; i++){
-		n = netboard.checkersOnPoint(color, i);
-		*ib++ = (float) (n == 1);			/* blot     */
-		*ib++ = (float) (n >= 2);			/* point    */
-		*ib++ =	(float) ( (n > 2) ? (n - 2) : 0 );	/* builders */
-	}
-	*ib = (float) netboard.checkersOnBar(color);			/* on bar   */
-}
-
-void net::compute_contact(const color_t color, float *ib)
-{
-	int me = netboard.highestChecker(color);
-	int him = opponentPoint(netboard.highestChecker(opponentOf(color)));
-	int contact = me - him;
-	float f = contact < 0.0f ? 0.0f : (contact / 23.0f);
-
-	*ib++ = f;
-	*ib++ = (1.0f - f);
-}
-
-void net::compute_pip(const color_t color, float *ib)
-{
-	int pdiff = netboard.pipCount(opponentOf(color)) - netboard.pipCount(color);
-
-	ib[0] = squash_sse( ((float) pdiff) / 27.0f);
-	ib[1] = 1.0f - ib[0];
-}
-
-void net::compute_hit_danger(const color_t color, float *ib)
-{
-	int i, h = num_hits(color, netboard);
-	int whole = (h * net::METRICS_HIT) / 36;
-	int partial = h % (36 / net::METRICS_HIT);
-
-	for (i = 0; i < whole; i++){
-		*ib++ = 1.0f;
-	}
-	if (partial){
-		*ib++ = partial * (net::METRICS_HIT / 36.0f);
-		i++;
-	}
-	for (; i < net::METRICS_HIT; i++)
-		*ib++ = 0;
-}
-
 void net::compute_hit_danger_v3(const color_t color, float *ib)
 {
 	float h = ((float) num_hits(color, netboard)) / 36.0f;
@@ -120,8 +57,6 @@ void net::compute_crossovers(const color_t color, float *ib)
 	ib[3] = 1.0f - ib[2];
 }
 
-
-
 void net::compute_v4_inputs(const color_t color, float *ib)
 {
 	// The first two are the same as net_v2.
@@ -151,11 +86,6 @@ void net::compute_v3_inputs(const color_t color, float *ib)
 	compute_hit_danger_v3(color, ib + net::METRICS_CONTACT + net::METRICS_PIP);
 	compute_hit_danger_v3(opponentOf(color), ib + net::METRICS_CONTACT +
 						  net::METRICS_PIP + net::METRICS_HIT_V3);
-}
-
-void net::compute_input(const color_t color, float *inbuf)
-{
-	fatal( "compute_input() on illegal net.");
 }
 
 const char *net::checker_names_self[] = {
@@ -252,102 +182,6 @@ const char *net::input_name(int n)
 	fatal("input_name() on illegal net.");
 	return "";
 }
-
-net::net(int nhidden, int ninputs)
-	: n_hidden(nhidden), n_inputs(ninputs)
-{
-	acc_grad = 0;
-	delta = 0;
-	grad = 0;
-	int i;
-
-	for (i = 0; i < n_hidden; i++)
- 		weights_1[i] = new float[n_inputs];
- 	inbuf = new float[n_inputs];
- 	input = new float[n_inputs];
-
-	for (i = 0; i < n_inputs; i++)
-		input[i] = 0.0f;
-
- 	hidden = new float[n_hidden];
- 	pre_hidden = new float[n_hidden];
- 	weights_2 = new float[n_hidden];
-
-	we_learn = 0;
-	games_trained = 0;
-}
-
-net::net() : n_hidden(0), n_inputs(0), we_learn(0)
-{
-	games_trained = 0L;
-}
-
-net::~net()
-{
-	if (n_hidden == 0)
-		return;
-
-	delete[ ] inbuf;
-	delete[ ] input;
-
- 	delete[ ] hidden;
- 	delete[ ] weights_2;
-
- 	delete[ ] pre_hidden;
-
-	for (int i = 0; i < n_hidden; i++)
- 		delete [ ] weights_1[i];
-}
-
-float net::neuralFeed()
-{
-	int i, j;
-	float f, d;
-
-// getting close to as fast as the specialized one if I play with the
-// compiler switches.  -mtune=barcelona under gcc works well when
-// using full calc.  Similar performance is obtained by using
-// and sse-specfic dot product, for example the ones provided
-// by gnu-radio.  But our optimized calc still does better.
-//#define FULL_CALC
-#ifdef FULL_CALC
-	for (i = 0; i < n_inputs ; i++)
-		input[i] = inbuf[i];
-	float r =  feedForward();
-	return r;
-#else
-
-	for (i = 0; i < n_inputs ; i++){
-		if (input[i] == inbuf[i])
-			continue;
-
-		d = inbuf[i] - input[i] ;
-		input[i] = inbuf[i];
-
-		for (j = 0; j < n_hidden; j++)
-			pre_hidden[j] += d * weights_1[j][i];
-
-	}
-	for (j = 0; j < n_hidden; j++)
-		hidden[j] = squash_sse(pre_hidden[j]);
-
-	f = dot_product(hidden, weights_2, n_hidden);
-
-	output = squash_sse(f);
-	return net_to_equity(output);
-#endif
-}
-
-/* Apply the current backgammon board to the input,
- * and compute the net's output.
- */
-float net::feedBoard(const board &b)
-{
-	netboard = b;
-	compute_input(b.colorOnRoll(), inbuf);
-	return neuralFeed();
-}
-
 
 /*
  * For each weight, compute the partial derivate of the output
