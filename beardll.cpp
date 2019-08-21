@@ -17,7 +17,7 @@ int cmp_bearoff(const void *key, const void *elem)
 }
 
 const int bsize = 54264;
-extern struct bear_off bear_off[];
+extern struct bear_off bear_off[bsize];
 
 int board_to_index(unsigned long b)
 {

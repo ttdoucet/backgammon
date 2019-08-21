@@ -1,59 +1,23 @@
+#include <algorithm>
 #include <stdio.h>
-#include <ctype.h>
-#include <stdlib.h>
-
-#include "console.h"
-
 
 #include "board.h"
-//#include "play.h"
 #include "move.h"
-
 #include "bearoff.h"
 
 struct bear_off bear_off[54264];
 const int bsize = 54264;
+
 int p_output;
-
 int perm_data[10];
-
-board b;
-
-
-extern "C" {
-    int cmp_bearoff(const void *key, const void *elem)
-    {
-        unsigned int left =  * ((unsigned int *) key);
-        unsigned int right = ((struct bear_off *) elem) ->board;
-
-        //  printf("comparing %lx to %lx\n", left, right);
-
-        if (left > right)
-            return 1;
-        else if (left < right)
-            return -1;
-        else
-            return 0;
-    }
-}
 
 int board_to_index(unsigned int b)
 {
-    struct bear_off *bp = (struct bear_off *) bsearch(&b,
-                                                      bear_off,
-                                                      bsize,
-                                                      sizeof(struct bear_off),
-                                                      cmp_bearoff);
+    auto comparison = [](struct bear_off &lhs, unsigned int val) { return lhs.board < val; };
 
-    if (bp == NULL){
-        fprintf(stderr,"error in find_board_expectation(), b=%x\n", b);
-        fflush(stderr);
-        exit(1);
-    }
-    return bp - bear_off;
+    struct bear_off *i = std::lower_bound(bear_off, bear_off + bsize, b, comparison);
+    return i - bear_off;
 }
-
-
 
 /* Return the probability that the bearoff position denoted
    by "b" will be cleared in n or fewer rolls.
@@ -66,27 +30,23 @@ double fewerEq(unsigned int b, int n)
         int i = board_to_index(b);
         return bear_off[i].f[n-1];
     }
-                
 }
-
 
 void print_bearoffs()
 {
     printf("struct bear_off bear_off[%d] = {\n", p_output);
-    for (int i = 0; i < p_output; i++){
+    for (int i = 0; i < p_output; i++)
+    {
         printf("    { 0x%08x,\t%ff,\t{", bear_off[i].board, bear_off[i].expectation);
-        for (int j = 0; j < 15; j++){
+        for (int j = 0; j < 15; j++)
             printf("%ff, ", bear_off[i].f[j]);
-        }
         printf("} },\n");
     }
-
     printf("};\n");
 }
 
 // Encode the current board as a 32-bit number (current, we
-// use 24 bits, although 4 are redundant.
-
+// use 28 bits, although 4 are redundant.
 unsigned int board_to_32(const board &b, color_t c)
 {
     unsigned int d6 = b.checkersOnPoint(c, 6) << (4 * 6);
@@ -99,20 +59,17 @@ unsigned int board_to_32(const board &b, color_t c)
     return d0 | d1 | d2 | d3 | d4 | d5 | d6;
 }
 
-
-static int extract_point(unsigned int b, int point)
+int extract_point(unsigned int b, int point)
 {
     int shift = (4 * point);
     unsigned int mask = (0x0fL << shift);
     return (b & mask) >> shift ;
 }
 
-
 void board_from_32(board &board, unsigned int b, color_t color)
 {
     board.clearBoard();
     for (int i = 0; i <= 6; i++){
-//        board.place(color, i, extract_point(b, i));
         int num = extract_point(b, i);
         for (int j = 0; j < num; j++){
             board.moveChecker(color, 0, i);
@@ -120,26 +77,20 @@ void board_from_32(board &board, unsigned int b, color_t color)
     }
 }
 
-
 void perm_output()
 {
-
     if ( (p_output % 1000) == 0 )
         fprintf(stderr, "p_output=%d\n", p_output); fflush(stderr);
 
+    board b;
     b.clearBoard();
     for (int i = 0; i <= 6; i++){
-//        b.place(white, i, perm_data[i]);
         for (int j = 0; j < perm_data[i]; j++)
             b.moveChecker(white, 0, i);
     }
 
     int l = board_to_32(b, white);
     bear_off[p_output].board = board_to_32(b, white);
-//      bear_off[p_output].expectation = -10.0F;
-
-//      printf("bear_off[%d].board = 0x%lx\n", p_output, bear_off[p_output].board);
-
     p_output++;
 }
 
@@ -165,9 +116,8 @@ float bearoffExpectation(unsigned int b)
     return bear_off[board_to_index(b)].expectation;
 }
 
-
-
-class bearoffCallBack  : public callBack {
+class bearoffCallBack  : public callBack
+{
 public:
     float best;
     unsigned int bestBoard;
@@ -184,9 +134,7 @@ public:
     bearoffCallBack(){
         best = 100.0F;
     }
-
 };
-
 
 // Given the current board and the roll i-j, return the
 // expected number of moves to bearoff of the best legal move.
@@ -195,11 +143,9 @@ float best_expectation_for(board b, int i, int j)
     bearoffCallBack cb;
     b.setRoller(white);
     b.setDice(i, j);
-//      b.play(cb);
     plays(b, cb);
     return cb.best;
 }
-
 
 // Given the current board and the roll i-j, return the best
 // board position resulting from a legal play.
@@ -210,14 +156,11 @@ unsigned int best_board_for(unsigned int theBoard, int i, int j)
     bearoffCallBack cb;
     b.setRoller(white);
     b.setDice(i, j);
-//      b.play(cb);
     plays(b, cb);
     return cb.bestBoard;
 }
 
-
 // Assumes that calc_fewer(i), i < n has been called.
-
 void calc_fewer(int n)
 {
     fprintf(stderr, "Calculating fewer(%d)\n", n); fflush(stderr);
@@ -240,8 +183,6 @@ void calc_fewer(int n)
     }
 }
 
-
-
 double compute_expectation(unsigned int bd)
 {
     board b;
@@ -261,7 +202,6 @@ double compute_expectation(unsigned int bd)
     double r = (e / 36.0) + 1.0;
     return r;
 }
-
 
 void calc_expectation()
 {
@@ -303,4 +243,3 @@ int main()
     print_bearoffs();
     return 0;
 }
-
