@@ -342,28 +342,31 @@ public:
 
 void net::dump_network(const char *fn, int portable)
 {
-		FILE *netfp;
+    FILE *netfp;
 
-		if ( (netfp = fopen(fn, "wb")) == NULL)
-				fatal(std::string("Cannot open file ") + fn + " for writing.");
+    if ( (netfp = fopen(fn, "wb")) == NULL)
+        fatal(std::string("Cannot open file ") + fn + " for writing.");
 
-		fprintf(netfp, "portable format: %d\n", portable);
-		fprintf(netfp, "net type: %d\n", n_type);
-		fprintf(netfp, "hidden nodes: %d\n", n_hidden);
-		fprintf(netfp, "input nodes: %d\n", n_inputs);
+    fprintf(netfp, "portable format: %d\n", portable);
+    fprintf(netfp, "net type: %d\n", n_type);
+    fprintf(netfp, "hidden nodes: %d\n", n_hidden);
+    fprintf(netfp, "input nodes: %d\n", n_inputs);
 
-		applyFunction(fSave(netfp, portable));
+    applyFunction(fSave(netfp, portable));
 
-		fprintf(netfp, "Current seed: %ldL\n", current_seed());
-		fprintf(netfp, "Games trained: %ldL\n", games_trained);
+    fprintf(netfp, "Current seed: %ldL\n", current_seed());
+    fprintf(netfp, "Games trained: %ldL\n", games_trained);
 
-		fclose(netfp);
+    fclose(netfp);
 }
 
 void net::must_have(int ntype, int inputs, int mustval)
 {
-	if (inputs != mustval)
-			fatal(std::string("net type ") + Str(ntype) + " must have " + Str(mustval) + " inputs, but has " + Str(inputs) + " instead");
+    if (inputs != mustval){
+        std::ostringstream s;
+        s << "net type " << ntype << " must have " << mustval << " inputs, but has " << inputs << " instead";
+        fatal(s.str());
+    }
 }
 
 void net::check_input_value(int ntype, int inputs)
@@ -382,7 +385,7 @@ void net::check_input_value(int ntype, int inputs)
 			must_have(ntype, inputs, net::inputsForV4);
 			break;
 		default:
-			fatal(std::string("invalid net type: ") + Str(ntype) );
+			fatal(std::string("invalid net type: ") + std::to_string(ntype) );
 	}
 }
 
@@ -429,7 +432,7 @@ net *net::read_network(const char *fn)
 
 	ignore = fscanf(netfp, " hidden nodes: %d\n", &hidden);
 	if (hidden > net::max_hidden)
-		fatal(std::string("Too many hidden nodes: ") + Str(hidden));
+		fatal(std::string("Too many hidden nodes: ") + std::to_string(hidden));
 
 	int inputs = net::inputsForV2;
 
@@ -439,7 +442,7 @@ net *net::read_network(const char *fn)
 		ignore = fscanf(netfp, "%c", &throwAway);
 	}
 	if (throwAway != '\n')
-		fatal(std::string("Expected newline, got ") + Str(throwAway));
+		fatal(std::string("Expected newline, got ") + std::to_string(throwAway));
 
 	cout << "inputs=" << inputs << endl;
 
@@ -461,7 +464,7 @@ net *net::read_network(const char *fn)
 	case 3: p = new net_v3(hidden); break;
 	case 4: p = new net_v4(hidden); break;
 	default:
-		fatal(std::string("Unknown net type: ") + Str(ntype));
+		fatal(std::string("Unknown net type: ") + std::to_string(ntype));
 	}
 	p->filename = fn;
 //      net::applyToNetwork(p, fRead(netfp, portable));

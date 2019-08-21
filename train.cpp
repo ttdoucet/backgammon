@@ -129,7 +129,7 @@ void cmdline(int argc, char *argv[])
 void setupRNG()
 {
 	if (explicitSeed == true){
-		debug_console << "RNG using user-specified seed: " << user_seed << "\n";
+		console << "RNG using user-specified seed: " << user_seed << "\n";
 		set_seed(user_seed);
 	} else {
 		randomize_seed();

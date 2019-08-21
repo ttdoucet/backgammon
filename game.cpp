@@ -35,7 +35,7 @@ class AnnotatedGame : public Game
 	{
 		std::string s;
 		moveStr(s, mv);
-		console << board::colorname(b.colorOnRoll()) << " rolls " << bd.d1() << " " <<  bd.d2() << " and moves " << s << std::endl;
+		console << board::colorname(b.colorOnRoll()) << " rolls " << bd.d1() << " " <<  bd.d2() << " and moves " << s << '\n';
 	}
 };
 
