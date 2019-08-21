@@ -20,16 +20,16 @@ static unsigned long seed;
 
 static unsigned long mult(unsigned long p, unsigned long q)
 {
-	unsigned long p1, p0, q1, q0;
-	p1 = p/M1; p0 = p%M1;
-  	q1 =q/M1; q0 = q%M1;
-	return ( ((p0*q1 + p1*q0) % M1) * M1  + p0 * q0) % M;
+    unsigned long p1, p0, q1, q0;
+    p1 = p/M1; p0 = p%M1;
+    q1 =q/M1; q0 = q%M1;
+    return ( ((p0*q1 + p1*q0) % M1) * M1  + p0 * q0) % M;
 }
 
 unsigned long l_random()
 {
-	seed = (mult(seed,B) + 1) % M;
-	return seed;
+    seed = (mult(seed,B) + 1) % M;
+    return seed;
 }
 
 
@@ -41,8 +41,8 @@ unsigned long l_random()
 
 int random(int n)
 {
-	seed = (mult(seed,B) + 1) % M;
-	return (int) ( ((seed/M1) * n) / M1);
+    seed = (mult(seed,B) + 1) % M;
+    return (int) ( ((seed/M1) * n) / M1);
 }
 
 
@@ -51,12 +51,12 @@ int random(int n)
 
 void set_seed(unsigned long s)
 {
-	seed = s;
+    seed = s;
 }
 
 unsigned long current_seed()
 {
-	return seed;
+    return seed;
 }
 
 
@@ -66,22 +66,22 @@ unsigned long current_seed()
 
 int throw_die()
 {
-	return random(6) + 1;
+    return random(6) + 1;
 }
 
 int random_bit()
 {
-	return l_random() < (M / 2);
+    return l_random() < (M / 2);
 }
 
-	// This returns a float in the range [0.0, 1.0).
+// This returns a float in the range [0.0, 1.0).
 float random_float()
 {
-	double total = 0.0;
-	for (int i = 0; i < 23; i++){
-		total = (random_bit() + total) / 2.0;
-	}
-	return (float) total;
+    double total = 0.0;
+    for (int i = 0; i < 23; i++){
+        total = (random_bit() + total) / 2.0;
+    }
+    return (float) total;
 }
 
 //#include <stdio.h>
@@ -99,5 +99,5 @@ void randomize_seed()
 
 float random_float(float f)
 {
-	return f * (2.0f * (random_float() - 0.5f));
+    return f * (2.0f * (random_float() - 0.5f));
 }
