@@ -2,11 +2,6 @@
  * Copyright (C) 1993 by Todd Doucet.  All Rights Reserved.
  */
 
-#include <stdio.h>
-#include <ctype.h>
-#include <math.h>
-#include <stdlib.h>
-#include <assert.h>
 #include <string.h>
 #include <sstream>
 
@@ -14,7 +9,6 @@
 #include "net.h"
 #include "hits.h"
 #include "random.h"
-
 #include "console.h"
 
 void net::compute_hit_danger_v3(const color_t color, float *ib)
@@ -58,7 +52,8 @@ void net::compute_crossovers(const color_t color, float *ib)
 }
 
 
-const char *net::checker_names_self[] = {
+const char *net::checker_names_self[] =
+{
     "off",
     "1-blot", "1-point", "1-build",
     "2-blot", "2-point", "2-build",
@@ -87,7 +82,8 @@ const char *net::checker_names_self[] = {
     "bar"
 };
 
-const char *net::checker_names_other[] = {
+const char *net::checker_names_other[] =
+{
     "opp-off",
     "opp-1-blot", "opp-1-point", "opp-1-build",
     "opp-2-blot", "opp-2-point", "opp-2-build",
@@ -116,7 +112,8 @@ const char *net::checker_names_other[] = {
     "opp-bar",
 };
 
-const char *net_v2::v2_names[] = {
+const char *net_v2::v2_names[] =
+{
     "Not-Broken", "Broken",
     "Pip-Ahead", "Pip-Behind",
 
@@ -127,7 +124,8 @@ const char *net_v2::v2_names[] = {
     "Hit-Attk-5", "Hit-Attk-6", "Hit-Attk-7", "Hit-Attk-8",
 };
 
-const char *net_v3::v3_names[] = {
+const char *net_v3::v3_names[] =
+{
     "Not-Broken", "Broken",
     "Pip-Ahead", "Pip-Behind",
 
@@ -135,7 +133,8 @@ const char *net_v3::v3_names[] = {
     "Hit-Attk", "!Hit-Attk"
 };
 
-const char *net_v4::v4_names[] = {
+const char *net_v4::v4_names[] =
+{
     "Not-Broken", "Broken",
     "Pip-Ahead", "Pip-Behind",
 
@@ -167,11 +166,11 @@ void net::calcGradient(net *g)
     float oprime, hprime;
 
     oprime = output * (1 - output) ;
-    for (i = 0; i < n_hidden; i++){
+    for (i = 0; i < n_hidden; i++)
         g->weights_2[i] = oprime * hidden[i];
-    }
 
-    for (i = 0; i < n_hidden; i++){
+    for (i = 0; i < n_hidden; i++)
+    {
         hprime = hidden[i] * (1 - hidden[i]) ;
         float product = hprime * oprime * weights_2[i];
         float *p = g->weights_1[i];
@@ -187,9 +186,8 @@ void net::calcGradient(net *g)
     float oprime, hprime;
 
     oprime = output * (1 - output) ;
-    for (i = 0; i < n_hidden; i++){
+    for (i = 0; i < n_hidden; i++)
         g->weights_2[i] = oprime * hidden[i];
-    }
 
 // Why not eliminate the hprime * oprime calculations
 // by computing hprime*oprime in the first place?
@@ -199,7 +197,8 @@ void net::calcGradient(net *g)
 // each i-loop (although the compiler might already
 // be doing this.  Take a look.
 
-    for (i = 0; i < n_hidden; i++){
+    for (i = 0; i < n_hidden; i++)
+    {
         hprime = hidden[i] * (1 - hidden[i]) ;
         for (j = 0; j < n_inputs; j++)
             g->weights_1[i][j] = hprime * oprime *
@@ -222,7 +221,8 @@ void net::init_learning(float a, float l)
 {
     if (we_learn == 0)
         return;
-    if (acc_grad == 0){
+    if (acc_grad == 0)
+    {
         acc_grad = new net(n_hidden, n_inputs);
         delta = new net(n_hidden, n_inputs);
         delta->clearNetwork();
@@ -280,7 +280,8 @@ class fAccum
 public:
     const float lambda;
     fAccum(float L) : lambda(L) {}
-    void operator() (float &ag, float &g) const {
+    void operator() (float &ag, float &g) const
+    {
         ag = (lambda * ag) + g;
     }
 };
@@ -290,9 +291,7 @@ void net::accumGradient()
     calcGradient(grad);
     // for each weight in acc_grad, w
     // acc_grad.w = (lambda * acc_grad.w) + grad.w
-
     applyToNetworks(acc_grad, grad, fAccum(lambda));
-
 }
 
 // this is really the same as fLearn.
@@ -301,7 +300,8 @@ class fUpdate
 public:
     const float alpha;
     fUpdate(float A) : alpha(A) {}
-    void operator() (float &n, float &d) const {
+    void operator() (float &n, float &d) const
+    {
         n += alpha * d;
     }
 };
@@ -333,11 +333,15 @@ public:
 
     fSave(FILE *fp, int p) : netfp(fp), portable(p){}
 
-    void operator() (float &f) const {
-        if (portable){
+    void operator() (float &f) const
+    {
+        if (portable)
+        {
             if (fprintf(netfp, "%.12f\n", (double) f) <= 0)
                 fatal( "Error writing to network file.");
-        } else {    // nonportable format saves all the bits in intel float format
+        }
+        else
+        {    // nonportable format saves all the bits in intel float format
             if (fwrite(&f, sizeof(f), 1, netfp) != 1)
                 fatal("Error writing to network file.");
         }
@@ -366,7 +370,8 @@ void net::dump_network(const char *fn, int portable)
 
 void net::must_have(int ntype, int inputs, int mustval)
 {
-    if (inputs != mustval){
+    if (inputs != mustval)
+    {
         std::ostringstream s;
         s << "net type " << ntype << " must have " << mustval << " inputs, but has " << inputs << " instead";
         fatal(s.str());
@@ -399,11 +404,15 @@ public:
     FILE *netfp;
     int portable;
     fRead(FILE *fp, int p) : netfp(fp), portable(p){}
-    void operator() (float &f) const {
-        if (portable){
+    void operator() (float &f) const
+    {
+        if (portable)
+        {
             if (fscanf(netfp, "%f", &f) == 0)
                 fatal("Error reading network file.");
-        } else {
+        }
+        else
+        {
             if (fread(&f, 1, sizeof(f), netfp) != sizeof(f))
                 fatal("Error reading network file.");
         }
@@ -430,7 +439,6 @@ net *net::read_network(const char *fn)
     int ignore = fscanf(netfp, " portable format: %d\n", &portable);
     cout << "portable format: " << (portable ? "yes" : "no") << "\n";
 
-
     int ntype = 0;
     // If ntype remains zero, then we have a really old-style net file.
     ignore = fscanf(netfp, " net type: %d\n", &ntype);
@@ -443,15 +451,16 @@ net *net::read_network(const char *fn)
 
     char throwAway;
     ignore = fscanf(netfp, " input nodes: %d%c", &inputs, &throwAway);
-    if (throwAway == '\r'){
+    if (throwAway == '\r')
         ignore = fscanf(netfp, "%c", &throwAway);
-    }
+
     if (throwAway != '\n')
         fatal(std::string("Expected newline, got ") + std::to_string(throwAway));
 
     cout << "inputs=" << inputs << endl;
 
-    if (ntype == 0){  // We have an old-style net file.
+    if (ntype == 0)
+    {  // We have an old-style net file.
         if (inputs == net::inputsForV2)
             ntype = 2;
         else
@@ -462,7 +471,8 @@ net *net::read_network(const char *fn)
     check_input_value(ntype, inputs);
 
     net *p;
-    switch (ntype){
+    switch (ntype)
+    {
     case 1: p = new net_v1(hidden); break;
     case 2: p = new net_v2(hidden); break;
     case 3: p = new net_v3(hidden); break;
@@ -501,7 +511,8 @@ int net::learns()
 
 class clearFtn {
 public:
-    void operator() (float &f) const {
+    void operator() (float &f) const
+    {
         f = 0.0f;
     }
 };
