@@ -252,6 +252,6 @@ int main()
     calc_fewer(14);
     calc_fewer(15);
 
-    std::cout << print_bearoffs();
+    console << print_bearoffs();
     return 0;
 }
