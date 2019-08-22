@@ -10,7 +10,6 @@ NeuralNetPlayer::NeuralNetPlayer(const char *player, const char *netname) : Play
     neural->init_play();
 }
 
-
 void NeuralNetPlayer::prepareToPlay()
 {
     neural->init_play();
@@ -19,13 +18,13 @@ void NeuralNetPlayer::prepareToPlay()
 int NeuralNetPlayer::callBackF(const board &b)
 {
     float e = - (this->*equityEstimator)(b);
-    if (e > bestEquity){
+    if (e > bestEquity)
+    {
         bestEquity = e;
         bestMove = m;   // the current move.
     }
     return 0;
 }
-
 
 // The issue is that play() modifies the board, so is not const, but
 // it puts it back after it is through.  I don't know how to make that
@@ -44,7 +43,6 @@ void NeuralNetPlayer::selectMove(const board &b, move &mv, evalFunction func)
     mv = bestMove;
 }
 
-
 void NeuralNetPlayer::chooseMove(const board& b, move& choice)
 {
     if (isBearingOff(b))
@@ -53,7 +51,6 @@ void NeuralNetPlayer::chooseMove(const board& b, move& choice)
         selectMove(b, choice, &NeuralNetPlayer::littleE);
 }
 
-//
 // Q: Why do we insist that checkers on both sides have
 // actually  been taken off before we return true?
 // Is this required by bearoffEquity()?
@@ -66,10 +63,11 @@ bool NeuralNetPlayer::isBearingOff(const board &bd)
         (bd.highestChecker(black) <= 6);
 }
 
-
-
+//
+// DUPLICATED: make it not so.
+//
 // Encode the bearoff board as a 32-bit number (currently,
-// we use 24 bits, although 4 are redundant.
+// we use 28 bits, although 4 are redundant.
 unsigned long NeuralNetPlayer::board_to_32(const board &b, color_t c)
 {
     unsigned long d6 = b.checkersOnPoint(c, 6) << (4 * 6);
@@ -104,14 +102,13 @@ float NeuralNetPlayer::littleE(const board &bd)
     return  neural->feedBoard(bd);
 }
 
-
-
 // winner won the game.  Return the equity counting gammons & backgammons.
 int NeuralNetPlayer::gammon_check(const board &nb, color_t winner)
 {
     color_t loser = opponentOf(winner);
     int equity = 1;
-    if (nb.checkersOnPoint(loser, 0) == 0){
+    if (nb.checkersOnPoint(loser, 0) == 0)
+    {
         equity++;       // gammon
         if (nb.highestChecker(loser) > 18)
             equity++;       // backgammon
