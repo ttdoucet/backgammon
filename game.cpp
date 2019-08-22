@@ -33,8 +33,7 @@ public:
 protected:
     void reportMove(board bd, move mv)
     {
-        std::string s;
-        moveStr(s, mv);
+        std::string s = moveStr(mv);
         console << board::colorname(b.colorOnRoll()) << " rolls " << bd.d1() << " " <<  bd.d2() << " and moves " << s << '\n';
     }
 };

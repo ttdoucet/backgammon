@@ -1,7 +1,6 @@
 #include <algorithm>
-#include <stdio.h>
+#include <iomanip>
 
-#include "board.h"
 #include "move.h"
 #include "bearoff.h"
 
@@ -32,17 +31,28 @@ double fewerEq(unsigned int b, int n)
     }
 }
 
-void print_bearoffs()
+std::string print_bearoffs()
 {
-    printf("struct bear_off bear_off[%d] = {\n", p_output);
+    using std::hex, std::setfill, std::setw, std::fixed;
+
+    std::ostringstream s;
+    s << "struct bear_off bear_off[" << p_output << "] = {\n";
+
+    s.precision(6);
+    s << fixed << setfill('0');
+
     for (int i = 0; i < p_output; i++)
     {
-        printf("    { 0x%08x,\t%ff,\t{", bear_off[i].board, bear_off[i].expectation);
+        s << "    { 0x" << setw(8) << hex << bear_off[i].board
+          << ",\t" << bear_off[i].expectation << "f,\t{" ;
+
         for (int j = 0; j < 15; j++)
-            printf("%ff, ", bear_off[i].f[j]);
-        printf("} },\n");
+            s << bear_off[i].f[j] << "f, ";
+        s << "} },\n";
     }
-    printf("};\n");
+    s << "};\n";
+
+    return s.str();
 }
 
 // Encode the current board as a 32-bit number (current, we
@@ -80,7 +90,7 @@ void board_from_32(board &board, unsigned int b, color_t color)
 void perm_output()
 {
     if ( (p_output % 1000) == 0 )
-        fprintf(stderr, "p_output=%d\n", p_output); fflush(stderr);
+        std::cerr << "p_output=" << p_output << "\n";
 
     board b;
     b.clearBoard();
@@ -163,12 +173,12 @@ unsigned int best_board_for(unsigned int theBoard, int i, int j)
 // Assumes that calc_fewer(i), i < n has been called.
 void calc_fewer(int n)
 {
-    fprintf(stderr, "Calculating fewer(%d)\n", n); fflush(stderr);
+    std::cerr << "Calculating fewer(" << n << ")\n";
 
     for (int k = 0; k < p_output; k++){
-        if ( (k % 1000) == 0){
-            fprintf(stderr, "fewer(%d): %d\n", n, k); fflush(stderr);
-        }
+        if ( (k % 1000) == 0)
+            std::cerr << "fewer(" << n << "): " << k << "\n";
+
         unsigned int from = bear_off[k].board;
         double f = 0.0;
         for (int i = 1; i <= 6; i++){
@@ -206,9 +216,9 @@ double compute_expectation(unsigned int bd)
 void calc_expectation()
 {
     for (int i = 0; i < p_output; i++){
-        if ( (i % 1000) == 0){
-            fprintf(stderr, "At %d.\n", i); fflush(stderr);
-        }
+        if ( (i % 1000) == 0)
+            std::cerr << "At " << i << ".\n";
+
         unsigned int b = bear_off[i].board;
         bear_off[i].expectation = (float) compute_expectation(b);
     }
@@ -216,9 +226,11 @@ void calc_expectation()
 
 int main()
 {
+    std::ios_base::sync_with_stdio(false);
+
     p_output = 0;
     perm(6, 15);
-    fprintf(stderr, "p_output = %d\n", p_output); fflush(stderr);
+    std::cerr << "p_output = " << p_output << "\n";
 
     calc_expectation();
 
@@ -240,6 +252,6 @@ int main()
     calc_fewer(14);
     calc_fewer(15);
 
-    print_bearoffs();
+    std::cout << print_bearoffs();
     return 0;
 }

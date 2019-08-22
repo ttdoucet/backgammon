@@ -1,11 +1,11 @@
 /*
- * Copyright (C) 1993, 1997, 2008, 2013 by Todd Doucet.
- All Rights Reserved.
+ * n Copyright (C) 1993, 1997, 2008, 2013 by Todd Doucet.
+ *  All Rights Reserved.
 */
 
-#include <stdio.h>
-#include "move.h"
 #include <assert.h>
+#include <iomanip>
+#include "move.h"
 
 class LegalPlay
 {
@@ -296,39 +296,24 @@ int checkersToPlay(board& b)
     return nullCallB.checkersToPlay;
 }
 
-void moveStr(std::string& str, struct move &mp)
+std::string moveStr(struct move &mp)
 {
-    char move_stringbuf[40];
-    int count = 1;
-    char countstr[5];
-    char buf[40];
-    char *s = move_stringbuf;
-    *s = 0;
-    char *last = s;
-    int printed = 0;
-    for (int i = 0; i < mp.moves; i++) {
-        if (i > 0 && (mp.from[i] == mp.from[i-1]) && (mp.to[i] == mp.to[i-1])){
-            sprintf(countstr, "(%d)", ++count);
-        } else {
-            count = 1;
-        }
-                
-        if (count > 1){
-            s = last;
-            printed--;
-        }
+    std::ostringstream s;
 
-        sprintf(buf, "%s%d/%d%s%s",
-                (printed != 0) ? ", " : " ",
-                mp.from[i], mp.to[i],
-                mp.hit[i - count + 1] ? "*" : "",
-                count > 1 ? countstr : ""
-            );
+    for (int i = 0; i < mp.moves;)
+    {
+        s << (s.str().length() ? ", " : " " );
+        s << mp.from[i] << "/" << mp.to[i];
+        if (mp.hit[i]) s << "*";
+        i++;
 
-        last = s;
-        printed++;
-        s += sprintf(s, "%s", buf);
+        int count = 1;
+        for ( ; (i < mp.moves) && (mp.from[i] == mp.from[i-1]) && (mp.to[i] == mp.to[i-1]); i++)
+            count++;
+        if (count > 1)
+            s << "(" << count << ")";
 
     }
-    str += move_stringbuf;
+    return s.str();
 }
+

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "board.h"
 #include <string>
+#include "board.h"
 
 struct move {
     int from[4];    // move from[i] - to[i], hit iff hit[i] 
@@ -34,14 +34,10 @@ public:
 
 class nullCallBack : public callBack
 {
-    int callBackF(const board &b)
-    {
-        return 0;
-    }
+    int callBackF(const board &b) { return 0; }
 };
 
-
-void moveStr(std::string& str, struct move &mp);
+std::string moveStr(struct move &mp);
 
 int plays(const board& b, callBack& callB);
 void applyMove(board& b,const move &m);
