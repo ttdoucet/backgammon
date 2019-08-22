@@ -2,6 +2,9 @@
  * Copyright (C) 1993, 2008 by Todd Doucet.  All Rights Reserved.
  */
 
+#include "game.h"
+#include "playernet.h"
+#include "human.h"
 #include "console.h"
 
 /*
@@ -21,33 +24,14 @@ void usage()
 int numPlayers;
 const char *player_name[2];
 
-float alpha = 0.02f;
-float lambda = 0.85f;
+float alpha = 0.02f;  // not hooked up
+float lambda = 0.85f; // not hooked up
 int trials = 500;
-int isTraining;
-int isServer = 0;
-int display_moves;
+int isTraining;  // not hooked up
+int display_moves;  // hack
 
 unsigned long user_seed;
 bool explicitSeed = false;
-
-double getFloat(char *s)
-{
-    float d;
-    int i = sscanf(s, "%f", &d);
-    if (i == 0)
-        fatal("error in getFloat()");
-    return d;
-}
-
-double getInt(char *s)
-{
-    int d;
-    int i = sscanf(s, "%d", &d);
-    if (i == 0)
-        fatal("error in getInt()");
-    return d;
-}
 
 void cmdline(int argc, char *argv[])
 {
@@ -59,18 +43,20 @@ void cmdline(int argc, char *argv[])
             switch (argv[i][1])
             {
             case 'n':
-                trials = (int) getInt(argv[i] + 2);
+                trials = std::stoi(argv[i] + 2);
                 break;
             case 'a':
-                alpha = getFloat(argv[i] + 2);
+                alpha = std::stof(argv[i] + 2);
+                console << "alpha: " << alpha << "\n";
                 break;
 
             case 'l':
-                lambda = getFloat(argv[i] + 2);
+                lambda = std::stof(argv[i] + 2);
+                console << "lambda: " << lambda << "\n";
                 break;
 
             case 'S':
-                user_seed = (int) getInt(argv[i] + 2);
+                user_seed = std::stoi(argv[i] + 2);
                 explicitSeed = true;
                 break;
 
@@ -110,9 +96,6 @@ void cmdline(int argc, char *argv[])
  *  Main routine. 
  */
 
-#include "game.h"
-#include "playernet.h"
-#include "human.h"
 
 void setupRNG()
 {
