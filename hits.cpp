@@ -164,13 +164,9 @@ int hitProblem::possibleHit[ ] =
 
 inline void hitProblem::clear_hits()
 {
-#if 1
     for (int i=1; i<=6; i++)
         for (int j=1; j<=6; j++)
             rhits[i][j] = 0;
-#else
-    memset(rhits, 0, sizeof(rhits));
-#endif
     nhits = 0;
 }
 

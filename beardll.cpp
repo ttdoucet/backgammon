@@ -6,8 +6,6 @@ int cmp_bearoff(const void *key, const void *elem)
 	unsigned long left =  * ((unsigned long *) key);
 	unsigned long right = ((struct bear_off *) elem) ->board;
 
-//	printf("comparing %lx to %lx\n", left, right);
-
 	if (left > right)
 		return 1;
 	else if (left < right)

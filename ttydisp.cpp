@@ -72,11 +72,9 @@ void display_board(const board &b, color_t color)
 
     console << "On roll: " << board::colorname(b.colorOnRoll()) << "\n";
 
-    char offstr[40] = {0};
     if (b.checkersOnPoint(white, 0) || b.checkersOnPoint(black, 0))
-        sprintf(offstr, "borne off: w=%d b=%d",
-                b.checkersOnPoint(white, 0),
-                b.checkersOnPoint(black, 0));
-    if (*offstr)
-        console << offstr << "\n";
+    {
+        console << "borne off: w=" << b.checkersOnPoint(white, 0)
+               << " b=" << b.checkersOnPoint(black, 0) << "\n";
+    }
 }
