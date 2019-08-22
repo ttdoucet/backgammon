@@ -10,15 +10,16 @@ struct dice {
     char low, hi;
 };
 
-struct hitProblem
+class hitProblem
 {
+public:
     int num_hits(color_t color);
     hitProblem(const board &b) : bd(b)
     {
         clear_hits();
     }
 
-protected:
+private:
     const board &bd;
     char rhits[7][7];
     char nhits;
@@ -41,7 +42,7 @@ protected:
 /* Color has a checker located at attacker.  Return whether
  * he is blocked from using both dice from that position.
  */
-int hitProblem::blocked(color_t color, int attacker, int low, int hi)
+inline int hitProblem::blocked(color_t color, int attacker, int low, int hi)
 {
     color_t opponent = opponentOf(color);
     return (bd.checkersOnPoint(opponent, opponentPoint(attacker-low)) >= 2) &&
@@ -52,7 +53,7 @@ int hitProblem::blocked(color_t color, int attacker, int low, int hi)
  * he is blocked from using n rolls of r from
  * that position.
  */
-int hitProblem::hops_blocked(color_t color, int attacker, int n, int r)
+inline int hitProblem::hops_blocked(color_t color, int attacker, int n, int r)
 {
     color_t oc = opponentOf(color);
     for (; n; n--)
@@ -65,7 +66,7 @@ int hitProblem::hops_blocked(color_t color, int attacker, int n, int r)
  *  distance away.  Return whether that checker can
  *  hit our blot.
  */
-int hitProblem::can_hit(color_t color, int blot, int distance, char low, char hi)
+inline int hitProblem::can_hit(color_t color, int blot, int distance, char low, char hi)
 {
     color_t oc = opponentOf(color);
     int hit_using, other, men_on_bar = bd.checkersOnBar(oc);
@@ -161,7 +162,7 @@ int hitProblem::possibleHit[ ] =
     0, 0, 15, 16, 0, 18, 0, 20, 0, 0, 0, 24
 };
 
-void hitProblem::clear_hits()
+inline void hitProblem::clear_hits()
 {
 #if 1
     for (int i=1; i<=6; i++)
@@ -173,7 +174,7 @@ void hitProblem::clear_hits()
     nhits = 0;
 }
 
-void hitProblem::record_hit(char low, char hi)
+inline void hitProblem::record_hit(char low, char hi)
 {
     if (rhits[low][hi]++ == 0)
         nhits += (1 + (low != hi)) ;
@@ -183,7 +184,7 @@ void hitProblem::record_hit(char low, char hi)
 /*  We have a blot and an opponent's checker located distance away.
  *  Find all the numbers that hit.
  */
-void hitProblem::find_hits(color_t color, int blot, int distance)
+inline void hitProblem::find_hits(color_t color, int blot, int distance)
 {
     dice *h;
     for (h = hits[distance]; h->low; h++)
@@ -197,7 +198,7 @@ void hitProblem::find_hits(color_t color, int blot, int distance)
 /* Compute how many numbers hit color, given that
  * color's opponent rolls next.
  */
-int hitProblem::num_hits(color_t color)
+inline int hitProblem::num_hits(color_t color)
 {
     int i, j;
 
