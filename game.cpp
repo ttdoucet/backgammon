@@ -1,7 +1,10 @@
+#include <string>
+#include <iostream>
+#include <iomanip>
+
 #include "board.h"
 #include "random.h"
 #include "game.h"
-#include <stdio.h>
 #include "ttydisp.h"
 #include "console.h"
 
@@ -20,10 +23,6 @@
  * global variables.  It obviously could be better done as an object.
  *
  */
-
-
-#include <string>
-#include <iostream>
 
 class AnnotatedGame : public Game
 {
@@ -94,23 +93,31 @@ double Game::playGame(bool verbose)
     return whiteEquity;
 }
 
+
 void playoffSession(int trials, Player *whitePlayer, Player *blackPlayer)
 {
     AnnotatedGame game(whitePlayer, blackPlayer);
     
     int numGames;
     double whitePoints = 0.0;
-    for (numGames = 1; numGames <= trials ; numGames++){
-        char buf[80];
-            
+
+    for (numGames = 1; numGames <= trials ; numGames++)
+    {
         double white_eq = game.playGame(false);
         whitePoints += white_eq;
 
-        sprintf(buf, "Game %d: %5.2f... ", numGames, white_eq);
-        console << buf;
-                
-        sprintf(buf, "white equity/game = %.3f (total %.2f)\n", whitePoints/numGames, whitePoints);
-        console << buf;
+        std::ostringstream ss;
+
+        ss << std::fixed << "Game " << numGames << ": "
+           << std::setprecision(2) << std::setw(5) << white_eq << "... ";
+
+        ss << "white equity/game = "
+           << std::setprecision(3) << whitePoints/numGames
+           << " (total "
+           << std::setprecision(2) << whitePoints
+           << ")\n";
+
+        console << ss.str();
     }
 }
 

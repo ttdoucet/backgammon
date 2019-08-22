@@ -35,13 +35,13 @@ private:
     int playDouble(int r, int n, int pt, callBack &callB);
 };
 
-int LegalPlay::openPoint(color_t color, int n)
+inline int LegalPlay::openPoint(color_t color, int n)
 {
     return n==0 || b.checkersOnPoint(color, n) ||
         b.checkersOnPoint(opponentOf(color), opponentPoint(n)) <= 1 ;
 }
 
-int LegalPlay::duplicate_move(color_t color, struct move *mp)
+inline int LegalPlay::duplicate_move(color_t color, struct move *mp)
 {
     /* moves start at the same place, use only one. */
     if (mp->from[0] == mp->from[1] && mp->to[0] > mp->to[1])
@@ -68,7 +68,7 @@ int LegalPlay::duplicate_move(color_t color, struct move *mp)
 
 // Move the indicated checker, and
 // return whether the move hits.
-int LegalPlay::move_die(int from, int to)
+inline int LegalPlay::move_die(int from, int to)
 {
     int op = opponentPoint(to);
     int hit = 0;
@@ -83,7 +83,7 @@ int LegalPlay::move_die(int from, int to)
 
 // Move the indicated piece and record the move
 // in the structure.
-void LegalPlay::move_die(int from, int to, struct move *mp)
+inline void LegalPlay::move_die(int from, int to, struct move *mp)
 {
     int &m = mp->moves;
     mp->from[m] = from;
@@ -93,14 +93,14 @@ void LegalPlay::move_die(int from, int to, struct move *mp)
     m++;
 }
 
-void LegalPlay::move_die(int f, int t, struct move *mp, int n)
+inline void LegalPlay::move_die(int f, int t, struct move *mp, int n)
 {
     while (n--)
         move_die(f, t, mp);
 }
 
 // Undo the last move indicated by the structure.
-void LegalPlay::unmove_die(struct move *mp)
+inline void LegalPlay::unmove_die(struct move *mp)
 {
     int &m = mp->moves;
     --m;
@@ -116,7 +116,7 @@ void LegalPlay::unmove_die(struct move *mp)
     mp->to[m] = 0;
 }
 
-void LegalPlay::unmove_die(struct move *mp, int n)
+inline void LegalPlay::unmove_die(struct move *mp, int n)
 {
     while (n--)
         unmove_die(mp);
@@ -133,7 +133,7 @@ void applyMove(board& b,const move &m)
     b.pickupDice();
 }
 
-int LegalPlay::play(callBack &callB)
+inline int LegalPlay::play(callBack &callB)
 {
     int &nmoves = callB.nMoves;
     int &ctp = callB.checkersToPlay;
@@ -180,7 +180,7 @@ int LegalPlay::play(callBack &callB)
     return nmoves;
 }
 
-int LegalPlay::outputMove(callBack &callB)
+inline int LegalPlay::outputMove(callBack &callB)
 {
     callB.nMoves++;
 
@@ -197,7 +197,7 @@ int LegalPlay::outputMove(callBack &callB)
     return i;
 }
 
-int LegalPlay::doRoll(int r1, int r2, int pt, callBack &callB)
+inline int LegalPlay::doRoll(int r1, int r2, int pt, callBack &callB)
 {
     move *mp = &(callB.m);
     int hi = b.highestChecker(b.colorOnRoll());
@@ -218,7 +218,7 @@ int LegalPlay::doRoll(int r1, int r2, int pt, callBack &callB)
     return 0;
 }
 
-int LegalPlay::playNonDouble(int r1, int r2, int pt, callBack &callB)
+inline int LegalPlay::playNonDouble(int r1, int r2, int pt, callBack &callB)
 {
     int &nm = callB.nMoves;
     move *mp = &(callB.m);
@@ -236,7 +236,7 @@ int LegalPlay::playNonDouble(int r1, int r2, int pt, callBack &callB)
     return 0;
 }
 
-int LegalPlay::playDouble(int r, int n, int pt, callBack &callB)
+inline int LegalPlay::playDouble(int r, int n, int pt, callBack &callB)
 {
     int hi, i, checkers;
     move *mp = &(callB.m);
