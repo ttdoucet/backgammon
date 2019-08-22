@@ -8,7 +8,6 @@
 static void display_checker(color_t color, int level, int n)
 {
     char ch =  (color == white) ? 'O' : 'X';
-
     std::ostringstream buf;
 
     if (level == 1 && n > 5)
