@@ -4,7 +4,7 @@
 */
 
 #pragma once
-#include "console.h"
+#include <cstring>
 
 enum color_t { white = 0, black = 1};
 
@@ -108,14 +108,16 @@ public:
 
     board() { clearBoard(); }
 
+// I think the new enums would make the runtime
+// check no longer necessary.    
     static const char *colorname(color_t color)
     {
         if (color == white)
             return "White";
         else if (color == black)
             return "Black";
-        fatal("illegal color value in colorname");
-        return "";
+//      fatal("illegal color value in colorname");
+        return "Unknown";
     }
 
 

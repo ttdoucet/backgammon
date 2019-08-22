@@ -2,6 +2,7 @@
 
 #include <string>
 #include "board.h"
+#include "console.h"
 
 struct move {
     int from[4];    // move from[i] - to[i], hit iff hit[i] 

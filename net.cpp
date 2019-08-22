@@ -362,7 +362,8 @@ void net::dump_network(const char *fn, int portable)
 
     applyFunction(fSave(netfp, portable));
 
-    fprintf(netfp, "Current seed: %ldL\n", current_seed());
+//    fprintf(netfp, "Current seed: %ldL\n", current_seed());
+    fprintf(netfp, "Current seed: %ldL\n", seed);
     fprintf(netfp, "Games trained: %ldL\n", games_trained);
 
     fclose(netfp);
@@ -497,17 +498,6 @@ net *net::read_network(const char *fn)
     p->init_play();
     return p;
 }
-
-void net::learns(int l)
-{
-    we_learn = l;
-}
-
-int net::learns()
-{
-    return we_learn;
-}
-
 
 class clearFtn {
 public:

@@ -3,8 +3,13 @@
 #include <emmintrin.h>
 #include <xmmintrin.h>
 
-#include <math.h>
+//#include <math.h>
+#include <cmath>
+#include <cassert>
+
+#include "board.h"
 #include "hits.h"
+#include "console.h"
 
 #define delta_equity_to_delta_net(de) (float)( (de)/ (MAX_EQUITY * 2.0f) )
 
@@ -25,13 +30,15 @@ public:
     void dump_network(const char *fn, int portable = 0);
     void randomizeNetwork();
 
-    void learns(int l);
-    int learns();
+    void learns(int l){ we_learn = l; };
+    int learns() const { return we_learn; };
+
     void init_play();
     void init_learning(float a = 0.25, float l = 0.70);
     float incorporate_learning();
     void observe(const float p);
     void observe_final(const float p);
+    unsigned long get_seed() const { return seed; }
 
     /* Apply the current backgammon board to the input,
      * and compute the net's output.
@@ -215,7 +222,7 @@ protected:
     const int n_inputs;
     int n_type;
 
-    unsigned long seed;
+    unsigned long seed;  // This is a bad idea.
     const char *filename;
 
     // for learning
@@ -239,8 +246,8 @@ protected:
 
 protected:
     void learn(float pNew, float pOld);
-    void copy_to_transpose();
 
+    // no reason for this to me even a static method?
     static inline float squash_sse(const float x)
     {
 #if 0
@@ -250,7 +257,7 @@ protected:
         const __m128 z = _mm_add_ss(_mm_mul_ss(y, c), b);
         const __m128i i = _mm_cvtps_epi32(z);
         const float r = _mm_cvtss_f32(_mm_rcp_ss(_mm_add_ss(_mm_load_ps((const float *)&i), one)));
-        // assert(std::abs(1/(1+std::exp(-x)) - r) < 1.48e-2);  // minimum accuracy on floats is 1.48e-2
+        // assert(std::abs(1/(1+expf(-x)) - r) < 1.48e-2);  // minimum accuracy on floats is 1.48e-2
         return r;
 #endif
     }
