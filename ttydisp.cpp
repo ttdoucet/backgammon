@@ -1,21 +1,25 @@
-#include <stdio.h>
+#include <string>
+#include <iostream>
+#include <iomanip>
+
 #include "board.h"
 #include "console.h"
 
 static void display_checker(color_t color, int level, int n)
 {
-    char buf[80];
     char ch =  (color == white) ? 'O' : 'X';
 
-    if (level == 1 && n > 5)
-        sprintf(buf, " %-2d", n - 4);
-    else if (n >= level)
-        sprintf(buf, " %c ", ch);
-    else
-        sprintf(buf, "   ");
-    console << buf;
-}
+    std::ostringstream buf;
 
+    if (level == 1 && n > 5)
+        buf << " " << std::left << std::setw(2) << n - 4;
+    else if (n >= level)
+        buf << " " << ch << " ";
+    else
+        buf << "   ";
+
+    console << buf.str();
+}
 
 static void display_bar(const board &b, color_t color, int level)
 {

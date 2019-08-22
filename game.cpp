@@ -66,9 +66,11 @@ double Game::playGame(bool verbose)
         if (display_moves)
             reportMove(b, m);
         applyMove(b, m);
-//                extern int display_moves;
-//                if (display_moves)
-//                    display_board(b, white);
+#if 0
+        extern int display_moves;
+        if (display_moves)
+            display_board(b, white);
+#endif
 
         b.setDice( throw_die(), throw_die() );
     }

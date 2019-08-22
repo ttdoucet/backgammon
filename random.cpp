@@ -84,7 +84,6 @@ float random_float()
     return (float) total;
 }
 
-//#include <stdio.h>
 #include <iostream>
 #include <sys/timeb.h>
 

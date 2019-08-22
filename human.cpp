@@ -1,8 +1,11 @@
+#include <string>
+#include <iostream>
+#include <iomanip>
+
 #include "game.h"
 #include "human.h"
 #include "math.h"
 #include "ttydisp.h"
-#include <stdio.h>
 #include "console.h"
 
 void HumanPlayer::chooseMove(const board& fromBoard, move& choice)
@@ -24,17 +27,17 @@ void HumanPlayer::prepareToPlay()
 
 void HumanPlayer::finalEquity(double e)
 {
-    char buf[80];
+    std::ostringstream buf;
+    buf << std::fixed << std::setprecision(3);
 
-    if (e > 0){
-        sprintf(buf, "You won %.3f points.  Congratulations!\n", e);
-        console << buf;
-    } else if (e < 0){
-        sprintf(buf, "You lost %.3f points.\n", fabs(e));
-        console << buf;
-    } else {
-        console << "Game over, and it is an exact tie.\n";;
-    }
+    if (e > 0)
+        buf << "You won " << e << " points.  Congratulations!\n";
+    else if (e < 0)
+        buf << "You lost " << fabs(e) << " points.\n";
+    else
+        buf << "Game over, and it is an exact tie.\n";
+
+    console << buf.str();
 }
 
 
