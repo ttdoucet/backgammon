@@ -25,7 +25,7 @@ inline float dotprod(float *vec1, float *vec2)
 }
 
 
-//#define FULL_CALC
+#define FULL_CALC
 
 
 #define delta_equity_to_delta_net(de) (float)( (de)/ (MAX_EQUITY * 2.0f) )
@@ -294,6 +294,7 @@ protected:
     }
 
 
+#ifndef FULL_CALC
     float feedForward_marginal()
     {
         assert(n_inputs == 156);
@@ -318,7 +319,7 @@ protected:
         output = squash_sse(f);
         return net_to_equity(output);
     }
-
+#endif
 
     void accumGradient();
     void calcGradient(net *g);
