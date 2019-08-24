@@ -1,14 +1,14 @@
 OBJS = train.o hits.o net.o move.o ttydisp.o random.o bdata.o beardll.o playernet.o human.o game.o mathfuncs.o console.o
 BEARGEN_OBJS = beargen.o random.o move.o console.o
 
-CPPFLAGS = -O3 -ffast-math -fvectorize --std=c++17 -save-temps -g
-#CPPFLAGS = -O3 -ffast-math -fvectorize --std=c++17
+#CPPFLAGS = -O3 -ffast-math -fvectorize --std=c++17 -save-temps -g
+CPPFLAGS = -O3 -ffast-math -fvectorize --std=c++17
 CXX = clang++-5.0
 
 train : $(OBJS)
 	$(CXX) -O3 -o train $(OBJS)
 
-NETCP_OBJS = netcp.o net.o console.o
+NETCP_OBJS = netcp.o net.o mathfuncs.o console.o
 netcp : $(NETCP_OBJS)
 	$(CXX) -O3  -o netcp $(NETCP_OBJS)
 
@@ -24,7 +24,7 @@ bearoff.dat :
 all : beargen train
 
 clean : 
-	-rm -f beargen train *.o
+	-rm -f beargen train *.o *.bc *.s *.ii
 
 distclean : 
 	-rm -f beargen train bearoff.dat *.o
