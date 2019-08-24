@@ -34,13 +34,10 @@ class net
 public:
     static net *read_network(const char *fn);
     void dump_network(const char *fn, int portable = 0);
-    void init_play();
     unsigned long get_seed() const { return seed; }
 
-    /* Apply the current backgammon board to the input,
-     * and compute the net's output.
-     */
-    float feedBoard(const board &b)
+    /* Neural net estimate for the equity of the side on roll. */
+    float equity(const board &b)
     {
         netboard = b;
 
@@ -51,6 +48,13 @@ public:
         }
         else
         {
+            static int count = 0;
+
+            if (count++ == 100)
+            {
+                init_play();
+                count = 0;
+            }
             compute_input(b.colorOnRoll(), inbuf);
             return  feedForward_marginal();
         }
@@ -58,17 +62,15 @@ public:
 
     net()
     {
-        for (int i = 0; i < N_INPUTS; i++)
-            input[i] = 0.0f;
-
         console << "net_v3(hidden=" << N_HIDDEN << ")\n";
+        init_play();
     }
 
 private:
     constexpr static int N_HIDDEN = 30;
     constexpr static int N_INPUTS = 156;
     constexpr static int stride = 192;
-    constexpr static bool full_calc = true;
+    constexpr static bool full_calc = false;
 
     constexpr static float MAX_EQUITY = 3.0f;
 
@@ -80,6 +82,14 @@ private:
     constexpr static float net_to_equity(float n)
     {
         return (MAX_EQUITY * 2.0f) * n - MAX_EQUITY;
+    }
+
+    void init_play()
+    {
+        for (int i = 0; i < N_INPUTS; i++)
+            input[i] = 0.0f;
+        // This makes future marginal calculations work.
+        feedForward();
     }
 
     /*

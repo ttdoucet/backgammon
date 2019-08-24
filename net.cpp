@@ -10,14 +10,6 @@
 #include "random.h"
 #include "console.h"
 
-void net::init_play()
-{
-    for (int i = 0; i < N_INPUTS; i++)
-        input[i] = 0.0f;
-    // This makes future marginal calculations work.
-    feedForward();
-}
-
 class fSave
 {
 public:

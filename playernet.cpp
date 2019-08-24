@@ -7,12 +7,12 @@
 NeuralNetPlayer::NeuralNetPlayer(const char *player, const char *netname) : Player(player)
 {
     neural = net::read_network(netname);
-    neural->init_play();
+//    neural->init_play();
 }
 
 void NeuralNetPlayer::prepareToPlay()
 {
-    neural->init_play();
+//    neural->init_play();
 }
 
 int NeuralNetPlayer::callBackF(const board &b)
@@ -99,7 +99,7 @@ float NeuralNetPlayer::littleE(const board &bd)
     int e = gameOver(bd);
     if (e)
         return (double) e;
-    return  neural->feedBoard(bd);
+    return  neural->equity(bd);
 }
 
 // winner won the game.  Return the equity counting gammons & backgammons.
@@ -168,7 +168,7 @@ NeuralNetLearner::NeuralNetLearner(const char *player, const char *netname) :
 
 void NeuralNetLearner::prepareToPlay()
 {
-    neural->init_play();
+//    neural->init_play();
 //    neural->learns(1);
 //    neural->init_learning(alpha, lambda);
 }
