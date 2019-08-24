@@ -34,7 +34,6 @@ class net
 public:
     static net *read_network(const char *fn);
     void dump_network(const char *fn, int portable = 0);
-    unsigned long get_seed() const { return seed; }
 
     /* Neural net estimate for the equity of the side on roll. */
     float equity(const board &b)
@@ -119,7 +118,9 @@ private:
     alignas(16) float weights_2[N_HIDDEN];
     float output;
 
-    unsigned long seed;  // This is a bad idea.
+    unsigned long seed = 0;  // legacy
+    long games_trained = 0;  // legacy
+
     const char *filename;
     board netboard;
 

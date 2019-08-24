@@ -41,11 +41,13 @@ void net::dump_network(const char *fn, int portable)
         fatal(std::string("Cannot open file ") + fn + " for writing.");
 
     fprintf(netfp, "portable format: %d\n", portable);
+    fprintf(netfp, "net type: %d\n", 3);  // legacy
     fprintf(netfp, "hidden nodes: %d\n", N_HIDDEN);
     fprintf(netfp, "input nodes: %d\n", N_INPUTS);
 
     applyFunction(fSave(netfp, portable));
     fprintf(netfp, "Current seed: %ldL\n", seed);
+    fprintf(netfp, "Games trained: %ldL\n", games_trained);
 
     fclose(netfp);
 }
@@ -120,6 +122,10 @@ net *net::read_network(const char *fn)
         fatal("Cannot read seed from network file.");
 
     p->seed = sd;
+
+    if (fscanf(netfp, " Games trained: %ldL\n", &(p->games_trained)) != 1)
+        p->games_trained = 0L;
+
     fclose(netfp);
 
     cout << "Finished." << endl;
