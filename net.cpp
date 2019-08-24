@@ -105,7 +105,7 @@ net *net::read_network(const char *fn)
 
     ignore = fscanf(netfp, " hidden nodes: %d\n", &hidden);
 
-    int inputs = metrics::inputsForV2;
+    int inputs;
 
     char throwAway;
     ignore = fscanf(netfp, " input nodes: %d%c", &inputs, &throwAway);

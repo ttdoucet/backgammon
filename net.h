@@ -82,40 +82,6 @@ private:
         return (MAX_EQUITY * 2.0f) * n - MAX_EQUITY;
     }
 
-    void compute_v3_inputs(const color_t color, float *ib)
-    {
-        // The first two are the same as net_v2.
-        compute_contact(color, ib);
-        compute_pip(color, ib + metrics::contact);
-
-        // Here we represent the hit danger and hit attack differently.
-
-        compute_hit_danger_v3(color, ib + metrics::contact + metrics::pip);
-        compute_hit_danger_v3(opponentOf(color), ib + metrics::contact +
-                              metrics::pip + metrics::hit_v3);
-    }
-
-    void compute_input(const color_t color, float *inbuf)
-    {
-        compute_input_for(color, inbuf);
-        compute_input_for(opponentOf(color), inbuf + metrics::n_check);
-        compute_v3_inputs(color, inbuf + (2 * metrics::n_check) );
-    }
-
-    enum /* class */ metrics {
-        hit = 9,
-        contact  = 2,
-        pip  = 2,
-        n_rel = (contact + pip + 2*hit ),
-        hit_v3  = 2,
-        cross_v4 = 4,
-        // blot, point, builders for each point, plus bar, borne off.
-        n_check = (3*24 + 2),
-        inputsForV1 = 2 * n_check,
-        inputsForV2 = inputsForV1 + contact + pip + 2 * metrics::hit,
-        inputsForV3 = inputsForV1 + contact + pip + 2 * hit_v3,
-    };
-
     /*
      * This takes a routine or function object to apply to each weight
      * of the network.  The routine or function object is passed a
@@ -209,15 +175,41 @@ private:
     }
 
     /*
-     * Encode the board as the network input.
-     * 
-     * The input can be divided into three types:
-     *  1. Functions of our checker configuration. (N_CHECK inputs)
-     *  2. Functions of the opponent's checker configuration. (N_CHECK)
-     *  3. Functions of the relationship of the two checker positions. 
-     * 
+     * Features
      */
-    void compute_input_for(const color_t color, float *ib)
+
+    float *compute_contact(const color_t color, float *ib)
+    {
+        int me = netboard.highestChecker(color);
+        int him = opponentPoint(netboard.highestChecker(opponentOf(color)));
+        int contact = me - him;
+        float f = contact < 0.0f ? 0.0f : (contact / 23.0f);
+
+        *ib++ = f;
+        *ib++ = (1.0f - f);
+        return ib;
+    }
+
+    float *compute_pip(const color_t color, float *ib)
+    {
+        int pdiff = netboard.pipCount(opponentOf(color)) - netboard.pipCount(color);
+
+        float h = squash_sse( ((float) pdiff) / 27.0f);
+        *ib++ = h;
+        *ib++ = 1.0f - h;
+        return ib;
+    }
+
+    float *compute_hit_danger_v3(const color_t color, float *ib)
+    {
+        float h = ((float) num_hits(color, netboard)) / 36.0f;
+
+        *ib++ = h;
+        *ib++ = 1.0f - h;
+        return ib;
+    }
+
+    float *compute_input_for(const color_t color, float *ib)
     {
         int i, n;
 
@@ -229,34 +221,42 @@ private:
             *ib++ = (float) (n >= 2);                   /* point    */
             *ib++ = (float) ( (n > 2) ? (n - 2) : 0 );  /* builders */
         }
-        *ib = (float) netboard.checkersOnBar(color);          /* on bar   */
+        *ib++ = (float) netboard.checkersOnBar(color);          /* on bar   */
+        return ib;
     }
 
-    void compute_contact(const color_t color, float *ib)
+    float *compute_v3_inputs(const color_t color, float *ib)
     {
-        int me = netboard.highestChecker(color);
-        int him = opponentPoint(netboard.highestChecker(opponentOf(color)));
-        int contact = me - him;
-        float f = contact < 0.0f ? 0.0f : (contact / 23.0f);
+        // The first two are the same as net_v2.
+        ib = compute_contact(color, ib);
+        ib = compute_pip(color, ib);
 
-        *ib++ = f;
-        *ib++ = (1.0f - f);
+        // Here we represent the hit danger and hit attack differently.
+        ib = compute_hit_danger_v3(color, ib);
+        ib = compute_hit_danger_v3(opponentOf(color), ib);
+
+        return ib;
     }
 
-    void compute_pip(const color_t color, float *ib)
+    /*
+     * Encode the board as the network input.
+     * 
+     * The input can be divided into three types:
+     *  1. Functions of our checker configuration. (N_CHECK inputs)
+     *  2. Functions of the opponent's checker configuration. (N_CHECK)
+     *  3. Functions of the relationship of the two checker positions. 
+     * 
+     */
+    float *compute_input(const color_t color, float *ib)
     {
-        int pdiff = netboard.pipCount(opponentOf(color)) - netboard.pipCount(color);
+        float *start = ib;
 
-        ib[0] = squash_sse( ((float) pdiff) / 27.0f);
-        ib[1] = 1.0f - ib[0];
-    }
-
-    void compute_hit_danger_v3(const color_t color, float *ib)
-    {
-        float h = ((float) num_hits(color, netboard)) / 36.0f;
-
-        ib[0] = h;
-        ib[1] = 1.0f - h;
+        ib = compute_input_for(color, ib);
+        ib = compute_input_for(opponentOf(color), ib);
+        ib = compute_v3_inputs(color, ib);
+        
+        assert( (ib - start) == N_INPUTS);
+        return ib;
     }
 
 } ;
