@@ -6,7 +6,6 @@
 
 #include "board.h"
 #include "net.h"
-#include "hits.h"
 #include "console.h"
 
 class fSave

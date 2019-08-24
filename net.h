@@ -1,14 +1,13 @@
 #pragma once
 
-#include <emmintrin.h>
-#include <xmmintrin.h>
-
 #include <cmath>
 #include <cassert>
 #include <numeric>
 
 #include "board.h"
-#include "hits.h"
+#include "features.h"
+#include "mathfuncs.h"
+
 #include "console.h"
 
 template<int N>
@@ -23,12 +22,6 @@ inline float dotprod(float *vec1, float *vec2)
     return sum;
 }
 
-static const __m128 maxx = _mm_set1_ps(87);
-static const __m128 minx = _mm_set1_ps(-87);
-static const __m128 one = _mm_set_ss(1);
-static const __m128 c = _mm_set_ss(-8388608/0.6931471806);
-static const __m128 b = _mm_set_ss(1065353216);
-
 class net
 {
 public:
@@ -38,11 +31,11 @@ public:
     /* Neural net estimate for the equity of the side on roll. */
     float equity(const board &b)
     {
-        netboard = b;
+        features feat{b};
 
         if constexpr (full_calc)
         {
-            compute_input(b.colorOnRoll(), input);
+            feat.calc(input);
             return  feedForward();
         }
         else
@@ -54,7 +47,7 @@ public:
                 init_play();
                 count = 0;
             }
-            compute_input(b.colorOnRoll(), inbuf);
+            feat.calc(inbuf);
             return  feedForward_marginal();
         }
     }
@@ -120,27 +113,7 @@ private:
 
     unsigned long seed = 0;  // legacy
     long games_trained = 0;  // legacy
-
     const char *filename;
-    board netboard;
-
-    // no reason for this to be even a static method?
-    static inline float squash_sse(const float x)
-    {
-        if constexpr (false)
-        {
-                return (float) (1 / (1 + expf(-x)) );
-        }
-        else
-        {
-            const __m128 y = _mm_max_ss(minx, _mm_min_ss(maxx, _mm_set_ss(x))); // clamp to [-87,87]
-            const __m128 z = _mm_add_ss(_mm_mul_ss(y, c), b);
-            const __m128i i = _mm_cvtps_epi32(z);
-            const float r = _mm_cvtss_f32(_mm_rcp_ss(_mm_add_ss(_mm_load_ps((const float *)&i), one)));
-            // assert(std::abs(1/(1+expf(-x)) - r) < 1.48e-2);  // minimum accuracy on floats is 1.48e-2
-            return r;
-        }
-    }
 
     inline static float squash(const float f)
     {
@@ -185,87 +158,4 @@ private:
         return net_to_equity(output);
     }
 
-    /*
-     * Features
-     */
-
-    float *compute_contact(const color_t color, float *ib)
-    {
-        int me = netboard.highestChecker(color);
-        int him = opponentPoint(netboard.highestChecker(opponentOf(color)));
-        int contact = me - him;
-        float f = contact < 0.0f ? 0.0f : (contact / 23.0f);
-
-        *ib++ = f;
-        *ib++ = (1.0f - f);
-        return ib;
-    }
-
-    float *compute_pip(const color_t color, float *ib)
-    {
-        int pdiff = netboard.pipCount(opponentOf(color)) - netboard.pipCount(color);
-
-        float h = squash_sse( ((float) pdiff) / 27.0f);
-        *ib++ = h;
-        *ib++ = 1.0f - h;
-        return ib;
-    }
-
-    float *compute_hit_danger_v3(const color_t color, float *ib)
-    {
-        float h = ((float) num_hits(color, netboard)) / 36.0f;
-
-        *ib++ = h;
-        *ib++ = 1.0f - h;
-        return ib;
-    }
-
-    float *compute_input_for(const color_t color, float *ib)
-    {
-        int i, n;
-
-        *ib++ = (float) netboard.checkersOnPoint(color, 0); /* borne off */
-
-        for (i = 1; i <= 24; i++){
-            n = netboard.checkersOnPoint(color, i);
-            *ib++ = (float) (n == 1);                   /* blot     */
-            *ib++ = (float) (n >= 2);                   /* point    */
-            *ib++ = (float) ( (n > 2) ? (n - 2) : 0 );  /* builders */
-        }
-        *ib++ = (float) netboard.checkersOnBar(color);          /* on bar   */
-        return ib;
-    }
-
-    float *compute_v3_inputs(const color_t color, float *ib)
-    {
-        // The first two are the same as net_v2.
-        ib = compute_contact(color, ib);
-        ib = compute_pip(color, ib);
-
-        // Here we represent the hit danger and hit attack differently.
-        ib = compute_hit_danger_v3(color, ib);
-        ib = compute_hit_danger_v3(opponentOf(color), ib);
-
-        return ib;
-    }
-
-    /*
-     * Encode the board as the network input.
-     * 
-     * The input can be divided into three types:
-     *  1. Functions of our checker configuration. (N_CHECK inputs)
-     *  2. Functions of the opponent's checker configuration. (N_CHECK)
-     *  3. Functions of the relationship of the two checker positions. 
-     * 
-     */
-    void compute_input(const color_t color, float *ib)
-    {
-        float *start = ib;
-
-        ib = compute_input_for(color, ib);
-        ib = compute_input_for(opponentOf(color), ib);
-        ib = compute_v3_inputs(color, ib);
-        
-        assert( (ib - start) == N_INPUTS);
-    }
 } ;
