@@ -169,12 +169,12 @@ NeuralNetLearner::NeuralNetLearner(const char *player, const char *netname) :
 void NeuralNetLearner::prepareToPlay()
 {
     neural->init_play();
-    neural->learns(1);
-    neural->init_learning(alpha, lambda);
+//    neural->learns(1);
+//    neural->init_learning(alpha, lambda);
 }
 
 void NeuralNetLearner::finalEquity(double e)
 {
-    neural->observe_final(e);
+//    neural->observe_final(e);
 }
 

@@ -23,16 +23,7 @@ inline float dotprod(float *vec1, float *vec2)
     return sum;
 }
 
-
-#define FULL_CALC
-
-
-#define delta_equity_to_delta_net(de) (float)( (de)/ (MAX_EQUITY * 2.0f) )
-
-#ifndef MAX_EQUITY
-#define MAX_EQUITY 3.0f
-#endif
-
+//#define FULL_CALC
 
 static const __m128 maxx = _mm_set1_ps(87);
 static const __m128 minx = _mm_set1_ps(-87);
@@ -45,19 +36,23 @@ class net {
     constexpr static int N_INPUTS = 156;
     constexpr static int stride = 192;
 
+    constexpr static float MAX_EQUITY = 3.0f;
+
+    constexpr static float delta_equity_to_delta_net(float de)
+    {
+        return (float)( (de)/ (MAX_EQUITY * 2.0f) );
+    }
+
+    constexpr static float net_to_equity(float n)
+    {
+        return (MAX_EQUITY * 2.0f) * n - MAX_EQUITY;
+    }
+
+
 public:
     static net *read_network(const char *fn);
     void dump_network(const char *fn, int portable = 0);
-    void randomizeNetwork();
-
-    void learns(int l){ we_learn = l; };
-    int learns() const { return we_learn; };
-
     void init_play();
-    void init_learning(float a = 0.25, float l = 0.70);
-    float incorporate_learning();
-    void observe(const float p);
-    void observe_final(const float p);
     unsigned long get_seed() const { return seed; }
 
     /* Apply the current backgammon board to the input,
@@ -73,88 +68,51 @@ public:
         compute_input(b.colorOnRoll(), inbuf);
         return  feedForward_marginal();
 #endif
-
     }
 
-    net(int nhidden, int ninputs) : n_hidden(nhidden) // , n_inputs(ninputs)
+    net()
     {
-        // because i am hacking for speed tests
-        assert(n_hidden == N_HIDDEN);
-//      assert(n_inputs == N_INPUTS);
-
-        acc_grad = 0;
-        delta = 0;
-        grad = 0;
-
         for (int i = 0; i < N_INPUTS; i++)
             input[i] = 0.0f;
 
-        we_learn = 0;
-        games_trained = 0;
+        console << "net_v3(hidden=" << N_HIDDEN << ")\n";
     }
 
-    net() : n_hidden(0), we_learn(0) // , n_inputs(0)
+private:
+    void compute_v3_inputs(const color_t color, float *ib)
     {
-        games_trained = 0L;
+        // The first two are the same as net_v2.
+        compute_contact(color, ib);
+        compute_pip(color, ib + metrics::contact);
+
+        // Here we represent the hit danger and hit attack differently.
+
+        compute_hit_danger_v3(color, ib + metrics::contact + metrics::pip);
+        compute_hit_danger_v3(opponentOf(color), ib + metrics::contact +
+                              metrics::pip + metrics::hit_v3);
     }
 
-    virtual ~net()
+    void compute_input(const color_t color, float *inbuf)
     {
-        if (n_hidden == 0)
-            return;
+        compute_input_for(color, inbuf);
+        compute_input_for(opponentOf(color), inbuf + metrics::n_check);
+
+        compute_v3_inputs(color, inbuf + (2 * metrics::n_check) );
     }
 
-protected:
-
-    static float net_to_equity(float n)
-    {
-        return (MAX_EQUITY * 2.0f) * n - MAX_EQUITY;
-    }
-
-
-    virtual void compute_input(const color_t color, float *inbuf)
-    {
-        fatal( "compute_input() on illegal net.");
-    }
-
-    enum {
-        max_hidden = 80,
-        METRICS_HIT  = 9,
-        METRICS_CONTACT  = 2,
-        METRICS_PIP  = 2,
-        N_REL = (METRICS_CONTACT + METRICS_PIP + 2*METRICS_HIT ),
-        METRICS_HIT_V3  = 2,
-        METRICS_CROSS_V4 = 4,
+    enum /* class */ metrics {
+        hit = 9,
+        contact  = 2,
+        pip  = 2,
+        n_rel = (contact + pip + 2*hit ),
+        hit_v3  = 2,
+        cross_v4 = 4,
         // blot, point, builders for each point, plus bar, borne-off.
-        N_CHECK = (3*24 + 2),
-        inputsForV1 = 2 * N_CHECK,
-        inputsForV2 = inputsForV1 + METRICS_CONTACT + METRICS_PIP + 2 * METRICS_HIT,
-        inputsForV3 = inputsForV1 + METRICS_CONTACT + METRICS_PIP + 2 * METRICS_HIT_V3,
-        inputsForV4 = inputsForV3 + METRICS_CROSS_V4
+        n_check = (3*24 + 2),
+        inputsForV1 = 2 * n_check,
+        inputsForV2 = inputsForV1 + contact + pip + 2 * metrics::hit,
+        inputsForV3 = inputsForV1 + contact + pip + 2 * hit_v3,
     };
-
-    static void must_have(int ntype, int inputs, int mustval);
-    static void check_input_value(int ntype, int inputs);
-
-    template <class Ftn> static void applyToNetworks(net *p1, net *p2, Ftn f)
-    {
-        const int n_hidden = p1->n_hidden;
-        int i, j;
-
-        for (i = 0; i < n_hidden; i++){
-            float *d = p1->weights_1[i];
-            float *a = p2->weights_1[i];
-
-            for (j = 0; j < N_INPUTS; j++)
-                f( d[j], a[j] );
-        }
-
-        float *d = p1->weights_2;
-        float *a = p2->weights_2;
-
-        for (i = 0; i < n_hidden; i++)
-            f(d[i], a[i]);
-    }
 
     /*
      * This takes a routine or function object to apply to each weight
@@ -165,57 +123,29 @@ protected:
      */
     template<class Ftn> void applyFunction(Ftn f)
     {
-        int i, j;
-
-        for (i = 0; i < n_hidden; i++){
-            for (j = 0; j < N_INPUTS; j++)
+        for (int i = 0; i < N_HIDDEN; i++)
+        {
+            for (int j = 0; j < N_INPUTS; j++)
                 f( weights_1[i][j] );
         }
-        for (i = 0; i < n_hidden; i++)
+        for (int i = 0; i < N_HIDDEN; i++)
             f( weights_2[i] );
     }
 
     // data members
-
+#ifndef FULL_CALC
+    alignas(16) float inbuf[N_INPUTS];
+#endif
     alignas(16) float input[N_INPUTS];
     alignas(16) float hidden[N_HIDDEN];
     alignas(16) float pre_hidden[N_HIDDEN];
     alignas(16) float weights_1[N_HIDDEN][stride];
     alignas(16) float weights_2[N_HIDDEN];
-
-#ifndef FULL_CALC
-    alignas(16) float inbuf[N_INPUTS];
-#endif
-
     float output;
-
-    const int n_hidden; // duplicated now
-
-    int n_type;  // get rid of this...
 
     unsigned long seed;  // This is a bad idea.
     const char *filename;
-
-    // for learning
-    int we_learn;
-
-    net *acc_grad;
-    net *delta;
-    net *grad;
-    float alpha;
-    float lambda;
-
-    long games_trained;
-
-    // miscellaneous bookkeeping for learning.
-    float last_observation;
-    int saw_final_signal;  // good lord
-
-
     board netboard;
-
-protected:
-    void learn(float pNew, float pOld);
 
     // no reason for this to me even a static method?
     static inline float squash_sse(const float x)
@@ -232,52 +162,50 @@ protected:
 #endif
     }
 
+    inline static float squash(const float f)
+    {
+        return (float) (1 / (1 + expf(-f)) );
+    }
 
     /*
      * Have the network evaluate its input.
      */
     float feedForward()
     {
-        for (int i = 0; i < n_hidden; i++)
+        for (int i = 0; i < N_HIDDEN; i++)
             pre_hidden[i] = dotprod<N_INPUTS>(input, weights_1[i]);
 
-        for (int i = 0; i < n_hidden; i++)
+        for (int i = 0; i < N_HIDDEN; i++)
             hidden[i] = squash_sse(pre_hidden[i]);
 
-//        output = squash_sse(dot_product(hidden, weights_2, n_hidden));
         output = squash_sse(dotprod<N_HIDDEN>(hidden, weights_2));
         return net_to_equity(output);
     }
 
-
 #ifndef FULL_CALC
     float feedForward_marginal()
     {
-        for (int i = 0; i < N_INPUTS ; i++){
+        for (int i = 0; i < N_INPUTS ; i++)
+        {
             if (input[i] == inbuf[i])
                 continue;
 
             float d = inbuf[i] - input[i] ;
             input[i] = inbuf[i];
 
-            for (int j = 0; j < n_hidden; j++)
+            for (int j = 0; j < N_HIDDEN; j++)
                 pre_hidden[j] += d * weights_1[j][i];
 
         }
-        for (int j = 0; j < n_hidden; j++)
+        for (int j = 0; j < N_HIDDEN; j++)
             hidden[j] = squash_sse(pre_hidden[j]);
 
-        // f = dot_product(hidden, weights_2, n_hidden);
         float f = dotprod<N_HIDDEN>(hidden, weights_2);
 
         output = squash_sse(f);
         return net_to_equity(output);
     }
 #endif
-
-    void accumGradient();
-    void calcGradient(net *g);
-    void clearNetwork();
 
     /*
      * Encode the board as the network input.
@@ -322,66 +250,12 @@ protected:
         ib[1] = 1.0f - ib[0];
     }
 
-    void compute_hit_danger(const color_t color, float *ib)
+    void compute_hit_danger_v3(const color_t color, float *ib)
     {
-        int i, h = num_hits(color, netboard);
-        int whole = (h * net::METRICS_HIT) / 36;
-        int partial = h % (36 / net::METRICS_HIT);
+        float h = ((float) num_hits(color, netboard)) / 36.0f;
 
-        for (i = 0; i < whole; i++){
-            *ib++ = 1.0f;
-        }
-        if (partial){
-            *ib++ = partial * (net::METRICS_HIT / 36.0f);
-            i++;
-        }
-        for (; i < net::METRICS_HIT; i++)
-            *ib++ = 0;
-    }
-
-
-    void compute_hit_danger_v3(const color_t color, float *ib);
-    int crossovers(color_t color);
-    void compute_crossovers(const color_t color, float *ib);
-
-    inline static float squash(const float f)
-    {
-        return (float) (1 / (1 + expf(-f)) );
+        ib[0] = h;
+        ib[1] = 1.0f - h;
     }
 
 } ;
-
-
-class net_v3 : public net
-{
-
-public:
-
-    net_v3(int nhidden) : net(nhidden, inputsForV3)
-    {
-        console << "net_v3(hidden=" << nhidden << ")\n";
-        n_type = 3;
-    }
-
- protected:
-    void compute_v3_inputs(const color_t color, float *ib)
-    {
-        // The first two are the same as net_v2.
-        compute_contact(color, ib);
-        compute_pip(color, ib + net::METRICS_CONTACT);
-
-        // Here we represent the hit danger and hit attack differently.
-
-        compute_hit_danger_v3(color, ib + net::METRICS_CONTACT + net::METRICS_PIP);
-        compute_hit_danger_v3(opponentOf(color), ib + net::METRICS_CONTACT +
-                              net::METRICS_PIP + net::METRICS_HIT_V3);
-    }
-
-    void compute_input(const color_t color, float *inbuf)
-    {
-        compute_input_for(color, inbuf);
-        compute_input_for(opponentOf(color), inbuf + net::N_CHECK);
-        compute_v3_inputs(color, inbuf + (2 * net::N_CHECK) );
-    }
-};
-
