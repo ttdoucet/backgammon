@@ -1,7 +1,8 @@
 OBJS = train.o hits.o net.o move.o ttydisp.o random.o bdata.o beardll.o playernet.o human.o game.o console.o
 BEARGEN_OBJS = beargen.o random.o move.o console.o
 
-CPPFLAGS = -O3 -ffast-math -fvectorize --std=c++17 -save-temps
+#CPPFLAGS = -O3 -ffast-math -fvectorize --std=c++17 -save-temps
+CPPFLAGS = -O3 -ffast-math -fvectorize --std=c++17
 CXX = clang++-5.0
 
 train : $(OBJS)

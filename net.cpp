@@ -19,15 +19,6 @@ void net::compute_hit_danger_v3(const color_t color, float *ib)
     ib[1] = 1.0f - h;
 }
 
-void net::compute_v2_inputs(const color_t color, float *ib)
-{
-    compute_contact(color, ib);
-    compute_pip(color, ib + net::METRICS_CONTACT);
-    compute_hit_danger(color, ib + net::METRICS_CONTACT + net::METRICS_PIP);
-    compute_hit_danger(opponentOf(color), ib + net::METRICS_CONTACT +
-                       net::METRICS_PIP + net::METRICS_HIT);
-}
-
 int net::crossovers(color_t color)
 {
     int m = 4 * netboard.checkersOnBar(color);
@@ -52,106 +43,6 @@ void net::compute_crossovers(const color_t color, float *ib)
 }
 
 
-const char *net::checker_names_self[] =
-{
-    "off",
-    "1-blot", "1-point", "1-build",
-    "2-blot", "2-point", "2-build",
-    "3-blot", "3-point", "3-build",
-    "4-blot", "4-point", "4-build",
-    "5-blot", "5-point", "5-build",
-    "6-blot", "6-point", "6-build",
-    "7-blot", "7-point", "7-build",
-    "8-blot", "8-point", "8-build",
-    "9-blot", "9-point", "9-build",
-    "10-blot", "10-point", "10-build",
-    "11-blot", "11-point", "11-build",
-    "12-blot", "12-point", "12-build",
-    "13-blot", "13-point", "13-build",
-    "14-blot", "14-point", "14-build",
-    "15-blot", "15-point", "15-build",
-    "16-blot", "16-point", "16-build",
-    "17-blot", "17-point", "17-build",
-    "18-blot", "18-point", "18-build",
-    "19-blot", "19-point", "19-build",
-    "20-blot", "20-point", "20-build",
-    "21-blot", "21-point", "21-build",
-    "22-blot", "22-point", "22-build",
-    "23-blot", "23-point", "23-build",
-    "24-blot", "24-point", "24-build",
-    "bar"
-};
-
-const char *net::checker_names_other[] =
-{
-    "opp-off",
-    "opp-1-blot", "opp-1-point", "opp-1-build",
-    "opp-2-blot", "opp-2-point", "opp-2-build",
-    "opp-3-blot", "opp-3-point", "opp-3-build",
-    "opp-4-blot", "opp-4-point", "opp-4-build",
-    "opp-5-blot", "opp-5-point", "opp-5-build",
-    "opp-6-blot", "opp-6-point", "opp-6-build",
-    "opp-7-blot", "opp-7-point", "opp-7-build",
-    "opp-8-blot", "opp-8-point", "opp-8-build",
-    "opp-9-blot", "opp-9-point", "opp-9-build",
-    "opp-10-blot", "opp-10-point", "opp-10-build",
-    "opp-11-blot", "opp-11-point", "opp-11-build",
-    "opp-12-blot", "opp-12-point", "opp-12-build",
-    "opp-13-blot", "opp-13-point", "opp-13-build",
-    "opp-14-blot", "opp-14-point", "opp-14-build",
-    "opp-15-blot", "opp-15-point", "opp-15-build",
-    "opp-16-blot", "opp-16-point", "opp-16-build",
-    "opp-17-blot", "opp-17-point", "opp-17-build",
-    "opp-18-blot", "opp-18-point", "opp-18-build",
-    "opp-19-blot", "opp-19-point", "opp-19-build",
-    "opp-20-blot", "opp-20-point", "opp-20-build",
-    "opp-21-blot", "opp-21-point", "opp-21-build",
-    "opp-22-blot", "opp-22-point", "opp-22-build",
-    "opp-23-blot", "opp-23-point", "opp-23-build",
-    "opp-24-blot", "opp-24-point", "opp-24-build",
-    "opp-bar",
-};
-
-const char *net_v2::v2_names[] =
-{
-    "Not-Broken", "Broken",
-    "Pip-Ahead", "Pip-Behind",
-
-    "Hit-Dang-0", "Hit-Dang-1", "Hit-Dang-2", "Hit-Dang-3", "Hit-Dang-4",
-    "Hit-Dang-5", "Hit-Dang-6", "Hit-Dang-7", "Hit-Dang-8",
-
-    "Hit-Attk-0", "Hit-Attk-1", "Hit-Attk-2", "Hit-Attk-3", "Hit-Attk-4",
-    "Hit-Attk-5", "Hit-Attk-6", "Hit-Attk-7", "Hit-Attk-8",
-};
-
-const char *net_v3::v3_names[] =
-{
-    "Not-Broken", "Broken",
-    "Pip-Ahead", "Pip-Behind",
-
-    "Hit-Dang", "!Hit-Dang",
-    "Hit-Attk", "!Hit-Attk"
-};
-
-const char *net_v4::v4_names[] =
-{
-    "Not-Broken", "Broken",
-    "Pip-Ahead", "Pip-Behind",
-
-    "Hit-Dang", "!Hit-Dang",
-    "Hit-Attk", "!Hit-Attk",
-
-    "X-me", "X-him",
-    "X-Behind",
-    "X-Ahead"
-};
-
-const char *net::input_name(int n)
-{
-    fatal("input_name() on illegal net.");
-    return "";
-}
-
 /*
  * For each weight, compute the partial derivate of the output
  * with respect to that weight, and store it in the appropriate
@@ -174,7 +65,7 @@ void net::calcGradient(net *g)
         hprime = hidden[i] * (1 - hidden[i]) ;
         float product = hprime * oprime * weights_2[i];
         float *p = g->weights_1[i];
-        for (j = 0; j < n_inputs; j++)
+        for (j = 0; j < N_INPUTS; j++)
             p[j] = product * input[j];
     }
 }
@@ -200,7 +91,7 @@ void net::calcGradient(net *g)
     for (i = 0; i < n_hidden; i++)
     {
         hprime = hidden[i] * (1 - hidden[i]) ;
-        for (j = 0; j < n_inputs; j++)
+        for (j = 0; j < N_INPUTS; j++)
             g->weights_1[i][j] = hprime * oprime *
                 input[j] * weights_2[i]; 
     }
@@ -211,7 +102,7 @@ void net::calcGradient(net *g)
 
 void net::init_play()
 {
-    for (int i = 0; i < n_inputs; i++)
+    for (int i = 0; i < N_INPUTS; i++)
         input[i] = 0.0f;
     // This makes future marginal calculations work.
     feedForward();
@@ -223,10 +114,10 @@ void net::init_learning(float a, float l)
         return;
     if (acc_grad == 0)
     {
-        acc_grad = new net(n_hidden, n_inputs);
-        delta = new net(n_hidden, n_inputs);
+        acc_grad = new net(n_hidden, N_INPUTS);
+        delta = new net(n_hidden, N_INPUTS);
         delta->clearNetwork();
-        grad = new net(n_hidden, n_inputs);
+        grad = new net(n_hidden, N_INPUTS);
     }
     acc_grad->clearNetwork();
     alpha = a;
@@ -358,7 +249,7 @@ void net::dump_network(const char *fn, int portable)
     fprintf(netfp, "portable format: %d\n", portable);
     fprintf(netfp, "net type: %d\n", n_type);
     fprintf(netfp, "hidden nodes: %d\n", n_hidden);
-    fprintf(netfp, "input nodes: %d\n", n_inputs);
+    fprintf(netfp, "input nodes: %d\n", N_INPUTS);
 
     applyFunction(fSave(netfp, portable));
 
@@ -379,25 +270,6 @@ void net::must_have(int ntype, int inputs, int mustval)
     }
 }
 
-void net::check_input_value(int ntype, int inputs)
-{
-    switch(ntype){
-    case 1:
-        must_have(ntype, inputs, net::inputsForV1);
-        break;
-    case 2:
-        must_have(ntype, inputs, net::inputsForV2);
-        break;
-    case 3:
-        must_have(ntype, inputs, net::inputsForV3);
-        break;
-    case 4:
-        must_have(ntype, inputs, net::inputsForV4);
-        break;
-    default:
-        fatal(std::string("invalid net type: ") + std::to_string(ntype) );
-    }
-}
 
 class fRead
 {
@@ -460,29 +332,11 @@ net *net::read_network(const char *fn)
 
     cout << "inputs=" << inputs << endl;
 
-    if (ntype == 0)
-    {  // We have an old-style net file.
-        if (inputs == net::inputsForV2)
-            ntype = 2;
-        else
-            ntype = 1;
-    }
+    assert(ntype == 3);
 
-    // Do a consistency check.
-    check_input_value(ntype, inputs);
+    net *p = new net_v3(hidden);
 
-    net *p;
-    switch (ntype)
-    {
-    case 1: p = new net_v1(hidden); break;
-    case 2: p = new net_v2(hidden); break;
-    case 3: p = new net_v3(hidden); break;
-    case 4: p = new net_v4(hidden); break;
-    default:
-        fatal(std::string("Unknown net type: ") + std::to_string(ntype));
-    }
     p->filename = fn;
-//      net::applyToNetwork(p, fRead(netfp, portable));
     p->applyFunction(fRead(netfp, portable));
 
     if (fscanf(netfp, " Current seed: %luL", &sd) != 1)
