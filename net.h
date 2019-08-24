@@ -124,7 +124,7 @@ private:
     const char *filename;
     board netboard;
 
-    // no reason for this to me even a static method?
+    // no reason for this to be even a static method?
     static inline float squash_sse(const float x)
     {
         if constexpr (false)
@@ -258,7 +258,7 @@ private:
      *  3. Functions of the relationship of the two checker positions. 
      * 
      */
-    float *compute_input(const color_t color, float *ib)
+    void compute_input(const color_t color, float *ib)
     {
         float *start = ib;
 
@@ -267,7 +267,5 @@ private:
         ib = compute_v3_inputs(color, ib);
         
         assert( (ib - start) == N_INPUTS);
-        return ib;
     }
-
 } ;

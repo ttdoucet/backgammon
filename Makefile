@@ -8,7 +8,7 @@ CXX = clang++-5.0
 train : $(OBJS)
 	$(CXX) -O3 -o train $(OBJS)
 
-NETCP_OBJS = netcp.o net.o hits.o random.o console.o
+NETCP_OBJS = netcp.o net.o hits.o console.o
 netcp : $(NETCP_OBJS)
 	$(CXX) -O3  -o netcp $(NETCP_OBJS)
 

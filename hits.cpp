@@ -209,7 +209,7 @@ inline int hitProblem::num_hits(color_t color)
                 find_hits(color, i, j);
         }
     }
-        return nhits;
+    return nhits;
 }
 
 int num_hits(color_t color, const board &b)

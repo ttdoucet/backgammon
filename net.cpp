@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 1993 by Todd Doucet.  All Rights Reserved.
+ * Copyright (C) 1993, 2019 by Todd Doucet.  All Rights Reserved.
  */
 
 #include <string.h>
@@ -7,7 +7,6 @@
 #include "board.h"
 #include "net.h"
 #include "hits.h"
-#include "random.h"
 #include "console.h"
 
 class fSave
