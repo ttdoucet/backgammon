@@ -108,6 +108,8 @@ void setupRNG()
         randomize_seed();
 }
 
+#include <chrono>
+using namespace std::chrono;
 
 int main(int argc, char *argv[])
 {
@@ -120,6 +122,20 @@ int main(int argc, char *argv[])
     Player *blackPlayer = new NeuralNetPlayer("black", player_name[1]);
 //  Player *blackPlayer = new NeuralNetLearner("black", player_name[1]);
 
+    auto start = high_resolution_clock::now();
+
     playoffSession(trials, whitePlayer, blackPlayer);
+
+    auto stop = high_resolution_clock::now();
+
+    std::cerr << duration_cast<nanoseconds> (stop - start).count() << " nsec\n";
+    std::cerr << duration_cast<microseconds> (stop - start).count() << " usec\n";
+
+
+    std::cerr << "period: " << high_resolution_clock::period::num
+              << " / "
+              << high_resolution_clock::period::den
+              << "\n";
+
     return 0;
 }

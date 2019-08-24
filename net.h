@@ -6,10 +6,27 @@
 //#include <math.h>
 #include <cmath>
 #include <cassert>
+#include <numeric>
 
 #include "board.h"
 #include "hits.h"
 #include "console.h"
+
+template<int N>
+inline float dotprod(float *vec1, float *vec2)
+{
+    float r = 0.0f;
+ 
+    float sum = 0.0f;
+    for (int i = 0; i < N; ++i)
+        sum += (vec1[i] * vec2[i]);
+
+    return sum;
+}
+
+
+//#define FULL_CALC
+
 
 #define delta_equity_to_delta_net(de) (float)( (de)/ (MAX_EQUITY * 2.0f) )
 
@@ -25,6 +42,8 @@ static const __m128 c = _mm_set_ss(-8388608/0.6931471806);
 static const __m128 b = _mm_set_ss(1065353216);
 
 class net {
+    constexpr static int N_HIDDEN = 30;
+    constexpr static int N_INPUTS = 156;
 public:
     static net *read_network(const char *fn);
     void dump_network(const char *fn, int portable = 0);
@@ -46,8 +65,14 @@ public:
     float feedBoard(const board &b)
     {
         netboard = b;
+#ifdef FULL_CALC
+        compute_input(b.colorOnRoll(), input);
+        return  feedForward();
+#else
         compute_input(b.colorOnRoll(), inbuf);
-        return neuralFeed();
+        return  feedForward_marginal();
+#endif
+
     }
 
     virtual const char *input_name(int n);
@@ -59,17 +84,22 @@ public:
         grad = 0;
         int i;
 
-        for (i = 0; i < n_hidden; i++)
-            weights_1[i] = new float[n_inputs];
-        inbuf = new float[n_inputs];
-        input = new float[n_inputs];
+        // because i am hacking for speed tests
+        assert(n_hidden == N_HIDDEN);
+        assert(n_inputs == N_INPUTS);
+
+//        for (i = 0; i < n_hidden; i++)
+//            weights_1[i] = new float[n_inputs];
+//      inbuf = new float[n_inputs];
+//      input = new float[n_inputs];
 
         for (i = 0; i < n_inputs; i++)
             input[i] = 0.0f;
 
-        hidden = new float[n_hidden];
-        pre_hidden = new float[n_hidden];
-        weights_2 = new float[n_hidden];
+//      hidden = new float[n_hidden];
+//      pre_hidden = new float[n_hidden];
+//      weights_2 = new float[n_hidden];
+
 
         we_learn = 0;
         games_trained = 0;
@@ -85,16 +115,15 @@ public:
         if (n_hidden == 0)
             return;
 
-        delete[ ] inbuf;
-        delete[ ] input;
+//      delete[ ] inbuf;
+//      delete[ ] input;
 
-        delete[ ] hidden;
-        delete[ ] weights_2;
+//      delete[ ] hidden;
+//      delete[ ] weights_2;
+//      delete[ ] pre_hidden;
 
-        delete[ ] pre_hidden;
-
-        for (int i = 0; i < n_hidden; i++)
-            delete [ ] weights_1[i];
+//        for (int i = 0; i < n_hidden; i++)
+//            delete [ ] weights_1[i];
     }
 
 protected:
@@ -104,43 +133,6 @@ protected:
         return (MAX_EQUITY * 2.0f) * n - MAX_EQUITY;
     }
 
-    float neuralFeed()
-    {
-        int i, j;
-        float f, d;
-
-        // getting close to as fast as the specialized one if I play with the
-        // compiler switches.  -mtune=barcelona under gcc works well when
-        // using full calc.  Similar performance is obtained by using
-        // and sse-specfic dot product, for example the ones provided
-        // by gnu-radio.  But our optimized calc still does better.
-        //#define FULL_CALC
-#ifdef FULL_CALC
-        for (i = 0; i < n_inputs ; i++)
-            input[i] = inbuf[i];
-        float r =  feedForward();
-        return r;
-#else
-        for (i = 0; i < n_inputs ; i++){
-            if (input[i] == inbuf[i])
-                continue;
-
-            d = inbuf[i] - input[i] ;
-            input[i] = inbuf[i];
-
-            for (j = 0; j < n_hidden; j++)
-                pre_hidden[j] += d * weights_1[j][i];
-
-        }
-        for (j = 0; j < n_hidden; j++)
-            hidden[j] = squash_sse(pre_hidden[j]);
-
-        f = dot_product(hidden, weights_2, n_hidden);
-
-        output = squash_sse(f);
-        return net_to_equity(output);
-#endif
-    }
 
     virtual void compute_input(const color_t color, float *inbuf)
     {
@@ -169,7 +161,7 @@ protected:
     static void must_have(int ntype, int inputs, int mustval);
     static void check_input_value(int ntype, int inputs);
 
-    template <class Ftn> static void applyToNetworks(const net *p1, const net *p2, Ftn f)
+    template <class Ftn> static void applyToNetworks(net *p1, net *p2, Ftn f)
     {
         const int n_hidden = p1->n_hidden;
         const int n_inputs = p1->n_inputs;
@@ -185,6 +177,7 @@ protected:
 
         float *d = p1->weights_2;
         float *a = p2->weights_2;
+
         for (i = 0; i < n_hidden; i++)
             f(d[i], a[i]);
     }
@@ -208,13 +201,30 @@ protected:
             f( weights_2[i] );
     }
 
-    float *inbuf;      // n_inputs
+    // the fucking data hides here.
 
-    float *input;      // n_inputs
-    float *hidden;     // n_hidden
-    float *pre_hidden; // n_hidden
-    float *weights_1[max_hidden];  // max n_hidden
-    float *weights_2;              // n_hidden
+//  float *inbuf;      // n_inputs
+//  float *input;      // n_inputs
+
+#ifndef FULL_CALC
+    alignas(16) float inbuf[N_INPUTS];
+#endif
+
+    alignas(16) float input[N_INPUTS];
+
+//  float *hidden;     // n_hidden
+//  float *pre_hidden; // n_hidden
+
+    alignas(16) float hidden[N_HIDDEN];
+    alignas(16) float pre_hidden[N_HIDDEN];
+
+
+//  float *weights_1[max_hidden];  // max n_hidden
+    alignas(16) float weights_1[N_HIDDEN][N_INPUTS];
+
+
+//  float *weights_2;              // n_hidden
+    float weights_2[N_HIDDEN];
 
     float output;
 
@@ -268,13 +278,44 @@ protected:
      */
     float feedForward()
     {
+        assert(n_inputs == 156);
+
         for (int i = 0; i < n_hidden; i++)
-            pre_hidden[i] = dot_product(input, weights_1[i], n_inputs);
+//            pre_hidden[i] = std::inner_product(input, input+156, weights_1[i], 0.0f);
+            pre_hidden[i] = dotprod<156>(input, weights_1[i]);
+//            pre_hidden[i] = dot_product(input, weights_1[i], n_inputs);
 
         for (int i = 0; i < n_hidden; i++)
             hidden[i] = squash_sse(pre_hidden[i]);
 
-        output = squash_sse(dot_product(hidden, weights_2, n_hidden));
+//        output = squash_sse(dot_product(hidden, weights_2, n_hidden));
+        output = squash_sse(dotprod<N_HIDDEN>(hidden, weights_2));
+        return net_to_equity(output);
+    }
+
+
+    float feedForward_marginal()
+    {
+        assert(n_inputs == 156);
+
+        for (int i = 0; i < n_inputs ; i++){
+            if (input[i] == inbuf[i])
+                continue;
+
+            float d = inbuf[i] - input[i] ;
+            input[i] = inbuf[i];
+
+            for (int j = 0; j < n_hidden; j++)
+                pre_hidden[j] += d * weights_1[j][i];
+
+        }
+        for (int j = 0; j < n_hidden; j++)
+            hidden[j] = squash_sse(pre_hidden[j]);
+
+        // f = dot_product(hidden, weights_2, n_hidden);
+        float f = dotprod<N_HIDDEN>(hidden, weights_2);
+
+        output = squash_sse(f);
         return net_to_equity(output);
     }
 
@@ -351,13 +392,17 @@ protected:
 //  void compute_v4_inputs(const color_t color, float *ib);
 //  void compute_v3_inputs(const color_t color, float *ib);
 
+
+#if 0
     inline static float dot_product(float *vec1, float *vec2, int size)
     {
         float r = 0.0;
+
         while (size--)
             r += (*vec1++ * *vec2++);
         return r;
     }
+#endif
 
     inline static float squash(const float f)
     {

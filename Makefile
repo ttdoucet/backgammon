@@ -1,11 +1,11 @@
 OBJS = train.o hits.o net.o move.o ttydisp.o random.o bdata.o beardll.o playernet.o human.o game.o console.o
 BEARGEN_OBJS = beargen.o random.o move.o console.o
 
-CPPFLAGS = -O3 -ffast-math -fvectorize --std=c++17
+CPPFLAGS = -O3 -ffast-math -fvectorize --std=c++17 -save-temps
 CXX = clang++-5.0
 
 train : $(OBJS)
-	$(CXX) -O3  -o train $(OBJS)
+	$(CXX) -O3 -o train $(OBJS)
 
 NETCP_OBJS = netcp.o net.o hits.o random.o console.o
 netcp : $(NETCP_OBJS)
