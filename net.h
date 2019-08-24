@@ -23,18 +23,52 @@ inline float dotprod(float *vec1, float *vec2)
     return sum;
 }
 
-//#define FULL_CALC
-
 static const __m128 maxx = _mm_set1_ps(87);
 static const __m128 minx = _mm_set1_ps(-87);
 static const __m128 one = _mm_set_ss(1);
 static const __m128 c = _mm_set_ss(-8388608/0.6931471806);
 static const __m128 b = _mm_set_ss(1065353216);
 
-class net {
+class net
+{
+public:
+    static net *read_network(const char *fn);
+    void dump_network(const char *fn, int portable = 0);
+    void init_play();
+    unsigned long get_seed() const { return seed; }
+
+    /* Apply the current backgammon board to the input,
+     * and compute the net's output.
+     */
+    float feedBoard(const board &b)
+    {
+        netboard = b;
+
+        if constexpr (full_calc)
+        {
+            compute_input(b.colorOnRoll(), input);
+            return  feedForward();
+        }
+        else
+        {
+            compute_input(b.colorOnRoll(), inbuf);
+            return  feedForward_marginal();
+        }
+    }
+
+    net()
+    {
+        for (int i = 0; i < N_INPUTS; i++)
+            input[i] = 0.0f;
+
+        console << "net_v3(hidden=" << N_HIDDEN << ")\n";
+    }
+
+private:
     constexpr static int N_HIDDEN = 30;
     constexpr static int N_INPUTS = 156;
     constexpr static int stride = 192;
+    constexpr static bool full_calc = true;
 
     constexpr static float MAX_EQUITY = 3.0f;
 
@@ -48,37 +82,6 @@ class net {
         return (MAX_EQUITY * 2.0f) * n - MAX_EQUITY;
     }
 
-
-public:
-    static net *read_network(const char *fn);
-    void dump_network(const char *fn, int portable = 0);
-    void init_play();
-    unsigned long get_seed() const { return seed; }
-
-    /* Apply the current backgammon board to the input,
-     * and compute the net's output.
-     */
-    float feedBoard(const board &b)
-    {
-        netboard = b;
-#ifdef FULL_CALC
-        compute_input(b.colorOnRoll(), input);
-        return  feedForward();
-#else
-        compute_input(b.colorOnRoll(), inbuf);
-        return  feedForward_marginal();
-#endif
-    }
-
-    net()
-    {
-        for (int i = 0; i < N_INPUTS; i++)
-            input[i] = 0.0f;
-
-        console << "net_v3(hidden=" << N_HIDDEN << ")\n";
-    }
-
-private:
     void compute_v3_inputs(const color_t color, float *ib)
     {
         // The first two are the same as net_v2.
@@ -96,7 +99,6 @@ private:
     {
         compute_input_for(color, inbuf);
         compute_input_for(opponentOf(color), inbuf + metrics::n_check);
-
         compute_v3_inputs(color, inbuf + (2 * metrics::n_check) );
     }
 
@@ -107,7 +109,7 @@ private:
         n_rel = (contact + pip + 2*hit ),
         hit_v3  = 2,
         cross_v4 = 4,
-        // blot, point, builders for each point, plus bar, borne-off.
+        // blot, point, builders for each point, plus bar, borne off.
         n_check = (3*24 + 2),
         inputsForV1 = 2 * n_check,
         inputsForV2 = inputsForV1 + contact + pip + 2 * metrics::hit,
@@ -133,9 +135,7 @@ private:
     }
 
     // data members
-#ifndef FULL_CALC
     alignas(16) float inbuf[N_INPUTS];
-#endif
     alignas(16) float input[N_INPUTS];
     alignas(16) float hidden[N_HIDDEN];
     alignas(16) float pre_hidden[N_HIDDEN];
@@ -150,16 +150,19 @@ private:
     // no reason for this to me even a static method?
     static inline float squash_sse(const float x)
     {
-#if 0
-        return (float) (1 / (1 + expf(-x)) );
-#else
-        const __m128 y = _mm_max_ss(minx, _mm_min_ss(maxx, _mm_set_ss(x))); // clamp to [-87,87]
-        const __m128 z = _mm_add_ss(_mm_mul_ss(y, c), b);
-        const __m128i i = _mm_cvtps_epi32(z);
-        const float r = _mm_cvtss_f32(_mm_rcp_ss(_mm_add_ss(_mm_load_ps((const float *)&i), one)));
-        // assert(std::abs(1/(1+expf(-x)) - r) < 1.48e-2);  // minimum accuracy on floats is 1.48e-2
-        return r;
-#endif
+        if constexpr (false)
+        {
+                return (float) (1 / (1 + expf(-x)) );
+        }
+        else
+        {
+            const __m128 y = _mm_max_ss(minx, _mm_min_ss(maxx, _mm_set_ss(x))); // clamp to [-87,87]
+            const __m128 z = _mm_add_ss(_mm_mul_ss(y, c), b);
+            const __m128i i = _mm_cvtps_epi32(z);
+            const float r = _mm_cvtss_f32(_mm_rcp_ss(_mm_add_ss(_mm_load_ps((const float *)&i), one)));
+            // assert(std::abs(1/(1+expf(-x)) - r) < 1.48e-2);  // minimum accuracy on floats is 1.48e-2
+            return r;
+        }
     }
 
     inline static float squash(const float f)
@@ -182,7 +185,6 @@ private:
         return net_to_equity(output);
     }
 
-#ifndef FULL_CALC
     float feedForward_marginal()
     {
         for (int i = 0; i < N_INPUTS ; i++)
@@ -205,7 +207,6 @@ private:
         output = squash_sse(f);
         return net_to_equity(output);
     }
-#endif
 
     /*
      * Encode the board as the network input.
