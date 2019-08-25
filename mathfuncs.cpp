@@ -1,5 +1,6 @@
 #include <emmintrin.h>
 #include <xmmintrin.h>
+//#include <cmath>
 
 #include "mathfuncs.h"
 
@@ -11,6 +12,8 @@ static const __m128 b = _mm_set_ss(1065353216);
 
 float squash_sse(const float x)
 {
+//  return 1/(1+expf(-x));
+
     const __m128 y = _mm_max_ss(minx, _mm_min_ss(maxx, _mm_set_ss(x))); // clamp to [-87,87]
     const __m128 z = _mm_add_ss(_mm_mul_ss(y, c), b);
     const __m128i i = _mm_cvtps_epi32(z);

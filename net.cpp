@@ -10,6 +10,7 @@
 
 stopwatch mtimer;
 stopwatch ftimer;
+stopwatch stimer;
 
 class fSave
 {

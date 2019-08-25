@@ -104,9 +104,10 @@ void setupRNG()
 }
 
 #include "stopwatch.h"
-extern stopwatch mtimer, ftimer;
+extern stopwatch mtimer, ftimer, stimer;
 stopwatch timer;
 
+#include <iomanip>
 using namespace std;
 
 int main(int argc, char *argv[])
@@ -124,9 +125,12 @@ int main(int argc, char *argv[])
     playoffSession(trials, whitePlayer, blackPlayer);
     timer.stop();
 
-    cerr << "ftimer: " << ftimer.elapsed() << " ns\n";
-    cerr << "mtimer: " << mtimer.elapsed() << " ns\n";
-    cerr << " timer: " <<  timer.elapsed() << " ns\n";
+    cerr << "ftimer: " << setw(12) << ftimer.elapsed() << " ns\n";
+    cerr << "\n";
+    cerr << "mtimer: " << setw(12) << mtimer.elapsed() << " ns\n";
+    cerr << "stimer: " << setw(12) << stimer.elapsed() << " ns\n";
+    cerr << "\n";
+    cerr << " timer: " <<  setw(12) << timer.elapsed() << " ns\n";
 
     cerr << "\n";
     cerr << "ftimer count: " << ftimer.count() << "\n";

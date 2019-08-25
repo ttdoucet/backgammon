@@ -11,7 +11,7 @@
 #include "console.h"
 
 #include "stopwatch.h"
-extern stopwatch mtimer, ftimer;
+extern stopwatch mtimer, ftimer, stimer;
 
 
 class net
@@ -129,9 +129,12 @@ private:
         for (int i = 0; i < N_HIDDEN; i++)
             pre_hidden[i] = dotprod<N_INPUTS>(input, weights_1[i]);
 
+        stimer.start();
+
         for (int i = 0; i < N_HIDDEN; i++)
             hidden[i] = squash_sse(pre_hidden[i]);
-//            hidden[i] = squash(pre_hidden[i]);
+
+        stimer.stop();
 
         output = squash_sse(dotprod<N_HIDDEN>(hidden, weights_2));
         return net_to_equity(output);
@@ -151,9 +154,13 @@ private:
                 pre_hidden[j] += d * weights_1[j][i];
 
         }
+        
+        stimer.start();
+
         for (int j = 0; j < N_HIDDEN; j++)
             hidden[j] = squash_sse(pre_hidden[j]);
-//          hidden[j] = squash(pre_hidden[j]);
+
+        stimer.stop();
 
         float f = dotprod<N_HIDDEN>(hidden, weights_2);
 
