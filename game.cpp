@@ -33,7 +33,7 @@ protected:
     void reportMove(board bd, move mv)
     {
         std::string s = moveStr(mv);
-        console << board::colorname(b.colorOnRoll()) << " rolls " << bd.d1() << " " <<  bd.d2() << " and moves " << s << '\n';
+        console << board::colorname(b.onRoll()) << " rolls " << bd.d1() << " " <<  bd.d2() << " and moves " << s << '\n';
     }
 };
 
@@ -58,7 +58,7 @@ double Game::playGame(bool verbose)
     move m;
 
     while( gameOver() == false ){
-        playerOnRoll = playerFor(b.colorOnRoll());
+        playerOnRoll = playerFor(b.onRoll());
 
         playerOnRoll->chooseMove(b, m);
 

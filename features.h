@@ -19,7 +19,7 @@ public:
 
         ftimer.start();
 
-        compute_input(netboard.colorOnRoll(), dest);
+        compute_input(netboard.onRoll(), dest);
 
         ftimer.stop();
 

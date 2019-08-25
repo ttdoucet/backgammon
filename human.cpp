@@ -63,7 +63,7 @@ void HumanPlayer::parseUserMove(const board& fromBoard, board& toBoard, char *s)
 {
     int from, to;
     board bd = fromBoard;
-    color_t color = bd.colorOnRoll();
+    color_t color = bd.onRoll();
 
     while(*s == ' ')
         s++;
@@ -102,7 +102,7 @@ void HumanPlayer::parseUserMove(const board& fromBoard, board& toBoard, char *s)
 
 void HumanPlayer::getUserBoard(board& bd)
 {
-    display_board(bd, bd.colorOnRoll());
+    display_board(bd, bd.onRoll());
     console << "You roll " << bd.d1() << " and " << bd.d2() << "> ";
 
     char userString[80];

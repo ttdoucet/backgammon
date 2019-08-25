@@ -73,11 +73,11 @@ inline int LegalPlay::move_die(int from, int to)
     int op = opponentPoint(to);
     int hit = 0;
 
-    if (to && b.checkersOnPoint(b.colorNotOnRoll(), op)){
+    if (to && b.checkersOnPoint(b.notOnRoll(), op)){
         hit = 1;
-        b.putOnBar(b.colorNotOnRoll(), op);
+        b.putOnBar(b.notOnRoll(), op);
     }
-    b.moveChecker(b.colorOnRoll(), from, to);
+    b.moveChecker(b.onRoll(), from, to);
     return hit;
 }
 
@@ -104,11 +104,11 @@ inline void LegalPlay::unmove_die(struct move *mp)
 {
     int &m = mp->moves;
     --m;
-    b.moveChecker(b.colorOnRoll(), mp->to[m], mp->from[m]);
+    b.moveChecker(b.onRoll(), mp->to[m], mp->from[m]);
     mp->from[m] = 0;
 
     if (mp->hit[m]){
-        b.removeFromBar(b.colorNotOnRoll(),
+        b.removeFromBar(b.notOnRoll(),
                         opponentPoint(mp->to[m])
             );
         mp->hit[m] = 0;
@@ -126,9 +126,9 @@ void applyMove(board& b,const move &m)
 {
     for (int i = 0;  i < m.moves; i++){
         if (m.hit[i]){
-            b.putOnBar(b.colorNotOnRoll(), opponentPoint(m.to[i]));
+            b.putOnBar(b.notOnRoll(), opponentPoint(m.to[i]));
         }
-        b.moveChecker(b.colorOnRoll(), m.from[i], m.to[i]);
+        b.moveChecker(b.onRoll(), m.from[i], m.to[i]);
     }
     b.pickupDice();
 }
@@ -188,7 +188,7 @@ inline int LegalPlay::outputMove(callBack &callB)
     int i = callB.callBackF(b);
 
     // Restore the dice and put us back on roll.
-    b.setRoller(b.colorNotOnRoll());
+    b.setRoller(b.notOnRoll());
     b.setDice(s1, s2);
     return i;
 }
@@ -196,9 +196,9 @@ inline int LegalPlay::outputMove(callBack &callB)
 inline int LegalPlay::doRoll(int r1, int r2, int pt, callBack &callB)
 {
     move *mp = &(callB.m);
-    int hi = b.highestChecker(b.colorOnRoll());
+    int hi = b.highestChecker(b.onRoll());
 
-    if (b.checkersOnBar(b.colorOnRoll()) && pt != 25)
+    if (b.checkersOnBar(b.onRoll()) && pt != 25)
         return 0;
 
     if (r1 == 0)
@@ -206,7 +206,7 @@ inline int LegalPlay::doRoll(int r1, int r2, int pt, callBack &callB)
     if (r1 > hi)
         r1 = hi;
 
-    if ( ((pt - r1 > 0) || ((pt - r1 == 0) && (hi <= 6)) ) && openPoint(b.colorOnRoll(), pt - r1)){
+    if ( ((pt - r1 > 0) || ((pt - r1 == 0) && (hi <= 6)) ) && openPoint(b.onRoll(), pt - r1)){
         move_die(pt, pt - r1, mp);
         playNonDouble(r2, 0, pt, callB);
         unmove_die(mp);
@@ -219,12 +219,12 @@ inline int LegalPlay::playNonDouble(int r1, int r2, int pt, callBack &callB)
     int &nm = callB.nMoves;
     move *mp = &(callB.m);
 
-    if (r1 == 0  && !duplicate_move(b.colorOnRoll(), mp)){
+    if (r1 == 0  && !duplicate_move(b.onRoll(), mp)){
         return outputMove(callB);
     }
 
     for (; pt; pt--){
-        if (!b.checkersOnPoint(b.colorOnRoll(), pt))
+        if (!b.checkersOnPoint(b.onRoll(), pt))
             continue;
         doRoll(r1, r2, pt, callB);
         doRoll(r2, r1, pt, callB);
@@ -241,19 +241,19 @@ inline int LegalPlay::playDouble(int r, int n, int pt, callBack &callB)
         return outputMove(callB);
     }
 
-    if (r > (hi = b.highestChecker(b.colorOnRoll())) )
+    if (r > (hi = b.highestChecker(b.onRoll())) )
         r = hi;
 
     for (; pt ; pt--){
         int can_move = ((pt - r > 0) || ((pt - r == 0) && (hi <= 6))) &&
-            openPoint(b.colorOnRoll(), pt - r);
+            openPoint(b.onRoll(), pt - r);
                         
-        if ( (checkers = b.checkersOnPoint(b.colorOnRoll(), pt)) && can_move)
+        if ( (checkers = b.checkersOnPoint(b.onRoll(), pt)) && can_move)
             break;
     }
     if (pt <= 0)
         return 0;
-    if (b.checkersOnBar(b.colorOnRoll()) && pt != 25)
+    if (b.checkersOnBar(b.onRoll()) && pt != 25)
         return 0;
 
     if (n < checkers)

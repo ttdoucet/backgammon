@@ -86,8 +86,8 @@ float NeuralNetPlayer::bearoffEquity(const board &b)
     double  bearoffEquity(unsigned long, unsigned long);
 
     assert(isBearingOff(b));
-    unsigned long onRoll = board_to_32(b, b.colorOnRoll());
-    unsigned long notOnRoll = board_to_32(b, b.colorNotOnRoll());
+    unsigned long onRoll = board_to_32(b, b.onRoll());
+    unsigned long notOnRoll = board_to_32(b, b.notOnRoll());
     return (float) bearoffEquity(onRoll, notOnRoll);
 }
 
@@ -130,9 +130,9 @@ int NeuralNetPlayer::win_check(const board &nb, color_t side)
 int NeuralNetPlayer::gameOver(const board &bd)
 {
     int e;
-    if ( (e = win_check(bd, bd.colorOnRoll())) != 0)
+    if ( (e = win_check(bd, bd.onRoll())) != 0)
         return e;
-    else if ( (e = win_check(bd, bd.colorNotOnRoll())) != 0)
+    else if ( (e = win_check(bd, bd.notOnRoll())) != 0)
         return -e;
     else
         return 0;

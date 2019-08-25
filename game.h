@@ -86,7 +86,7 @@ protected:
         }
         b.setRoller( (dwhite > dblack) ? white : black);
         b.setDice(dwhite, dblack);
-        return playerFor(b.colorOnRoll());
+        return playerFor(b.onRoll());
     }
 };
 

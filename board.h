@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1993, 1997, 2008, 2013 by Todd Doucet.
- All Rights Reserved.
+                  All Rights Reserved.
 */
 
 #pragma once
@@ -33,8 +33,8 @@ public:
 
     void setRoller(color_t r) { on_roll = r; }
 
-    color_t colorOnRoll() const { return on_roll;}
-    color_t colorNotOnRoll() const { return opponentOf(on_roll);}
+    color_t onRoll() const { return on_roll;}
+    color_t notOnRoll() const { return opponentOf(on_roll);}
 
     inline int checkersOnPoint(color_t color, int point) const
     {
@@ -50,7 +50,7 @@ public:
         int op = opponentPoint(to);
         int hit = 0;
         while(checkersOnPoint(opponentOf(color), op)){
-            putOnBar(colorNotOnRoll(), op);
+            putOnBar(notOnRoll(), op);
             hit++;
         }
         _moveChecker(color, from, to);

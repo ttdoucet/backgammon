@@ -70,7 +70,7 @@ void display_board(const board &b, color_t color)
     console << "+---------------------------------------------+\n";
     console << "   1  2  3  4  5  6         7  8  9 10 11 12\n\n";
 
-    console << "On roll: " << board::colorname(b.colorOnRoll()) << "\n";
+    console << "On roll: " << board::colorname(b.onRoll()) << "\n";
 
     if (b.checkersOnPoint(white, 0) || b.checkersOnPoint(black, 0))
     {
