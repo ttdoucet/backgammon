@@ -104,7 +104,7 @@ void setupRNG()
 }
 
 #include "stopwatch.h"
-extern stopwatch mtimer, ftimer, stimer;
+extern stopwatch mtimer, ftimer, stimer, htimer;
 stopwatch timer;
 
 #include <iomanip>
@@ -126,6 +126,7 @@ int main(int argc, char *argv[])
     timer.stop();
 
     cerr << "ftimer: " << setw(12) << ftimer.elapsed() << " ns\n";
+    cerr << "htimer: " << setw(12) << htimer.elapsed() << " ns\n";
     cerr << "\n";
     cerr << "mtimer: " << setw(12) << mtimer.elapsed() << " ns\n";
     cerr << "stimer: " << setw(12) << stimer.elapsed() << " ns\n";

@@ -6,6 +6,9 @@
 #include "hits.h"
 #include "console.h"
 
+#include "stopwatch.h"
+stopwatch htimer;
+
 struct dice {
     char low, hi;
 };
@@ -164,8 +167,8 @@ int hitProblem::possibleHit[ ] =
 
 inline void hitProblem::clear_hits()
 {
-    for (int i=1; i<=6; i++)
-        for (int j=1; j<=6; j++)
+    for (int i = 0; i < 7; i++)
+        for (int j = 0; j < 7; j++)
             rhits[i][j] = 0;
     nhits = 0;
 }
@@ -214,6 +217,15 @@ inline int hitProblem::num_hits(color_t color)
 
 int num_hits(color_t color, const board &b)
 {
+    htimer.start();
+
     hitProblem hp(b);
-    return hp.num_hits(color);
+
+//  htimer.start();
+
+    auto v = hp.num_hits(color);
+
+    htimer.stop();
+
+    return v;
 }
