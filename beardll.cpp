@@ -1,4 +1,6 @@
 #include <stdlib.h>
+#include <cassert>
+
 #include "bearoff.h"
 
 int cmp_bearoff(const void *key, const void *elem)
@@ -22,12 +24,11 @@ int board_to_index(unsigned long b)
 	struct bear_off *bp = (struct bear_off *) bsearch(&b, bear_off, bsize,
 							sizeof(struct bear_off),
 							cmp_bearoff);
-
-	if (bp == NULL){
-//		fprintf(stderr, "error in find_board_expectation(), b=%lx\n", b);
-
-		exit(1);
-	}
+        if (bp == NULL){
+//          fprintf(stderr, "error in find_board_expectation(), b=%lx\n", b);            
+            exit(1);
+        }
+//      assert(bp != NULL);
 	return bp - bear_off;
 }
 
@@ -38,13 +39,13 @@ int board_to_index(unsigned long b)
 */
 double fewerEq(unsigned long b, int n)
 {
-	if (n == 0){
-		return (float) (b == 0x0f);
-	} else {
-		int i = board_to_index(b);
-		return bear_off[i].f[n-1];
+	if (n == 0)
+            return (float) (b == 0x0f);
+        else
+        {
+            int i = board_to_index(b);
+            return bear_off[i].f[n-1];
 	}
-		
 }
 
 /* Return the probability that the bearoff position denoted
@@ -52,9 +53,8 @@ double fewerEq(unsigned long b, int n)
 */
 double greaterEq(unsigned long b, int n)
 {
-	if (n == 0.0){
+	if (n == 0.0)
 		return 1.0;
-	}
 	return 1.0 - fewerEq(b, n - 1);
 }
 
@@ -63,9 +63,8 @@ double greaterEq(unsigned long b, int n)
 */
 double exact(unsigned long b, int n)
 {
-	if (n == 0){
-		return b == 0x0f;
-	}
+	if (n == 0)
+            return b == 0x0f;
 	return fewerEq(b, n) - fewerEq(b, n - 1);
 }
 
@@ -76,8 +75,7 @@ double exact(unsigned long b, int n)
 double bearoffEquity(unsigned long onRoll, unsigned long notOnRoll)
 {
 	double p = 0.0;
-	for (int i = 0; i <= 15; i++){
+	for (int i = 0; i <= 15; i++)
 		p += (exact(onRoll, i) * greaterEq(notOnRoll, i));
-	}
 	return (2.0 * p) - 1.0;
 }

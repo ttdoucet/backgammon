@@ -57,7 +57,8 @@ double Game::playGame(bool verbose)
     Player *playerOnRoll = setupGame();
     moves m;
 
-    while( gameOver() == false ){
+    while( gameOver() == false )
+    {
         playerOnRoll = playerFor(b.onRoll());
 
         playerOnRoll->chooseMove(b, m);

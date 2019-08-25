@@ -63,7 +63,8 @@ protected:
 
     void both(int pt, int num)
     {
-        for(int i = 0; i < num; i++){
+        for(int i = 0; i < num; i++)
+        {
             b.moveChecker(white, 0, pt);
             b.moveChecker(black, 0, pt);
         }
@@ -80,7 +81,8 @@ protected:
 
         // See who plays first.
         int dwhite = 0, dblack = 0;
-        while (dwhite == dblack){
+        while (dwhite == dblack)
+        {
             dwhite = throw_die();
             dblack = throw_die();
         }

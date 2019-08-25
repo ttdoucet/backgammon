@@ -72,7 +72,8 @@ private:
 
         *ib++ = (float) netboard.checkersOnPoint(color, 0); /* borne off */
 
-        for (i = 1; i <= 24; i++){
+        for (i = 1; i <= 24; i++)
+        {
             n = netboard.checkersOnPoint(color, i);
             *ib++ = (float) (n == 1);                   /* blot     */
             *ib++ = (float) (n >= 2);                   /* point    */

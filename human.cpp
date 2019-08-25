@@ -10,7 +10,8 @@
 
 void HumanPlayer::chooseMove(const board& fromBoard, moves& choice)
 {
-    while (1){
+    while (1)
+    {
         board toBoard = fromBoard;
         getUserBoard(toBoard);
         if (legalToMove(fromBoard, toBoard, choice) )
@@ -51,7 +52,8 @@ static bool isdigit(char ch)
 
 static bool point_ok(int p)
 {
-    if (p > 25 || p < 0){
+    if (p > 25 || p < 0)
+    {
         console << "Illegal checker position.\n";
         return false;
     }
@@ -67,26 +69,26 @@ void HumanPlayer::parseUserMove(const board& fromBoard, board& toBoard, char *s)
 
     while(*s == ' ')
         s++;
-    while (isdigit(*s)){
+    while (isdigit(*s))
+    {
         for(from = 0; isdigit(*s); s++)
             from = 10 * from + *s - '0';
         while(*s==' ')
             s++;
 
-        if (!isdigit(*s)){
+        if (!isdigit(*s))
             return;
-        }
-        for(to = 0; isdigit(*s); s++){
-            to = 10 * to + *s - '0';
-        }
 
-        if (!point_ok(from) || !point_ok(to)){
+        for(to = 0; isdigit(*s); s++)
+            to = 10 * to + *s - '0';
+
+        if (!point_ok(from) || !point_ok(to))
             return;
-        }
 
 // will simplify with new moveChecker() semantics...
         int ck;
-        if ( (ck = bd.checkersOnPoint( opponentOf(color), opponentPoint(to) )) > 0){
+        if ( (ck = bd.checkersOnPoint( opponentOf(color), opponentPoint(to) )) > 0)
+        {
             while (ck--)
                 bd.putOnBar(opponentOf(color), opponentPoint(to));
         }
@@ -128,7 +130,8 @@ public:
 
     int callBackF(const board &b)
         {
-            if (b == targetBoard){
+            if (b == targetBoard)
+            {
                 found = true;
                 savedMove = m;
             }
@@ -151,7 +154,8 @@ bool HumanPlayer::legalToMove(board fromBoard, board toBoard, moves& mv)
     enumerate en(toBoard);
 //      fromBoard.play(en);
     plays(fromBoard, en);
-    if (en.foundLegalMove() ){
+    if (en.foundLegalMove())
+    {
         mv = en.foundMove();
         return true;
     }

@@ -46,7 +46,8 @@ void display_board(const board &b, color_t color)
     console << "\n";
     console << "  24 23 22 21 20 19        18 17 16 15 14 13\n";
     console << "+---------------------------------------------+\n";
-    for (j = 1; j <= 5; j++){
+    for (j = 1; j <= 5; j++)
+    {
         console << "| ";
         for (i = 24; i > 18; i--)
             display_point(b, color, i, j);
@@ -57,7 +58,8 @@ void display_board(const board &b, color_t color)
     }
 
     console << "|                    |   |                    |\n";
-    for (j = 5; j >= 1; j--){
+    for (j = 5; j >= 1; j--)
+    {
         console << "| ";
         for (i = 1; i < 7; i++)
             display_point(b, color, i, j);

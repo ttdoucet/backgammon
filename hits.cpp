@@ -92,7 +92,8 @@ inline int hitProblem::can_hit(color_t color, int blot, int distance, char low, 
     else
         hit_using = distance / low;     // doubles
 
-    switch(hit_using){
+    switch(hit_using)
+    {
     case 1:
         if (men_on_bar == 0) return 1;
         if (attacker == 0) return 1;

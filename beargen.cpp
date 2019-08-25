@@ -23,9 +23,10 @@ int board_to_index(unsigned int b)
 */
 double fewerEq(unsigned int b, int n)
 {
-    if (n == 0){
+    if (n == 0)
         return (float) (b == 0x0f);
-    } else {
+    else
+    {
         int i = board_to_index(b);
         return bear_off[i].f[n-1];
     }
@@ -79,11 +80,11 @@ int extract_point(unsigned int b, int point)
 void board_from_32(board &board, unsigned int b, color_t color)
 {
     board.clearBoard();
-    for (int i = 0; i <= 6; i++){
+    for (int i = 0; i <= 6; i++)
+    {
         int num = extract_point(b, i);
-        for (int j = 0; j < num; j++){
+        for (int j = 0; j < num; j++)
             board.moveChecker(color, 0, i);
-        }
     }
 }
 
@@ -94,10 +95,9 @@ void perm_output()
 
     board b;
     b.clearBoard();
-    for (int i = 0; i <= 6; i++){
+    for (int i = 0; i <= 6; i++)
         for (int j = 0; j < perm_data[i]; j++)
             b.moveChecker(white, 0, i);
-    }
 
     int l = board_to_32(b, white);
     bear_off[p_output].board = board_to_32(b, white);
@@ -107,12 +107,14 @@ void perm_output()
 // Distribute "n" checkers from "hi" to 0.
 void perm(int hi, int n)
 {
-    if (hi == 0){
+    if (hi == 0)
+    {
         perm_data[0] = n;
         perm_output();
         return;
     }
-    for (int i = 0; i <= n; i++){
+    for (int i = 0; i <= n; i++)
+    {
         perm_data[hi] = i;
         perm(hi - 1, n - i);
     }
@@ -132,16 +134,19 @@ public:
     float best;
     unsigned int bestBoard;
 
-    int callBackF(const board &b){
+    int callBackF(const board &b)
+    {
         int i = board_to_32(b, white);
         float f = bearoffExpectation(i);
-        if (f < best){
+        if (f < best)
+        {
             best = f;
             bestBoard = i;
         }
         return 0;
     }
-    bearoffCallBack(){
+    bearoffCallBack()
+    {
         best = 100.0F;
     }
 };
@@ -175,16 +180,17 @@ void calc_fewer(int n)
 {
     std::cerr << "Calculating fewer(" << n << ")\n";
 
-    for (int k = 0; k < p_output; k++){
+    for (int k = 0; k < p_output; k++)
+    {
         if ( (k % 1000) == 0)
             std::cerr << "fewer(" << n << "): " << k << "\n";
 
         unsigned int from = bear_off[k].board;
         double f = 0.0;
-        for (int i = 1; i <= 6; i++){
-            for (int j = 1; j < i; j++){
+        for (int i = 1; i <= 6; i++)
+        {
+            for (int j = 1; j < i; j++)
                 f += 2 * fewerEq(best_board_for(from, i, j), n - 1);
-            }
             f += fewerEq(best_board_for(from, i, i), n - 1);
         }
         f /= 36.0;
@@ -203,10 +209,10 @@ double compute_expectation(unsigned int bd)
 
     double e = 0.0;
     float ff;
-    for (int i = 1; i <= 6; i++){
-        for (int j = 1; j < i; j++){
+    for (int i = 1; i <= 6; i++)
+    {
+        for (int j = 1; j < i; j++)
             e += 2 * (ff = best_expectation_for(b, i, j));
-        }
         e += (ff = best_expectation_for(b, i, i));
     }
     double r = (e / 36.0) + 1.0;
@@ -215,7 +221,8 @@ double compute_expectation(unsigned int bd)
 
 void calc_expectation()
 {
-    for (int i = 0; i < p_output; i++){
+    for (int i = 0; i < p_output; i++)
+    {
         if ( (i % 1000) == 0)
             std::cerr << "At " << i << ".\n";
 

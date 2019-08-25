@@ -1,10 +1,9 @@
-struct bear_off {
+struct bear_off
+{
 	unsigned int board;
 	float expectation;
 	float f[15];
 };
-
-
 
 	// Not necessarily exported by the bearoff dll.  But maybe they will be
 float bearoffExpectation(unsigned int b);
