@@ -11,9 +11,13 @@ struct move {
     int from[4];    // move from[i] - to[i], hit iff hit[i] 
     int to[4];      // for i = 0 to moves-1
     int hit[4];
-    int d1, d2;
+//    int d1, d2;
     int moves;      
 
+    int count() const
+    {
+        return moves;
+    }
     void clear()
     {
         moves = 0;
@@ -27,7 +31,7 @@ struct move {
 class callBack
 {
 public:
-    struct move m;
+    move m;
     int nMoves;
     int checkersToPlay;
 
@@ -41,7 +45,7 @@ class nullCallBack : public callBack
     int callBackF(const board &b) { return 0; }
 };
 
-std::string moveStr(struct move& m);
+std::string moveStr(move& m);
 
 int plays(const board& b, callBack& callB);
 void applyMove(board& b,const move& m);

@@ -22,12 +22,12 @@ public:
 private:
     int openPoint(color_t color, int n);
 
-    int duplicate_move(color_t color, struct move& m);
+    int duplicate_move(color_t color, move& m);
     int move_die(int from, int to);
-    void move_die(int from, int to, struct move& m);
-    void move_die(int f, int t, struct move& m, int n);
-    void unmove_die(struct move& m);
-    void unmove_die(struct move& m, int n);
+    void move_die(int from, int to, move& m);
+    void move_die(int f, int t, move& m, int n);
+    void unmove_die(move& m);
+    void unmove_die(move& m, int n);
 
     int outputMove(callBack &callB);
     int doRoll(int r1, int r2, int pt, callBack &callB);
@@ -40,7 +40,7 @@ inline int LegalPlay::openPoint(color_t color, int n)
     return n==0 || b.checkersOnPoint(opponentOf(color), opponentPoint(n)) <= 1 ;
 }
 
-inline int LegalPlay::duplicate_move(color_t color, struct move& m)
+inline int LegalPlay::duplicate_move(color_t color, move& m)
 {
     /* moves start at the same place, use only one. */
     if (m.from[0] == m.from[1] && m.to[0] > m.to[1])
@@ -85,7 +85,7 @@ inline int LegalPlay::move_die(int from, int to)
 
 // Move the indicated piece and record the move
 // in the structure.
-inline void LegalPlay::move_die(int from, int to, struct move& m)
+inline void LegalPlay::move_die(int from, int to, move& m)
 {
     int &n = m.moves;
     m.from[n] = from;
@@ -95,14 +95,14 @@ inline void LegalPlay::move_die(int from, int to, struct move& m)
     n++;
 }
 
-inline void LegalPlay::move_die(int f, int t, struct move& m, int n)
+inline void LegalPlay::move_die(int f, int t, move& m, int n)
 {
     while (n--)
         move_die(f, t, m);
 }
 
 // Undo the last move indicated by the structure.
-inline void LegalPlay::unmove_die(struct move& m)
+inline void LegalPlay::unmove_die(move& m)
 {
     int &n = m.moves;
     --n;
@@ -119,7 +119,7 @@ inline void LegalPlay::unmove_die(struct move& m)
     m.to[n] = 0;
 }
 
-inline void LegalPlay::unmove_die(struct move& m, int n)
+inline void LegalPlay::unmove_die(move& m, int n)
 {
     while (n--)
         unmove_die(m);
@@ -127,7 +127,7 @@ inline void LegalPlay::unmove_die(struct move& m, int n)
 
 void applyMove(board& b,const move &m)
 {
-    for (int i = 0;  i < m.moves; i++)
+    for (int i = 0;  i < m.count(); i++)
     {
         if (m.hit[i])
             b.putOnBar(b.notOnRoll(), opponentPoint(m.to[i]));
@@ -145,8 +145,8 @@ inline int LegalPlay::play(callBack &callB)
     nmoves = ctp = 0;
         
 
-    callB.m.d1 = b.d1();
-    callB.m.d2 = b.d2();
+//    callB.m.d1 = b.d1();
+//    callB.m.d2 = b.d2();
 
     board save = b;
 
@@ -300,11 +300,11 @@ int checkersToPlay(board& b)
     return nullCallB.checkersToPlay;
 }
 
-std::string moveStr(struct move &m)
+std::string moveStr(move &m)
 {
     std::ostringstream s;
 
-    for (int i = 0; i < m.moves;)
+    for (int i = 0; i < m.count();)
     {
         s << (s.str().length() ? ", " : " " );
         s << m.from[i] << "/" << m.to[i];
@@ -312,7 +312,7 @@ std::string moveStr(struct move &m)
         i++;
 
         int count = 1;
-        for ( ; (i < m.moves) && (m.from[i] == m.from[i-1]) && (m.to[i] == m.to[i-1]); i++)
+        for ( ; (i < m.count()) && (m.from[i] == m.from[i-1]) && (m.to[i] == m.to[i-1]); i++)
             count++;
         if (count > 1)
             s << "(" << count << ")";
