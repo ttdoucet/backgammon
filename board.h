@@ -5,6 +5,7 @@
 
 #pragma once
 #include <cstring>
+#include <cassert>
 
 enum color_t { white = 0, black = 1};
 
@@ -18,7 +19,8 @@ inline int opponentPoint(int x)
     return (25 - (x));
 }
 
-class board {
+class board
+{
 public:
     int d1() const { return die_1; }
     int d2() const { return die_2; }
@@ -43,13 +45,15 @@ public:
 
     int moveChecker(color_t color, int from, int to)
     {
-        if ( (to == 0) || (to == 25) ){
+        if ( (to == 0) || (to == 25) )
+        {
             _moveChecker(color, from, to);
             return 0;
         }
         int op = opponentPoint(to);
         int hit = 0;
-        while(checkersOnPoint(opponentOf(color), op)){
+        while(checkersOnPoint(opponentOf(color), op))
+        {
             putOnBar(notOnRoll(), op);
             hit++;
         }
@@ -75,10 +79,9 @@ public:
     int highestChecker(color_t color) const
     {
         int i;
-        for (i = 25; i >= 0; i--){
+        for (i = 25; i >= 0; i--)
             if (checkersOnPoint(color, i) > 0)
                 break;
-        }
         return i;
     }
 
@@ -94,7 +97,8 @@ public:
 
     void clearBoard()
     {
-        for (int i = 0; i <= 25; i++){
+        for (int i = 0; i <= 25; i++)
+        {
             thePoints[0][i] = 0;
             thePoints[1][i] = 0;
         }
@@ -108,18 +112,15 @@ public:
 
     board() { clearBoard(); }
 
-// I think the new enums would make the runtime
-// check no longer necessary.    
     static const char *colorname(color_t color)
     {
+        assert (color == white || color == black);
         if (color == white)
             return "White";
         else if (color == black)
             return "Black";
-//      fatal("illegal color value in colorname");
-        return "Unknown";
+        return "";
     }
-
 
 private:
     signed char thePoints[2][32];
@@ -134,6 +135,4 @@ private:
 
         pip[color] += (to - from);
     }
-
 };
-

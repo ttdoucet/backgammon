@@ -12,9 +12,10 @@ public:
     move& operator[](int i)       { return m[i]; }
     move  operator[](int i) const { return m[i]; }
 
-    void push(move mp) { m[cnt++] = mp; }
     int count() const { return cnt; }
     moves() { clear(); }
+
+    void push(move mp) { m[cnt++] = mp; }
 
     move pop()
     {
