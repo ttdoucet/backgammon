@@ -8,7 +8,6 @@ public:
     NeuralNetPlayer(const char *player, const char *netname);
     virtual void prepareToPlay();
     virtual void finalEquity(double e) { }
-
     virtual void chooseMove(const board& b, move& choice);
 
 protected:
@@ -18,40 +17,22 @@ protected:
     int callBackF(const board &b);
     void selectMove(const board &b, move &m, evalFunction func);
 
-
 protected:
     class net *neural;
 
     float bestEquity;
     move bestMove;
 
-
 protected:
 
     float littleE(const board &bd);
-
     float bearoffEquity(const board &b);
+
     static unsigned long board_to_32(const board &b, color_t c);
     static bool isBearingOff(const board &bd);
 
     static int gameOver(const board &bd);
     static int win_check(const board &nb, color_t side);
     static int gammon_check(const board &nb, color_t winner);
-};
-
-
-class NeuralNetLearner : public NeuralNetPlayer
-{
-    float alpha;
-    float lambda;
-    
-public:
-    NeuralNetLearner(const char *player, const char *netname);
-
-    void prepareToPlay();
-    void finalEquity(double e);
-//        void chooseMove(const board& b, move& choice);
-
-
 };
 

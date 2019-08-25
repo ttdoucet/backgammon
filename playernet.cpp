@@ -7,12 +7,10 @@
 NeuralNetPlayer::NeuralNetPlayer(const char *player, const char *netname) : Player(player)
 {
     neural = net::read_network(netname);
-//    neural->init_play();
 }
 
 void NeuralNetPlayer::prepareToPlay()
 {
-//    neural->init_play();
 }
 
 int NeuralNetPlayer::callBackF(const board &b)
@@ -136,45 +134,5 @@ int NeuralNetPlayer::gameOver(const board &bd)
         return -e;
     else
         return 0;
-}
-
-/*
- * Neural nets that learn while playing.
- *
- *  In the process of getting this to work again.
- */
-
-// Problem: there is no good place currently to have the neural net
-// do its observe() method.  The chooseMove() method gets called
-// slightly too late, after the dice have been rolled.  We need to
-// fix up the Game sequence so that we can have access to the board
-// at the time appropriate for an observe() call.  Similarly, in the
-// future we will need to see this snapshot in order to decide whether
-// to double.
-//
-// One possibility is the leave Game alone, and manipulate the dice
-// that are passed in so we ignore them while evaluation.  Seems
-// like a bad way to do it, though.
-//
-// We should not prejudge what information a Player might use to learn,
-// or make whatever calculations it wants.  I think a Player should be
-// able to see the game unfold at all relevant points.
-
-
-NeuralNetLearner::NeuralNetLearner(const char *player, const char *netname) :
-    NeuralNetPlayer(player, netname)
-{
-}
-
-void NeuralNetLearner::prepareToPlay()
-{
-//    neural->init_play();
-//    neural->learns(1);
-//    neural->init_learning(alpha, lambda);
-}
-
-void NeuralNetLearner::finalEquity(double e)
-{
-//    neural->observe_final(e);
 }
 
