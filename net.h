@@ -8,8 +8,6 @@
 #include "features.h"
 #include "mathfuncs.h"
 
-#include "console.h"
-
 #include "stopwatch.h"
 extern stopwatch mtimer, ftimer, stimer;
 
@@ -17,8 +15,8 @@ extern stopwatch mtimer, ftimer, stimer;
 class net
 {
 public:
-    static net *read_network(const char *fn);
-    void dump_network(const char *fn, int portable = 0);
+    static net *readFile(const char *fn);
+    void writeFile(const char *fn);
 
     /* Neural net estimate for the equity of the side on roll. */
     float equity(const board &b)
@@ -55,7 +53,6 @@ public:
 
     net()
     {
-        console << "net_v3(hidden=" << N_HIDDEN << ")\n";
         init_play();
     }
 

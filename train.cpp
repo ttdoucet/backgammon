@@ -2,6 +2,7 @@
  * Copyright (C) 1993, 2008 by Todd Doucet.  All Rights Reserved.
  */
 
+#include <cstdlib>
 #include "game.h"
 #include "playernet.h"
 #include "human.h"
@@ -14,11 +15,9 @@ void usage()
 {
     console << "usage: train  [flags] [playerOne] [playerTwo]\n";
     console << "\t-d display moves.\n";
-    console << "\t-aAlpha\n";
-    console << "\t-lLambda\n";
     console << "\t-nTrials.\n";
     console << "\t-Sseedval\n";
-    fatal("");
+    std::exit(1);
 }
 
 int numPlayers;

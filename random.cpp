@@ -3,7 +3,6 @@
  */
 
 #include "random.h"
-#include "console.h"
 
 /* M = M1 * M1.  It is important that
  * M be less than half of the biggest
@@ -90,7 +89,6 @@ void randomize_seed()
 {
     struct timeb tb;
     ftime(&tb);
-    console << "initializing random number generator to second count: " << (int) tb.time << "\n";
     set_seed(tb.time);
 }
 

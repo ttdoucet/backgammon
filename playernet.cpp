@@ -6,7 +6,7 @@
 
 NeuralNetPlayer::NeuralNetPlayer(const char *player, const char *netname) : Player(player)
 {
-    neural = net::read_network(netname);
+    neural = net::readFile(netname);
 }
 
 void NeuralNetPlayer::prepareToPlay()

@@ -4,6 +4,7 @@ BEARGEN_OBJS = beargen.o random.o move.o console.o
 #CPPFLAGS = -O3 -ffast-math -fvectorize --std=c++17 -save-temps -g
 CPPFLAGS = -O3 -ffast-math -fvectorize --std=c++17
 CXX = clang++-5.0
+#CXX = clang++-8
 
 train : $(OBJS)
 	$(CXX) -O3 -o train $(OBJS)

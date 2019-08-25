@@ -100,8 +100,6 @@ void HumanPlayer::parseUserMove(const board& fromBoard, board& toBoard, char *s)
     toBoard = bd;
 }
 
-
-
 void HumanPlayer::getUserBoard(board& bd)
 {
     display_board(bd, bd.onRoll());
@@ -114,7 +112,6 @@ void HumanPlayer::getUserBoard(board& bd)
     parseUserMove(bd, newBoard, userString);
     bd = newBoard;
 }
-
 
 class enumerate : public callBack
 {

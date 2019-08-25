@@ -2,9 +2,10 @@
  * Copyright (C) 1993 by Todd Doucet.  All Rights Reserved.
  */
 
+#include <stdexcept>
+
 #include "board.h"
 #include "hits.h"
-#include "console.h"
 
 #include "stopwatch.h"
 stopwatch htimer;
@@ -17,7 +18,7 @@ class hitProblem
 {
 public:
     int num_hits(color_t color);
-    hitProblem(const board &b) : bd(b)
+    hitProblem(const board &b): bd(b)
     {
         clear_hits();
     }
@@ -125,9 +126,8 @@ inline int hitProblem::can_hit(color_t color, int blot, int distance, char low, 
         return !hops_blocked(oc, opponentPoint(attacker),
                              hit_using - 1, low);
 
-        // this can throw instead
     default:
-        fatal("Error in can_hit()");
+        throw std::runtime_error("Error in can_hit()");
     }
     return 0;
 }
