@@ -30,7 +30,7 @@ public:
     AnnotatedGame(Player *wh, Player *bl) : Game(wh, bl) {}
 
 protected:
-    void reportMove(board bd, move mv)
+    void reportMove(board bd, moves mv)
     {
         std::string s = moveStr(mv);
         console << board::colorname(b.onRoll()) << " rolls " << bd.d1() << " " <<  bd.d2() << " and moves " << s << '\n';
@@ -55,7 +55,7 @@ double Game::playGame(bool verbose)
 
 // unnecessary assignment?
     Player *playerOnRoll = setupGame();
-    move m;
+    moves m;
 
     while( gameOver() == false ){
         playerOnRoll = playerFor(b.onRoll());

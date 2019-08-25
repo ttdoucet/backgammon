@@ -1,37 +1,50 @@
 #pragma once
 
 #include <string>
-#include <tuple>
 
 #include "board.h"
-#include "console.h"
 
-
-struct move {
-    int from[4];    // move from[i] - to[i], hit iff hit[i] 
-    int to[4];      // for i = 0 to moves-1
-    int hit[4];
-//    int d1, d2;
-    int moves;      
-
-    int count() const
+class moves
+{
+public:
+    struct move
     {
-        return moves;
+        int from, to,  hit;
+    };
+
+    move& operator[](int i) { return m[i]; }
+
+    move operator[](int i) const { return m[i]; }
+
+    void push(move mp) { m[cnt++] = mp; }
+
+    move pop()
+    {
+        move r = m[--cnt];
+        m[cnt] = {0, 0, 0};
+        return r;
     }
+
+    int count() const { return cnt; }
+
+    moves() { clear(); }
+
     void clear()
     {
-        moves = 0;
+        cnt = 0;
         for (int i = 0; i < 4; i++)
-            to[i] = from[i] = hit[i] = 0;
+            m[i] = {0, 0, 0};
     }
 
-    move() { clear(); }
+private:
+    move m[4];
+    int cnt;
 };
 
 class callBack
 {
 public:
-    move m;
+    moves m;
     int nMoves;
     int checkersToPlay;
 
@@ -45,9 +58,9 @@ class nullCallBack : public callBack
     int callBackF(const board &b) { return 0; }
 };
 
-std::string moveStr(move& m);
+std::string moveStr(moves& m);
 
 int plays(const board& b, callBack& callB);
-void applyMove(board& b,const move& m);
+void applyMove(board& b,const moves& m);
 int numMoves(board& b);
 int checkersToPlay(board& b);

@@ -30,7 +30,7 @@ int NeuralNetPlayer::callBackF(const board &b)
 // Casting away const is not safe, but also works in this case.
 // The copy does not seem to impact performance measurably, at least
 // for the current 1-ply searches.
-void NeuralNetPlayer::selectMove(const board &b, move &mv, evalFunction func)
+void NeuralNetPlayer::selectMove(const board &b, moves &mv, evalFunction func)
 {
     equityEstimator = func;
     bestEquity = -10.0f;
@@ -41,7 +41,7 @@ void NeuralNetPlayer::selectMove(const board &b, move &mv, evalFunction func)
     mv = bestMove;
 }
 
-void NeuralNetPlayer::chooseMove(const board& b, move& choice)
+void NeuralNetPlayer::chooseMove(const board& b, moves& choice)
 {
     if (isBearingOff(b))
         selectMove(b, choice, &NeuralNetPlayer::bearoffEquity);

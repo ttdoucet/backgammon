@@ -8,7 +8,7 @@
 #include "ttydisp.h"
 #include "console.h"
 
-void HumanPlayer::chooseMove(const board& fromBoard, move& choice)
+void HumanPlayer::chooseMove(const board& fromBoard, moves& choice)
 {
     while (1){
         board toBoard = fromBoard;
@@ -118,7 +118,7 @@ class enumerate : public callBack
 {
 protected:
     board targetBoard;
-    move savedMove;
+    moves savedMove;
     bool found;
 
 public:
@@ -140,13 +140,13 @@ public:
             return found;
         }
 
-    move foundMove()
+    moves foundMove()
         {
             return savedMove;
         }
 };
 
-bool HumanPlayer::legalToMove(board fromBoard, board toBoard, move& mv)
+bool HumanPlayer::legalToMove(board fromBoard, board toBoard, moves& mv)
 {
     enumerate en(toBoard);
 //      fromBoard.play(en);

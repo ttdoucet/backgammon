@@ -18,7 +18,7 @@ public:
     void setColor(color_t clr){ myColor = clr; }
     virtual void prepareToPlay() = 0;
     virtual void finalEquity(double e) = 0;
-    virtual void chooseMove(const board& b, move& choice) = 0;
+    virtual void chooseMove(const board& b, moves& choice) = 0;
     virtual void presentBoard(const board&b) {}
     virtual ~Player(){}
 };
@@ -34,7 +34,7 @@ public:
     double playGame(bool verbose = false);
 
 protected:
-    virtual void reportMove(board bd, move mv) { }
+    virtual void reportMove(board bd, moves mv) { }
 
     Player& whitePlayer;
     Player& blackPlayer;

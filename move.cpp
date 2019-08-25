@@ -5,6 +5,7 @@
 
 #include <assert.h>
 #include <iomanip>
+
 #include "move.h"
 
 class LegalPlay
@@ -22,12 +23,12 @@ public:
 private:
     int openPoint(color_t color, int n);
 
-    int duplicate_move(color_t color, move& m);
+    int duplicate_move(color_t color, moves& m);
     int move_die(int from, int to);
-    void move_die(int from, int to, move& m);
-    void move_die(int f, int t, move& m, int n);
-    void unmove_die(move& m);
-    void unmove_die(move& m, int n);
+    void move_die(int from, int to, moves& m);
+    void move_die(int f, int t, moves& m, int n);
+    void unmove_die(moves& m);
+    void unmove_die(moves& m, int n);
 
     int outputMove(callBack &callB);
     int doRoll(int r1, int r2, int pt, callBack &callB);
@@ -40,26 +41,25 @@ inline int LegalPlay::openPoint(color_t color, int n)
     return n==0 || b.checkersOnPoint(opponentOf(color), opponentPoint(n)) <= 1 ;
 }
 
-inline int LegalPlay::duplicate_move(color_t color, move& m)
+inline int LegalPlay::duplicate_move(color_t color, moves& m)
 {
     /* moves start at the same place, use only one. */
-    if (m.from[0] == m.from[1] && m.to[0] > m.to[1])
+    if (m[0].from == m[1].from && m[0].to > m[1].to)
         return 1;
-    if (m.from[0] == m.to[1])
-        fatal("unexpected type of skip move");
+
+    assert(m[0].from != m[1].to);
 
     /* a non-blocked skip move involving no hits,
      * and whose transpose involves no hits.
      */
-    if (m.to[0] == m.from[1])
+    if (m[0].to == m[1].from)
     {
-        if (!m.hit[0] && 
+        if (!m[0].hit && 
             !b.checkersOnPoint(opponentOf(color),
-                               opponentPoint(m.from[0] +
-                                             (m.to[1] - m.from[1])))
+                               opponentPoint(m[0].from + (m[1].to - m[1].from))
+                              )
             &&
-            ((m.to[0] - m.from[0]) >
-             (m.to[1] - m.from[1])) )
+            ((m[0].to - m[0].from) > (m[1].to - m[1].from)) )
         {
             return 1;
         } 
@@ -85,53 +85,44 @@ inline int LegalPlay::move_die(int from, int to)
 
 // Move the indicated piece and record the move
 // in the structure.
-inline void LegalPlay::move_die(int from, int to, move& m)
+inline void LegalPlay::move_die(int from, int to, moves& m)
 {
-    int &n = m.moves;
-    m.from[n] = from;
-    m.to[n] = to;
-    if (move_die(from, to))
-        m.hit[n] = 1;
-    n++;
+    int hit = move_die(from, to);
+    m.push({from, to, hit});
+
+
 }
 
-inline void LegalPlay::move_die(int f, int t, move& m, int n)
+inline void LegalPlay::move_die(int f, int t, moves& m, int n)
 {
     while (n--)
         move_die(f, t, m);
 }
 
-// Undo the last move indicated by the structure.
-inline void LegalPlay::unmove_die(move& m)
-{
-    int &n = m.moves;
-    --n;
-    b.moveChecker(b.onRoll(), m.to[n], m.from[n]);
-    m.from[n] = 0;
 
-    if (m.hit[n])
-    {
-        b.removeFromBar(b.notOnRoll(),
-                        opponentPoint(m.to[n])
-                       );
-        m.hit[n] = 0;
-    }
-    m.to[n] = 0;
+// Undo the last move indicated by the structure.
+inline void LegalPlay::unmove_die(moves& m)
+{
+    auto [from, to, hit] = m.pop();
+
+    b.moveChecker(b.onRoll(), to, from);
+    if (hit)
+        b.removeFromBar(b.notOnRoll(), opponentPoint(to) );
 }
 
-inline void LegalPlay::unmove_die(move& m, int n)
+inline void LegalPlay::unmove_die(moves& m, int n)
 {
     while (n--)
         unmove_die(m);
 }
 
-void applyMove(board& b,const move &m)
+void applyMove(board& b,const moves &m)
 {
     for (int i = 0;  i < m.count(); i++)
     {
-        if (m.hit[i])
-            b.putOnBar(b.notOnRoll(), opponentPoint(m.to[i]));
-        b.moveChecker(b.onRoll(), m.from[i], m.to[i]);
+        if (m[i].hit)
+            b.putOnBar(b.notOnRoll(), opponentPoint(m[i].to));
+        b.moveChecker(b.onRoll(), m[i].from, m[i].to);
     }
     b.pickupDice();
 }
@@ -140,14 +131,7 @@ inline int LegalPlay::play(callBack &callB)
 {
     int &nmoves = callB.nMoves;
     int &ctp = callB.checkersToPlay;
-
-// testing
     nmoves = ctp = 0;
-        
-
-//    callB.m.d1 = b.d1();
-//    callB.m.d2 = b.d2();
-
     board save = b;
 
     assert( b.diceInCup() == false);
@@ -203,7 +187,7 @@ inline int LegalPlay::outputMove(callBack &callB)
 
 inline int LegalPlay::doRoll(int r1, int r2, int pt, callBack &callB)
 {
-    move& m = callB.m;
+    moves& m = callB.m;
     int hi = b.highestChecker(b.onRoll());
 
     if (b.checkersOnBar(b.onRoll()) && pt != 25)
@@ -225,7 +209,7 @@ inline int LegalPlay::doRoll(int r1, int r2, int pt, callBack &callB)
 
 inline int LegalPlay::playNonDouble(int r1, int r2, int pt, callBack& callB)
 {
-    move& m = callB.m;
+    moves& m = callB.m;
 
     if (r1 == 0  && !duplicate_move(b.onRoll(), m))
         return outputMove(callB);
@@ -243,7 +227,7 @@ inline int LegalPlay::playNonDouble(int r1, int r2, int pt, callBack& callB)
 inline int LegalPlay::playDouble(int r, int n, int pt, callBack &callB)
 {
     int hi, i, checkers;
-    move& m = callB.m;
+    moves& m = callB.m;
 
     if (n == 0)
         return outputMove(callB);
@@ -251,16 +235,18 @@ inline int LegalPlay::playDouble(int r, int n, int pt, callBack &callB)
     if (r > (hi = b.highestChecker(b.onRoll())) )
         r = hi;
 
-    for (; pt ; pt--)
+    for (; pt; pt--)
     {
-        int can_move = ((pt - r > 0) || ((pt - r == 0) && (hi <= 6))) &&
-            openPoint(b.onRoll(), pt - r);
+        const int dest = pt - r;
+        int can_move = ((dest > 0) || ((dest == 0) && (hi <= 6))) &&
+            openPoint(b.onRoll(), dest);
                         
-        if ( (checkers = b.checkersOnPoint(b.onRoll(), pt)) && can_move)
+        if ( (checkers = b.checkersOnPoint(b.onRoll(), pt)) && can_move )
             break;
     }
     if (pt <= 0)
         return 0;
+
     if (b.checkersOnBar(b.onRoll()) && pt != 25)
         return 0;
 
@@ -300,19 +286,19 @@ int checkersToPlay(board& b)
     return nullCallB.checkersToPlay;
 }
 
-std::string moveStr(move &m)
+std::string moveStr(moves &m)
 {
     std::ostringstream s;
 
     for (int i = 0; i < m.count();)
     {
         s << (s.str().length() ? ", " : " " );
-        s << m.from[i] << "/" << m.to[i];
-        if (m.hit[i]) s << "*";
+        s << m[i].from << "/" << m[i].to;
+        if (m[i].hit) s << "*";
         i++;
 
         int count = 1;
-        for ( ; (i < m.count()) && (m.from[i] == m.from[i-1]) && (m.to[i] == m.to[i-1]); i++)
+        for ( ; (i < m.count()) && (m[i].from == m[i-1].from) && (m[i].to == m[i-1].to); i++)
             count++;
         if (count > 1)
             s << "(" << count << ")";

@@ -8,20 +8,20 @@ public:
     NeuralNetPlayer(const char *player, const char *netname);
     virtual void prepareToPlay();
     virtual void finalEquity(double e) { }
-    virtual void chooseMove(const board& b, move& choice);
+    virtual void chooseMove(const board& b, moves& choice);
 
 protected:
     typedef float (NeuralNetPlayer::* evalFunction)(const board& bd);
     NeuralNetPlayer::evalFunction equityEstimator;
 
     int callBackF(const board &b);
-    void selectMove(const board &b, move &m, evalFunction func);
+    void selectMove(const board &b, moves& m, evalFunction func);
 
 protected:
     class net *neural;
 
     float bestEquity;
-    move bestMove;
+    moves bestMove;
 
 protected:
 
