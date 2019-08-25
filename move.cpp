@@ -24,10 +24,10 @@ private:
 
     int duplicate_move(color_t color, struct move *mp);
     int move_die(int from, int to);
-    void move_die(int from, int to, struct move *mp);
-    void move_die(int f, int t, struct move *mp, int n);
-    void unmove_die(struct move *mp);
-    void unmove_die(struct move *mp, int n);
+    void move_die(int from, int to, struct move& mp);
+    void move_die(int f, int t, struct move& mp, int n);
+    void unmove_die(struct move& mp);
+    void unmove_die(struct move& mp, int n);
 
     int outputMove(callBack &callB);
     int doRoll(int r1, int r2, int pt, callBack &callB);
@@ -85,41 +85,41 @@ inline int LegalPlay::move_die(int from, int to)
 
 // Move the indicated piece and record the move
 // in the structure.
-inline void LegalPlay::move_die(int from, int to, struct move *mp)
+inline void LegalPlay::move_die(int from, int to, struct move& mp)
 {
-    int &m = mp->moves;
-    mp->from[m] = from;
-    mp->to[m] = to;
+    int &m = mp.moves;
+    mp.from[m] = from;
+    mp.to[m] = to;
     if (move_die(from, to))
-        mp->hit[m] = 1;         
+        mp.hit[m] = 1;
     m++;
 }
 
-inline void LegalPlay::move_die(int f, int t, struct move *mp, int n)
+inline void LegalPlay::move_die(int f, int t, struct move& mp, int n)
 {
     while (n--)
         move_die(f, t, mp);
 }
 
 // Undo the last move indicated by the structure.
-inline void LegalPlay::unmove_die(struct move *mp)
+inline void LegalPlay::unmove_die(struct move& mp)
 {
-    int &m = mp->moves;
+    int &m = mp.moves;
     --m;
-    b.moveChecker(b.onRoll(), mp->to[m], mp->from[m]);
-    mp->from[m] = 0;
+    b.moveChecker(b.onRoll(), mp.to[m], mp.from[m]);
+    mp.from[m] = 0;
 
-    if (mp->hit[m])
+    if (mp.hit[m])
     {
         b.removeFromBar(b.notOnRoll(),
-                        opponentPoint(mp->to[m])
-            );
-        mp->hit[m] = 0;
+                        opponentPoint(mp.to[m])
+                       );
+        mp.hit[m] = 0;
     }
-    mp->to[m] = 0;
+    mp.to[m] = 0;
 }
 
-inline void LegalPlay::unmove_die(struct move *mp, int n)
+inline void LegalPlay::unmove_die(struct move& mp, int n)
 {
     while (n--)
         unmove_die(mp);
@@ -203,7 +203,7 @@ inline int LegalPlay::outputMove(callBack &callB)
 
 inline int LegalPlay::doRoll(int r1, int r2, int pt, callBack &callB)
 {
-    move *mp = &(callB.m);
+    move& mp = callB.m;
     int hi = b.highestChecker(b.onRoll());
 
     if (b.checkersOnBar(b.onRoll()) && pt != 25)
@@ -244,7 +244,7 @@ inline int LegalPlay::playNonDouble(int r1, int r2, int pt, callBack &callB)
 inline int LegalPlay::playDouble(int r, int n, int pt, callBack &callB)
 {
     int hi, i, checkers;
-    move *mp = &(callB.m);
+    move& mp = callB.m;
 
     if (n == 0)
         return outputMove(callB);
