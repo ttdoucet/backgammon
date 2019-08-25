@@ -7,16 +7,14 @@
 class moves
 {
 public:
-    struct move
-    {
-        int from, to,  hit;
-    };
+    struct move { int from, to, hit; };
 
-    move& operator[](int i) { return m[i]; }
-
-    move operator[](int i) const { return m[i]; }
+    move& operator[](int i)       { return m[i]; }
+    move  operator[](int i) const { return m[i]; }
 
     void push(move mp) { m[cnt++] = mp; }
+    int count() const { return cnt; }
+    moves() { clear(); }
 
     move pop()
     {
@@ -24,10 +22,6 @@ public:
         m[cnt] = {0, 0, 0};
         return r;
     }
-
-    int count() const { return cnt; }
-
-    moves() { clear(); }
 
     void clear()
     {
