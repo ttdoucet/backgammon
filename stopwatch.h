@@ -7,6 +7,7 @@ namespace detail_stopwatch {
 
 using namespace std::chrono;
 
+#if 0
 class stopwatch
 {
 public:
@@ -42,6 +43,20 @@ private:
     time_point<high_resolution_clock> started;
     long accum = 0;
 };
+
+#else
+
+class stopwatch
+{
+public:
+    void start() { }
+    void stop()  { }
+    void reset() { }
+    long count() { return 0; }
+    long elapsed() { return 0; }
+};
+
+#endif
 
 } // namespace detail_stopwatch
 
