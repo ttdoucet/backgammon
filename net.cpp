@@ -8,6 +8,9 @@
 #include "net.h"
 #include "console.h"
 
+stopwatch mtimer;
+stopwatch ftimer;
+
 class fSave
 {
 public:

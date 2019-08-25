@@ -92,11 +92,6 @@ void cmdline(int argc, char *argv[])
         usage();
 }
 
-/*
- *  Main routine. 
- */
-
-
 void setupRNG()
 {
     if (explicitSeed == true)
@@ -108,8 +103,11 @@ void setupRNG()
         randomize_seed();
 }
 
-#include <chrono>
-using namespace std::chrono;
+#include "stopwatch.h"
+extern stopwatch mtimer, ftimer;
+stopwatch timer;
+
+using namespace std;
 
 int main(int argc, char *argv[])
 {
@@ -122,20 +120,18 @@ int main(int argc, char *argv[])
     Player *blackPlayer = new NeuralNetPlayer("black", player_name[1]);
 //  Player *blackPlayer = new NeuralNetLearner("black", player_name[1]);
 
-    auto start = high_resolution_clock::now();
-
+    timer.start();
     playoffSession(trials, whitePlayer, blackPlayer);
+    timer.stop();
 
-    auto stop = high_resolution_clock::now();
+    cerr << "ftimer: " << ftimer.elapsed() << " ns\n";
+    cerr << "mtimer: " << mtimer.elapsed() << " ns\n";
+    cerr << " timer: " <<  timer.elapsed() << " ns\n";
 
-    std::cerr << duration_cast<nanoseconds> (stop - start).count() << " nsec\n";
-    std::cerr << duration_cast<microseconds> (stop - start).count() << " usec\n";
-
-
-    std::cerr << "period: " << high_resolution_clock::period::num
-              << " / "
-              << high_resolution_clock::period::den
-              << "\n";
+    cerr << "\n";
+    cerr << "ftimer count: " << ftimer.count() << "\n";
+    cerr << "mtimer count: " << mtimer.count() << "\n";
+    
 
     return 0;
 }

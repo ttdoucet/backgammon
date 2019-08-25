@@ -4,6 +4,8 @@
 #include "hits.h"
 #include "mathfuncs.h"
 
+#include "stopwatch.h"
+
 class features
 {
 public:
@@ -13,7 +15,14 @@ public:
 
     float *calc(float *dest) const
     {
+        extern stopwatch ftimer;
+
+        ftimer.start();
+
         compute_input(netboard.colorOnRoll(), dest);
+
+        ftimer.stop();
+
         return dest + features::count;
     }
 

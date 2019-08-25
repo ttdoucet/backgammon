@@ -10,6 +10,10 @@
 
 #include "console.h"
 
+#include "stopwatch.h"
+extern stopwatch mtimer, ftimer;
+
+
 class net
 {
 public:
@@ -24,7 +28,12 @@ public:
         if constexpr (full_calc)
         {
             feat.calc(input);
-            return  feedForward();
+
+            mtimer.start();
+            auto v = feedForward();
+            mtimer.stop();
+
+            return v;
         }
         else
         {
@@ -36,7 +45,11 @@ public:
                 count = 0;
             }
             feat.calc(inbuf);
-            return  feedForward_marginal();
+
+            mtimer.start();
+            auto v = feedForward_marginal();
+            mtimer.stop();
+            return v;
         }
     }
 
@@ -105,7 +118,7 @@ private:
 
     inline static float squash(const float f)
     {
-        return (float) (1 / (1 + expf(-f)) );
+        return 1 / (1 + expf(-f));
     }
 
     /*
@@ -118,6 +131,7 @@ private:
 
         for (int i = 0; i < N_HIDDEN; i++)
             hidden[i] = squash_sse(pre_hidden[i]);
+//            hidden[i] = squash(pre_hidden[i]);
 
         output = squash_sse(dotprod<N_HIDDEN>(hidden, weights_2));
         return net_to_equity(output);
@@ -139,6 +153,7 @@ private:
         }
         for (int j = 0; j < N_HIDDEN; j++)
             hidden[j] = squash_sse(pre_hidden[j]);
+//          hidden[j] = squash(pre_hidden[j]);
 
         float f = dotprod<N_HIDDEN>(hidden, weights_2);
 
@@ -146,4 +161,4 @@ private:
         return net_to_equity(output);
     }
 
-} ;
+};

@@ -8,6 +8,8 @@ CXX = clang++-5.0
 train : $(OBJS)
 	$(CXX) -O3 -o train $(OBJS)
 
+netcp.o : stopwatch.h
+
 NETCP_OBJS = netcp.o net.o mathfuncs.o console.o
 netcp : $(NETCP_OBJS)
 	$(CXX) -O3  -o netcp $(NETCP_OBJS)
