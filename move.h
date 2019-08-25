@@ -1,8 +1,11 @@
 #pragma once
 
 #include <string>
+#include <tuple>
+
 #include "board.h"
 #include "console.h"
+
 
 struct move {
     int from[4];    // move from[i] - to[i], hit iff hit[i] 
@@ -38,9 +41,9 @@ class nullCallBack : public callBack
     int callBackF(const board &b) { return 0; }
 };
 
-std::string moveStr(struct move &mp);
+std::string moveStr(struct move& m);
 
 int plays(const board& b, callBack& callB);
-void applyMove(board& b,const move &m);
+void applyMove(board& b,const move& m);
 int numMoves(board& b);
 int checkersToPlay(board& b);
