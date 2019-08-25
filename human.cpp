@@ -124,29 +124,19 @@ protected:
     bool found;
 
 public:
-    enumerate(board target) : targetBoard(target), found(false)
-        {
-        }
+    enumerate(board target) : targetBoard(target), found(false) { }
+    bool foundLegalMove() { return found; }
+    moves foundMove() { return savedMove; }
 
     int callBackF(const board &b)
+    {
+        if (b == targetBoard)
         {
-            if (b == targetBoard)
-            {
-                found = true;
-                savedMove = m;
-            }
-            return 0;
+            found = true;
+            savedMove = m;
         }
-            
-    bool foundLegalMove()
-        {
-            return found;
-        }
-
-    moves foundMove()
-        {
-            return savedMove;
-        }
+        return 0;
+    }
 };
 
 bool HumanPlayer::legalToMove(board fromBoard, board toBoard, moves& mv)
