@@ -44,5 +44,3 @@ int plays(const board& b, callBack& callB);
 void applyMove(board& b,const move &m);
 int numMoves(board& b);
 int checkersToPlay(board& b);
-
-#define CHECK_BOARD

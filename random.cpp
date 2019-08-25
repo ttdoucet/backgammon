@@ -11,10 +11,9 @@
  * that B end in [even]21.
  */
 
-#define M ((unsigned long) 2147395600L)
-#define M1 ((unsigned long) 46340L)
-#define B ((unsigned long) 31415821L)
-
+constexpr auto M = ((unsigned long) 2147395600L);
+constexpr auto M1 = ((unsigned long) 46340L);
+constexpr auto B  = ((unsigned long) 31415821L);
 
 static unsigned long seed;
 

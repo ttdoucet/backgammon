@@ -1,6 +1,6 @@
 /*
- * n Copyright (C) 1993, 1997, 2008, 2013 by Todd Doucet.
- *  All Rights Reserved.
+ * Copyright (C) 1993, 1997, 2008, 2013 by Todd Doucet.
+ *               All Rights Reserved.
 */
 
 #include <assert.h>
@@ -145,10 +145,7 @@ inline int LegalPlay::play(callBack &callB)
     callB.m.d1 = b.d1();
     callB.m.d2 = b.d2();
 
-#ifdef CHECK_BOARD
-// This check might go away in the production version.
     board save = b;
-#endif
 
     assert( b.diceInCup() == false);
     if (b.d1() == b.d2()){
@@ -174,9 +171,8 @@ inline int LegalPlay::play(callBack &callB)
         nmoves = 0;     // Dancing doesn't count.
         ctp = 0;        // No checkers to play.
     }
-#ifdef CHECK_BOARD
+
     assert(memcmp(&save, &b, sizeof(save)) == 0);
-#endif
     return nmoves;
 }
 
