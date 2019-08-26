@@ -6,15 +6,15 @@ class NeuralNetPlayer : public Player, public callBack
 {
 public:
     NeuralNetPlayer(const char *player, const char *netname);
-    virtual void prepareToPlay();
-    virtual void finalEquity(double e) { }
-    virtual void chooseMove(const board& b, moves& choice);
+    virtual void prepareToPlay() override;
+    virtual void finalEquity(double e) override { }
+    virtual void chooseMove(const board& b, moves& choice) override;
 
 protected:
     typedef float (NeuralNetPlayer::* evalFunction)(const board& bd);
     NeuralNetPlayer::evalFunction equityEstimator;
 
-    int callBackF(const board &b);
+    int callBackF(const board &b) override;
     void selectMove(const board &b, moves& m, evalFunction func);
 
 protected:

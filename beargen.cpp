@@ -134,7 +134,7 @@ public:
     float best;
     unsigned int bestBoard;
 
-    int callBackF(const board &b)
+    int callBackF(const board &b) override
     {
         int i = board_to_32(b, white);
         float f = bearoffExpectation(i);
@@ -145,6 +145,7 @@ public:
         }
         return 0;
     }
+
     bearoffCallBack()
     {
         best = 100.0F;

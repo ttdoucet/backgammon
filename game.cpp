@@ -30,10 +30,12 @@ public:
     AnnotatedGame(Player *wh, Player *bl) : Game(wh, bl) {}
 
 protected:
-    void reportMove(board bd, moves mv)
+    void reportMove(board bd, moves mv) override
     {
         std::string s = moveStr(mv);
-        console << board::colorname(b.onRoll()) << " rolls " << bd.d1() << " " <<  bd.d2() << " and moves " << s << '\n';
+        console << board::colorname(b.onRoll()) << " rolls "
+                << bd.d1() << " " <<  bd.d2()
+                << " and moves " << s << '\n';
     }
 };
 

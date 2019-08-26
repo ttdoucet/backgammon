@@ -125,7 +125,7 @@ public:
     bool foundLegalMove() { return found; }
     moves foundMove() { return savedMove; }
 
-    int callBackF(const board &b)
+    int callBackF(const board &b) override
     {
         if (b == targetBoard)
         {
