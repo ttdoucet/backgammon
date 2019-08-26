@@ -59,7 +59,7 @@ public:
 private:
     constexpr static int N_HIDDEN = 30;
     constexpr static int N_INPUTS = 156;
-    constexpr static int stride = 192;
+    constexpr static int stride = N_INPUTS;
     constexpr static bool full_calc = false;
 
     constexpr static float MAX_EQUITY = 3.0f;
