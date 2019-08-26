@@ -51,19 +51,11 @@ class fRead
 public:
     FILE *netfp;
     int portable;
-    fRead(FILE *fp, int p) : netfp(fp), portable(p){}
+    fRead(FILE *fp) : netfp(fp) { }
     void operator() (float &f) const
     {
-        if (portable)
-        {
-            if (fscanf(netfp, "%f", &f) == 0)
-                throw std::runtime_error("Error reading network file.");
-        }
-        else
-        {
-            if (fread(&f, 1, sizeof(f), netfp) != sizeof(f))
-                throw std::runtime_error("Error reading network file.");
-        }
+        if (fread(&f, 1, sizeof(f), netfp) != sizeof(f))
+            throw std::runtime_error("Error reading network file.");
     }
 };
 
@@ -83,6 +75,8 @@ net *net::readFile(const char *fn)
 
     int portable = 1;
     int ignore = fscanf(netfp, " portable format: %d\n", &portable);
+    assert(portable == 0);
+
 
     int ntype = 0;
     // If ntype remains zero, then we have a really old-style net file.
@@ -105,7 +99,7 @@ net *net::readFile(const char *fn)
     net *p = new net();
 
     p->filename = fn;
-    p->applyFunction(fRead(netfp, portable));
+    p->applyFunction(fRead(netfp));
 
     if (fscanf(netfp, " Current seed: %luL", &sd) != 1)
         throw std::runtime_error("Cannot read seed from network file.");
