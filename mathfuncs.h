@@ -1,8 +1,7 @@
 #pragma once
 #include <emmintrin.h>
 #include <xmmintrin.h>
-
-float squash_sse(const float x);
+#include <cmath>
 
 template<int N>
 inline float dotprod(float *vec1, float *vec2)
@@ -27,8 +26,6 @@ namespace _squash_sse
 
 inline float squash_sse(const float x)
 {
-//  return 1/(1+expf(-x));
-
     using namespace _squash_sse;
 
     const __m128 y = _mm_max_ss(minx, _mm_min_ss(maxx, _mm_set_ss(x))); // clamp to [-87,87]
@@ -38,4 +35,9 @@ inline float squash_sse(const float x)
 
     // assert(std::abs(1/(1+expf(-x)) - r) < 1.48e-2);  // minimum accuracy on floats is 1.48e-2
     return r;
+}
+
+inline float squash(const float f)
+{
+    return 1 / (1 + expf(-f));
 }
