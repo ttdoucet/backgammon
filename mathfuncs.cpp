@@ -4,11 +4,13 @@
 
 #include "mathfuncs.h"
 
-static const __m128 maxx = _mm_set1_ps(87);
-static const __m128 minx = _mm_set1_ps(-87);
-static const __m128 one = _mm_set_ss(1);
-static const __m128 c = _mm_set_ss(-8388608/0.6931471806);
-static const __m128 b = _mm_set_ss(1065353216);
+const __m128 maxx = _mm_set1_ps(87);
+const __m128 minx = _mm_set1_ps(-87);
+const __m128 one = _mm_set_ss(1);
+const __m128 c = _mm_set_ss(-8388608/0.6931471806);
+const __m128 b = _mm_set_ss(1065353216);
+
+#if 0
 
 float squash_sse(const float x)
 {
@@ -23,3 +25,4 @@ float squash_sse(const float x)
     return r;
 }
 
+#endif

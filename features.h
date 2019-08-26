@@ -5,6 +5,7 @@
 #include "mathfuncs.h"
 
 #include "stopwatch.h"
+#include <cassert>
 
 class features
 {
@@ -51,7 +52,6 @@ private:
         int pdiff = netboard.pipCount(opponentOf(color)) - netboard.pipCount(color);
 
         float h = squash_sse( ((float) pdiff) / 27.0f);
-//      float h = squash( ((float) pdiff) / 27.0f);
         *ib++ = h;
         *ib++ = 1.0f - h;
         return ib;
@@ -98,12 +98,6 @@ private:
 
     /*
      * Encode the board as the network input.
-     * 
-     * The input can be divided into three types:
-     *  1. Functions of our checker configuration. (N_CHECK inputs)
-     *  2. Functions of the opponent's checker configuration. (N_CHECK)
-     *  3. Functions of the relationship of the two checker positions. 
-     * 
      */
     void compute_input(const color_t color, float *ib) const
     {

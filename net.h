@@ -19,7 +19,7 @@ public:
     void writeFile(const char *fn);
 
     /* Neural net estimate for the equity of the side on roll. */
-    float equity(const board &b)
+    float equity(const board &b) noexcept
     {
         features feat{b};
 
