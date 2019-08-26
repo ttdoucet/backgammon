@@ -16,15 +16,20 @@ inline float dotprod(float *vec1, float *vec2)
     return sum;
 }
 
-extern const __m128 maxx;
-extern const __m128 minx;
-extern const __m128 one;
-extern const __m128 c;
-extern const __m128 b;
+namespace _squash_sse
+{
+    extern const __m128 maxx;
+    extern const __m128 minx;
+    extern const __m128 one;
+    extern const __m128 c;
+    extern const __m128 b;
+}
 
 inline float squash_sse(const float x)
 {
 //  return 1/(1+expf(-x));
+
+    using namespace _squash_sse;
 
     const __m128 y = _mm_max_ss(minx, _mm_min_ss(maxx, _mm_set_ss(x))); // clamp to [-87,87]
     const __m128 z = _mm_add_ss(_mm_mul_ss(y, c), b);
