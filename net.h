@@ -11,7 +11,6 @@
 #include "stopwatch.h"
 extern stopwatch mtimer, ftimer, stimer;
 
-
 class net
 {
 public:
@@ -61,34 +60,21 @@ private:
     constexpr static int N_INPUTS = 156;
     constexpr static int stride = N_INPUTS;
     constexpr static bool full_calc = false;
-
     constexpr static float MAX_EQUITY = 3.0f;
 
-    constexpr static float delta_equity_to_delta_net(float de)
+    constexpr static float net_to_equity(float p)
     {
-        return (float)( (de)/ (MAX_EQUITY * 2.0f) );
-    }
-
-    constexpr static float net_to_equity(float n)
-    {
-        return (MAX_EQUITY * 2.0f) * n - MAX_EQUITY;
+        return  (2 * p - 1) * MAX_EQUITY;
     }
 
     void init_play()
     {
         for (int i = 0; i < N_INPUTS; i++)
             input[i] = 0.0f;
-        // This makes future marginal calculations work.
         feedForward();
     }
 
-    /*
-     * This takes a routine or function object to apply to each weight
-     * of the network.  The routine or function object is passed a
-     * pointer to the weight.  Depending on what is passed in, we can
-     * randomly initialize the network, read the network from a file,
-     * clear the network, or write the network to a file.
-     */
+    // Applies a functor to each weight parameter in the network.
     template<class Ftn> void applyFunction(Ftn f)
     {
         for (int i = 0; i < N_HIDDEN; i++)

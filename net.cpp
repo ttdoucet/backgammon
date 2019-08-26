@@ -1,29 +1,23 @@
 /*
  * Copyright (C) 1993, 2019 by Todd Doucet.  All Rights Reserved.
  */
-
 #include <string.h>
 #include <stdexcept>
 
 #include "board.h"
 #include "net.h"
 
-stopwatch mtimer;
-stopwatch ftimer;
-stopwatch stimer;
+stopwatch mtimer, ftimer, stimer;
 
-class fWrite
+struct fWrite
 {
-public:
-    FILE *netfp;
-
-    fWrite(FILE *fp, int p) : netfp(fp) { }
-
     void operator() (float &f) const
     {
         if (fwrite(&f, sizeof(f), 1, netfp) != 1)
             throw std::runtime_error("Error writing to network file.");
     }
+    fWrite(FILE *fp) : netfp(fp) { }
+    FILE *netfp;
 };
 
 void net::writeFile(const char *fn)
@@ -38,31 +32,24 @@ void net::writeFile(const char *fn)
     fprintf(netfp, "hidden nodes: %d\n", N_HIDDEN);
     fprintf(netfp, "input nodes: %d\n", N_INPUTS);
 
-    applyFunction(fWrite(netfp, 0));
+    applyFunction(fWrite(netfp));
     fprintf(netfp, "Current seed: %ldL\n", seed);
     fprintf(netfp, "Games trained: %ldL\n", games_trained);
-
     fclose(netfp);
 }
 
-
-class fRead
+struct fRead
 {
-public:
-    FILE *netfp;
-    int portable;
-    fRead(FILE *fp) : netfp(fp) { }
     void operator() (float &f) const
     {
         if (fread(&f, 1, sizeof(f), netfp) != sizeof(f))
             throw std::runtime_error("Error reading network file.");
     }
+    fRead(FILE *fp) : netfp(fp) { }
+    FILE *netfp;
 };
 
-
-/* Allocate and initialize a network based
- * on the information in file fn.
- */
+// Read in a neural net from a file.
 net *net::readFile(const char *fn)
 {
     using namespace std;
@@ -77,15 +64,12 @@ net *net::readFile(const char *fn)
     int ignore = fscanf(netfp, " portable format: %d\n", &portable);
     assert(portable == 0);
 
-
     int ntype = 0;
     // If ntype remains zero, then we have a really old-style net file.
     ignore = fscanf(netfp, " net type: %d\n", &ntype);
-
     ignore = fscanf(netfp, " hidden nodes: %d\n", &hidden);
 
     int inputs;
-
     char throwAway;
     ignore = fscanf(netfp, " input nodes: %d%c", &inputs, &throwAway);
     if (throwAway == '\r')
@@ -96,21 +80,19 @@ net *net::readFile(const char *fn)
 
     assert(ntype == 3);
 
+// Maybe return a unique_ptr<net> instead.
     net *p = new net();
-
     p->filename = fn;
     p->applyFunction(fRead(netfp));
 
     if (fscanf(netfp, " Current seed: %luL", &sd) != 1)
         throw std::runtime_error("Cannot read seed from network file.");
-
     p->seed = sd;
 
     if (fscanf(netfp, " Games trained: %ldL\n", &(p->games_trained)) != 1)
         p->games_trained = 0L;
 
     fclose(netfp);
-
     p->init_play();
     return p;
 }
