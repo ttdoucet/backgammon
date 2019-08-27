@@ -4,12 +4,9 @@
 
 #include <random>
 #include <chrono>
-
-// maybe change this to dice.h
-#include "random.h"
-
 using namespace std;
 
+#include "random.h"
 
 //using engine = mt19937;
 using engine = default_random_engine;
@@ -34,7 +31,6 @@ int throw_die()
     return dice(generator);
 }
 
-
 void set_seed(unsigned long s)
 {
     generator.seed(s);
@@ -45,5 +41,3 @@ float random_float()
 {
     return std::generate_canonical<float, 20>(generator);
 }
-
-

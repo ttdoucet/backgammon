@@ -23,12 +23,12 @@ public:
     virtual ~Player(){}
 };
 
-void playoffSession(int trials, Player *wh, Player *bl);
+void playoffSession(int trials, Player& wh, Player& bl);
 
 class Game
 {
 public:
-    Game(Player *wh, Player *bl);
+    Game(Player& wh, Player& bl);
 
     // Returns the equity of white at the end of the game.
     double playGame(bool verbose = false);

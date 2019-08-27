@@ -114,16 +114,17 @@ int main(int argc, char *argv[])
     cmdline(argc, argv);
     setupRNG();
 
-    NeuralNetPlayer *whitePlayer = new NeuralNetPlayer("white", player_name[0]);
-//  Player *whitePlayer = new HumanPlayer("human");
+    NeuralNetPlayer whitePlayer("white", player_name[0]);
+//  HumanPlayer whitePlayer("white", player_name[0]);
 
-    Player *blackPlayer = new NeuralNetPlayer("black", player_name[1]);
-//  Player *blackPlayer = new NeuralNetLearner("black", player_name[1]);
+    NeuralNetPlayer blackPlayer("black", player_name[1]);
+//  HumanPlayer blackPlayer("black", player_name[1]);
 
     timer.start();
     playoffSession(trials, whitePlayer, blackPlayer);
     timer.stop();
 
+#if 0
     cerr << "ftimer: " << setw(12) << ftimer.elapsed() << " ns\n";
     cerr << "htimer: " << setw(12) << htimer.elapsed() << " ns\n";
     cerr << "\n";
@@ -135,7 +136,7 @@ int main(int argc, char *argv[])
     cerr << "\n";
     cerr << "ftimer count: " << ftimer.count() << "\n";
     cerr << "mtimer count: " << mtimer.count() << "\n";
-    
+#endif
 
     return 0;
 }

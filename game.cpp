@@ -27,7 +27,7 @@
 class AnnotatedGame : public Game
 {
 public:
-    AnnotatedGame(Player *wh, Player *bl) : Game(wh, bl) {}
+    AnnotatedGame(Player& wh, Player& bl) : Game(wh, bl) {}
 
 protected:
     void reportMove(board bd, moves mv) override
@@ -40,9 +40,9 @@ protected:
 };
 
 
-Game::Game(Player *wh, Player *bl) :
-    whitePlayer(*wh),
-    blackPlayer(*bl)
+Game::Game(Player& wh, Player& bl) :
+    whitePlayer(wh),
+    blackPlayer(bl)
 {
     b.clearBoard();
 }
@@ -99,7 +99,7 @@ double Game::playGame(bool verbose)
 }
 
 
-void playoffSession(int trials, Player *whitePlayer, Player *blackPlayer)
+void playoffSession(int trials, Player& whitePlayer, Player& blackPlayer)
 {
     AnnotatedGame game(whitePlayer, blackPlayer);
     
