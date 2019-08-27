@@ -23,73 +23,10 @@ public:
     virtual ~Player(){}
 };
 
-
-class Game
+inline bool gameOver(const board& bd)
 {
-public:
-    Game(Player& wh, Player& bl) :
-        whitePlayer(wh),
-        blackPlayer(bl)
-    {
-        b.clearBoard();
-    }
-
-    // Returns the equity of white at the end of the game.
-    double playGame(bool verbose = false);
-
-protected:
-    virtual void reportMove(board bd, moves mv) { }
-
-    Player& whitePlayer;
-    Player& blackPlayer;
-    board b;
-
-    color_t winningColor() const
-    {
-        if (b.checkersOnPoint(white, 0) == 15)
-            return white;
-        else
-            return black;
-    }
-
-    Player& playerFor(color_t color) const
-    {
-        if (color == white)
-            return whitePlayer;
-        else
-            return blackPlayer;
-    }
-
-    void both(int pt, int num)
-    {
-        for(int i = 0; i < num; i++)
-        {
-            b.moveChecker(white, 0, pt);
-            b.moveChecker(black, 0, pt);
-        }
-    }
-
-    Player& setupGame()
-    {
-        b.clearBoard();
-        // Set up the checkers.
-        both(24, 2);
-        both(13, 5);
-        both(8, 3);
-        both(6, 5);
-
-        // See who plays first.
-        int dwhite = 0, dblack = 0;
-        while (dwhite == dblack)
-        {
-            dwhite = throw_die();
-            dblack = throw_die();
-        }
-        b.setRoller( (dwhite > dblack) ? white : black);
-        b.setDice(dwhite, dblack);
-        return playerFor(b.onRoll());
-    }
-};
+    return (bd.checkersOnPoint(white, 0) == 15) || (bd.checkersOnPoint(black, 0) == 15);
+}
 
 inline int score(const board& b, color_t color)
 {
@@ -118,8 +55,83 @@ inline int score(const board& b, color_t color)
     return equity;
 }
 
-inline bool gameOver(const board& bd)
+class Game
 {
-    return (bd.checkersOnPoint(white, 0) == 15) || (bd.checkersOnPoint(black, 0) == 15);
-}
+public:
+    Game(Player& wh, Player& bl) : whitePlayer(wh), blackPlayer(bl)
+    {
+        b.clearBoard();
+    }
 
+    // Returns the equity of white at the end of the game.
+    double playGame(bool verbose)
+    {
+        whitePlayer.setColor(white);
+        blackPlayer.setColor(black);
+
+        whitePlayer.prepareToPlay();
+        blackPlayer.prepareToPlay();
+
+        setupGame();
+        moves m;
+
+        while( gameOver(b) == false )
+        {
+            playerFor(b.onRoll()).chooseMove(b, m);
+
+            if (verbose)
+                reportMove(b, m);
+            applyMove(b, m);
+    //      if (verbose)
+    //          display_board(b, white);
+            b.setDice( throw_die(), throw_die() );
+        }
+
+        return score(b, white);
+    }
+
+    Player& setupGame()
+    {
+        b.clearBoard();
+        // Set up the checkers.
+        both(24, 2);
+        both(13, 5);
+        both(8, 3);
+        both(6, 5);
+
+        // See who plays first.
+        int dwhite = 0, dblack = 0;
+        while (dwhite == dblack)
+        {
+            dwhite = throw_die();
+            dblack = throw_die();
+        }
+        b.setRoller( (dwhite > dblack) ? white : black);
+        b.setDice(dwhite, dblack);
+        return playerFor(b.onRoll());
+    }
+
+protected:
+    Player& whitePlayer;
+    Player& blackPlayer;
+    board b;
+
+    virtual void reportMove(board bd, moves mv) { }
+
+    Player& playerFor(color_t color) const
+    {
+        if (color == white)
+            return whitePlayer;
+        else
+            return blackPlayer;
+    }
+
+    void both(int pt, int num)
+    {
+        for(int i = 0; i < num; i++)
+        {
+            b.moveChecker(white, 0, pt);
+            b.moveChecker(black, 0, pt);
+        }
+    }
+};

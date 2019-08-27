@@ -1,4 +1,4 @@
-OBJS = train.o hits.o net.o move.o ttydisp.o random.o bdata.o beardll.o playernet.o human.o game.o mathfuncs.o console.o
+OBJS = train.o hits.o net.o move.o ttydisp.o random.o bdata.o beardll.o playernet.o human.o mathfuncs.o console.o
 BEARGEN_OBJS = beargen.o random.o move.o console.o
 
 #CPPFLAGS = -O3 -ffast-math -fvectorize --std=c++17 -save-temps -g
