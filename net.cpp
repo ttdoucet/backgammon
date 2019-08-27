@@ -1,14 +1,10 @@
 /*
  * Copyright (C) 1993, 2019 by Todd Doucet.  All Rights Reserved.
  */
-#include <string.h>
 #include <stdexcept>
 #include <fstream>
 
-#include "board.h"
 #include "net.h"
-
-#include "console.h"
 
 using namespace std;
 
@@ -30,6 +26,7 @@ void net::writeFile(const char *fn)
     ofstream ofs{fn};
     if (!ofs)
         throw runtime_error(string("Cannot open file stream ") + fn + " for writing.");
+        throw runtime_error("Cannot open file stream "s + fn + " for writing.");
 
     ofs << "portable format: " << 0 << "\n"; // legacy
     ofs << "net type: " << 3 << "\n";        // legacy
@@ -71,7 +68,7 @@ net *net::readFile(const char *fn)
 
     ifstream ifs(fn, ios::binary);
     if (!ifs)
-        throw runtime_error(string("Cannot open network file: ") + fn);
+        throw runtime_error("Cannot open network file: "s + fn);
 
     has(ifs, "portable format:"); ifs >> portable >> ws;
     assert(portable == 0);
