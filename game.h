@@ -23,7 +23,7 @@ public:
     virtual ~Player(){}
 };
 
-void playoffSession(int trials, Player& wh, Player& bl);
+void playoffSession(int trials, Player& wh, Player& bl, bool verbose);
 
 class Game
 {

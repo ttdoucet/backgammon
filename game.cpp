@@ -69,11 +69,9 @@ double Game::playGame(bool verbose)
         if (display_moves)
             reportMove(b, m);
         applyMove(b, m);
-#if 0
-        extern int display_moves;
-        if (display_moves)
+
+        if (verbose)
             display_board(b, white);
-#endif
 
         b.setDice( throw_die(), throw_die() );
     }
@@ -99,7 +97,7 @@ double Game::playGame(bool verbose)
 }
 
 
-void playoffSession(int trials, Player& whitePlayer, Player& blackPlayer)
+void playoffSession(int trials, Player& whitePlayer, Player& blackPlayer, bool verbose)
 {
     AnnotatedGame game(whitePlayer, blackPlayer);
     
@@ -108,7 +106,7 @@ void playoffSession(int trials, Player& whitePlayer, Player& blackPlayer)
 
     for (numGames = 1; numGames <= trials ; numGames++)
     {
-        double white_eq = game.playGame(false);
+        double white_eq = game.playGame(verbose);
         whitePoints += white_eq;
 
         std::ostringstream ss;

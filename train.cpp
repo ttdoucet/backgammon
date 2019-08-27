@@ -121,7 +121,7 @@ int main(int argc, char *argv[])
 //  HumanPlayer blackPlayer("black", player_name[1]);
 
     timer.start();
-    playoffSession(trials, whitePlayer, blackPlayer);
+    playoffSession(trials, whitePlayer, blackPlayer, display_moves);
     timer.stop();
 
 #if 0
