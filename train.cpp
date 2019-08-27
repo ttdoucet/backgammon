@@ -28,7 +28,7 @@ protected:
 void playoffSession(int trials, Player& whitePlayer, Player& blackPlayer, bool verbose)
 {
     AnnotatedGame game(whitePlayer, blackPlayer);
-    
+
     int numGames;
     double whitePoints = 0.0;
 
