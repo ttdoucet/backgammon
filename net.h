@@ -1,9 +1,5 @@
 #pragma once
 
-#include <cmath>
-#include <cassert>
-#include <numeric>
-
 #include "board.h"
 #include "features.h"
 #include "mathfuncs.h"

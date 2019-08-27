@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 1993, 1997, 2008, 2013 by Todd Doucet.
-                  All Rights Reserved.
-*/
+ *                 All Rights Reserved.
+ */
 
 #pragma once
 #include <cstring>

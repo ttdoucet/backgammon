@@ -3,9 +3,14 @@
  */
 #include <string.h>
 #include <stdexcept>
+#include <fstream>
 
 #include "board.h"
 #include "net.h"
+
+#include "console.h"
+
+using namespace std;
 
 stopwatch mtimer, ftimer, stimer;
 
@@ -13,86 +18,75 @@ struct fWrite
 {
     void operator() (float &f) const
     {
-        if (fwrite(&f, sizeof(f), 1, netfp) != 1)
-            throw std::runtime_error("Error writing to network file.");
+        fs.write( reinterpret_cast<char *>(&f), sizeof(f) );
     }
-    fWrite(FILE *fp) : netfp(fp) { }
-    FILE *netfp;
+    fWrite(ofstream& ofs) : fs(ofs) { }
+    ostream& fs;
 };
 
 void net::writeFile(const char *fn)
 {
-    FILE *netfp;
 
-    if ( (netfp = fopen(fn, "wb")) == NULL)
-        throw std::runtime_error(std::string("Cannot open file ") + fn + " for writing.");
+    ofstream ofs{fn};
+    if (!ofs)
+        throw runtime_error(string("Cannot open file stream ") + fn + " for writing.");
 
-    fprintf(netfp, "portable format: %d\n", 0); // legacy
-    fprintf(netfp, "net type: %d\n", 3);  // legacy
-    fprintf(netfp, "hidden nodes: %d\n", N_HIDDEN);
-    fprintf(netfp, "input nodes: %d\n", N_INPUTS);
+    ofs << "portable format: " << 0 << "\n"; // legacy
+    ofs << "net type: " << 3 << "\n";        // legacy
+    ofs << "hidden nodes: " << N_HIDDEN << "\n";
+    ofs << "input nodes: " << N_INPUTS << "\n";
 
-    applyFunction(fWrite(netfp));
-    fprintf(netfp, "Current seed: %ldL\n", seed);
-    fprintf(netfp, "Games trained: %ldL\n", games_trained);
-    fclose(netfp);
+    applyFunction(fWrite(ofs));
+
+    ofs << "Current seed: " << seed << "L\n";            // legacy
+    ofs << "Games trained: " << games_trained << "L\n";  // legacy
 }
 
 struct fRead
 {
     void operator() (float &f) const
     {
-        if (fread(&f, 1, sizeof(f), netfp) != sizeof(f))
-            throw std::runtime_error("Error reading network file.");
+        fs.read( reinterpret_cast<char *>(&f), sizeof(f) );
     }
-    fRead(FILE *fp) : netfp(fp) { }
-    FILE *netfp;
+    fRead(istream& ifs) : fs(ifs) { }
+    istream& fs;
 };
+
+static bool has(istream& is, const char *str)
+{
+    char ch;
+    const char *s;
+
+    for(s = str; *s; s++)
+        if ( !(is.get(ch)) || (ch != *s) )
+            return false;
+    return *s == 0;
+}
 
 // Read in a neural net from a file.
 net *net::readFile(const char *fn)
 {
-    using namespace std;
-    unsigned long sd;
-    int hidden = 40;
+    int hidden = 40, portable = 1;
+    int ntype = 0, input = 0;
 
-    FILE *netfp;
-    if ( (netfp = fopen(fn, "rb")) == NULL)
-        throw std::runtime_error(std::string("Cannot open network file: ") + fn);
+    ifstream ifs(fn, ios::binary);
+    if (!ifs)
+        throw runtime_error(string("Cannot open network file: ") + fn);
 
-    int portable = 1;
-    int ignore = fscanf(netfp, " portable format: %d\n", &portable);
+    has(ifs, "portable format:"); ifs >> portable >> ws;
     assert(portable == 0);
-
-    int ntype = 0;
-    // If ntype remains zero, then we have a really old-style net file.
-    ignore = fscanf(netfp, " net type: %d\n", &ntype);
-    ignore = fscanf(netfp, " hidden nodes: %d\n", &hidden);
-
-    int inputs;
-    char throwAway;
-    ignore = fscanf(netfp, " input nodes: %d%c", &inputs, &throwAway);
-    if (throwAway == '\r')
-        ignore = fscanf(netfp, "%c", &throwAway);
-
-    if (throwAway != '\n')
-        throw std::runtime_error(std::string("Expected newline, got ") + std::to_string(throwAway));
-
+    has(ifs, "net type:"); ifs >> ntype >> ws;
     assert(ntype == 3);
+    has(ifs, "hidden nodes:"); ifs >> hidden >> ws;
+    has(ifs, "input nodes:"); ifs >> input >> ws;
 
-// Maybe return a unique_ptr<net> instead.
     net *p = new net();
-    p->filename = fn;
-    p->applyFunction(fRead(netfp));
+    p->applyFunction(fRead(ifs));
 
-    if (fscanf(netfp, " Current seed: %luL", &sd) != 1)
-        throw std::runtime_error("Cannot read seed from network file.");
-    p->seed = sd;
+    has(ifs, "Current seed:");
+    char L;
+    ifs >> p->seed >> L >> ws;
+    has(ifs, "Games trained:"); ifs >> p->games_trained;
 
-    if (fscanf(netfp, " Games trained: %ldL\n", &(p->games_trained)) != 1)
-        p->games_trained = 0L;
-
-    fclose(netfp);
-    p->init_play();
     return p;
 }
