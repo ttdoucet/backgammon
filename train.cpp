@@ -2,11 +2,56 @@
  * Copyright (C) 1993, 2008 by Todd Doucet.  All Rights Reserved.
  */
 
-#include <cstdlib>
+#include <iostream>
+#include <iomanip>
+
 #include "game.h"
 #include "playernet.h"
 #include "human.h"
 #include "console.h"
+
+class AnnotatedGame : public Game
+{
+public:
+    AnnotatedGame(Player& wh, Player& bl) : Game(wh, bl) {}
+
+protected:
+    void reportMove(board bd, moves mv) override
+    {
+        std::string s = moveStr(mv);
+        console << board::colorname(b.onRoll()) << " rolls "
+                << bd.d1() << " " <<  bd.d2()
+                << " and moves " << s << '\n';
+    }
+};
+
+void playoffSession(int trials, Player& whitePlayer, Player& blackPlayer, bool verbose)
+{
+    AnnotatedGame game(whitePlayer, blackPlayer);
+    
+    int numGames;
+    double whitePoints = 0.0;
+
+    for (numGames = 1; numGames <= trials ; numGames++)
+    {
+        double white_eq = game.playGame(verbose);
+        whitePoints += white_eq;
+
+        std::ostringstream ss;
+
+        ss << std::fixed << "Game " << numGames << ": "
+           << std::setprecision(2) << std::setw(5) << white_eq << "... ";
+
+        ss << "white equity/game = "
+           << std::setprecision(3) << whitePoints/numGames
+           << " (total "
+           << std::setprecision(2) << whitePoints
+           << ")\n";
+
+        console << ss.str();
+    }
+}
+
 
 /*
  * Command-line stuff
@@ -106,7 +151,6 @@ void setupRNG()
 extern stopwatch mtimer, ftimer, stimer, htimer;
 stopwatch timer;
 
-#include <iomanip>
 using namespace std;
 
 int main(int argc, char *argv[])

@@ -23,13 +23,16 @@ public:
     virtual ~Player(){}
 };
 
-void playoffSession(int trials, Player& wh, Player& bl, bool verbose);
-
 
 class Game
 {
 public:
-    Game(Player& wh, Player& bl);
+    Game(Player& wh, Player& bl) :
+        whitePlayer(wh),
+        blackPlayer(bl)
+    {
+        b.clearBoard();
+    }
 
     // Returns the equity of white at the end of the game.
     double playGame(bool verbose = false);
@@ -87,9 +90,6 @@ protected:
         return playerFor(b.onRoll());
     }
 };
-
-class AnnotatedGame;
-
 
 inline int score(const board& b, color_t color)
 {
