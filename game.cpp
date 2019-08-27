@@ -55,7 +55,6 @@ double Game::playGame(bool verbose)
     whitePlayer.prepareToPlay();
     blackPlayer.prepareToPlay();
 
-// unnecessary assignment?
     Player *playerOnRoll = setupGame();
     moves m;
 
@@ -65,20 +64,19 @@ double Game::playGame(bool verbose)
 
         playerOnRoll->chooseMove(b, m);
 
-        extern int display_moves;
-        if (display_moves)
+        if (verbose)
             reportMove(b, m);
+
         applyMove(b, m);
 
-        if (verbose)
-            display_board(b, white);
+//      if (verbose)
+//          display_board(b, white);
 
         b.setDice( throw_die(), throw_die() );
     }
 
     color_t winner = winningColor();
     color_t loser = opponentOf(winner);
-
 
     double whiteEquity = (white == winner) ? 1.0 : -1.0;
 

@@ -6,9 +6,11 @@ class NeuralNetPlayer : public Player, public callBack
 {
 public:
     NeuralNetPlayer(const char *player, const char *netname);
-    virtual void prepareToPlay() override;
-    virtual void finalEquity(double e) override { }
-    virtual void chooseMove(const board& b, moves& choice) override;
+    void prepareToPlay() override;
+    void chooseMove(const board& b, moves& choice) override;
+    void finalEquity(double e) override
+    {
+    }
 
 protected:
     typedef float (NeuralNetPlayer::* evalFunction)(const board& bd);
