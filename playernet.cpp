@@ -1,16 +1,10 @@
 #include <assert.h>
-#include "game.h"
-#include "net.h"
 
 #include "playernet.h"
 
 NeuralNetPlayer::NeuralNetPlayer(const char *player, const char *netname) : Player(player)
 {
     neural = net::readFile(netname);
-}
-
-void NeuralNetPlayer::prepareToPlay()
-{
 }
 
 int NeuralNetPlayer::callBackF(const board &b)
@@ -91,48 +85,9 @@ float NeuralNetPlayer::bearoffEquity(const board &b)
 
 float NeuralNetPlayer::littleE(const board &bd)
 {
-    assert(bd.diceInCup());
-    assert(neural != 0);
+//  assert(bd.diceInCup());
+    if (gameOver(bd))
+        return score(bd, bd.onRoll());
 
-    int e = gameOver(bd);
-    if (e)
-        return (double) e;
     return  neural->equity(bd);
 }
-
-// winner won the game.  Return the equity counting gammons & backgammons.
-int NeuralNetPlayer::gammon_check(const board &nb, color_t winner)
-{
-    color_t loser = opponentOf(winner);
-    int equity = 1;
-    if (nb.checkersOnPoint(loser, 0) == 0)
-    {
-        equity++;       // gammon
-        if (nb.highestChecker(loser) > 18)
-            equity++;       // backgammon
-    }
-    return equity;
-}
-
-int NeuralNetPlayer::win_check(const board &nb, color_t side)
-{
-    if (nb.checkersOnPoint(side, 0) == 15)
-        return gammon_check(nb, side);
-    else
-        return 0;
-}
-
-/* Returns nonzero if the game is over, in which case the
- * returned value is the equity of the player on roll.
- */
-int NeuralNetPlayer::gameOver(const board &bd)
-{
-    int e;
-    if ( (e = win_check(bd, bd.onRoll())) != 0)
-        return e;
-    else if ( (e = win_check(bd, bd.notOnRoll())) != 0)
-        return -e;
-    else
-        return 0;
-}
-

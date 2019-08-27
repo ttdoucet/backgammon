@@ -8,6 +8,7 @@
 #include "ttydisp.h"
 #include "console.h"
 
+
 /*
  * Learning will be done by a specialized Player.
  *
@@ -55,14 +56,12 @@ double Game::playGame(bool verbose)
     whitePlayer.prepareToPlay();
     blackPlayer.prepareToPlay();
 
-    Player *playerOnRoll = setupGame();
+    setupGame();
     moves m;
 
-    while( gameOver() == false )
+    while( gameOver(b) == false )
     {
-        playerOnRoll = playerFor(b.onRoll());
-
-        playerOnRoll->chooseMove(b, m);
+        playerFor(b.onRoll()).chooseMove(b, m);
 
         if (verbose)
             reportMove(b, m);
@@ -75,26 +74,11 @@ double Game::playGame(bool verbose)
         b.setDice( throw_die(), throw_die() );
     }
 
-    color_t winner = winningColor();
-    color_t loser = opponentOf(winner);
-
-    double whiteEquity = (white == winner) ? 1.0 : -1.0;
-
-    bool gammon = (b.checkersOnPoint(loser, 0) == 0);
-    bool backgammon = (gammon && b.highestChecker(loser) > 18);
-
-    if (backgammon)
-        whiteEquity *= 3;
-    else if (gammon)
-        whiteEquity *= 2;
-
-    whitePlayer.finalEquity(whiteEquity);
-    blackPlayer.finalEquity(-whiteEquity);
-
-    return whiteEquity;
+    return score(b, white);
 }
 
 
+// probably does not belong here
 void playoffSession(int trials, Player& whitePlayer, Player& blackPlayer, bool verbose)
 {
     AnnotatedGame game(whitePlayer, blackPlayer);

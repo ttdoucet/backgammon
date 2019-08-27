@@ -16,14 +16,15 @@ protected:
 public:
     Player(const char *nameOfPlayer) : playerName(nameOfPlayer) {};
     void setColor(color_t clr){ myColor = clr; }
-    virtual void prepareToPlay() = 0;
-    virtual void finalEquity(double e) = 0;
+    virtual void prepareToPlay() { }
+    virtual void finalEquity(double e) { }
     virtual void chooseMove(const board& b, moves& choice) = 0;
     virtual void presentBoard(const board&b) {}
     virtual ~Player(){}
 };
 
 void playoffSession(int trials, Player& wh, Player& bl, bool verbose);
+
 
 class Game
 {
@@ -48,17 +49,12 @@ protected:
             return black;
     }
 
-    Player *playerFor(color_t color) const
+    Player& playerFor(color_t color) const
     {
         if (color == white)
-            return &whitePlayer;
+            return whitePlayer;
         else
-            return &blackPlayer;
-    }
-
-    bool gameOver() const
-    {
-        return (b.checkersOnPoint(white, 0) == 15) || (b.checkersOnPoint(black, 0) == 15);
+            return blackPlayer;
     }
 
     void both(int pt, int num)
@@ -70,7 +66,7 @@ protected:
         }
     }
 
-    Player *setupGame()
+    Player& setupGame()
     {
         b.clearBoard();
         // Set up the checkers.
@@ -94,4 +90,36 @@ protected:
 
 class AnnotatedGame;
 
+
+inline int score(const board& b, color_t color)
+{
+    color_t winner;
+    int equity;
+
+    if (b.checkersOnPoint(color, 0) == 15)
+    {
+        winner = color;
+        equity = 1;
+    }
+    else
+    {
+        winner = opponentOf(color);
+        equity = -1;
+    }
+    const color_t loser = opponentOf(winner);
+    bool gammon = (b.checkersOnPoint(loser, 0) == 0);
+    bool backgammon = (gammon && b.highestChecker(loser) > 18);
+
+    if (backgammon)
+        equity *= 3;
+    else if (gammon)
+        equity *= 2;
+
+    return equity;
+}
+
+inline bool gameOver(const board& bd)
+{
+    return (bd.checkersOnPoint(white, 0) == 15) || (bd.checkersOnPoint(black, 0) == 15);
+}
 

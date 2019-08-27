@@ -56,6 +56,6 @@ class nullCallBack : public callBack
 std::string moveStr(moves& m);
 
 int plays(const board& b, callBack& callB);
-void applyMove(board& b,const moves& m);
 int numMoves(board& b);
 int checkersToPlay(board& b);
+void applyMove(board& b,const moves& m);
