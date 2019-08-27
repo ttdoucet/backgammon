@@ -22,11 +22,9 @@ struct fWrite
 
 void net::writeFile(const char *fn)
 {
-
     ofstream ofs{fn};
     if (!ofs)
         throw runtime_error(string("Cannot open file stream ") + fn + " for writing.");
-        throw runtime_error("Cannot open file stream "s + fn + " for writing.");
 
     ofs << "portable format: " << 0 << "\n"; // legacy
     ofs << "net type: " << 3 << "\n";        // legacy

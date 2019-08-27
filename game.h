@@ -1,6 +1,4 @@
-/*
- *  Game and Player data types.
- */
+// Written by Todd Doucet.
 
 #pragma once
 
