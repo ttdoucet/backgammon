@@ -32,7 +32,7 @@ double fewerEq(uint32_t b, int n)
 */
 double greaterEq(uint32_t b, int n)
 {
-	if (n == 0.0)
+	if (n == 0)
 		return 1.0;
 	return 1.0 - fewerEq(b, n - 1);
 }
