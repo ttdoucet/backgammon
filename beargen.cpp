@@ -1,5 +1,6 @@
 #include <iostream>
 #include <iomanip>
+#include <cstdint>
 
 #include "move.h"
 #include "bearoff.h"
@@ -10,9 +11,9 @@ int p_output;
 int perm_data[10];
 
 // shared between this generator and the main code
-extern int board_to_index(unsigned int b);
-extern double fewerEq(unsigned int b, int n);
-extern unsigned int board_to_32(const board &b, color_t c);
+extern int board_to_index(uint32_t b);
+extern double fewerEq(uint32_t b, int n);
+extern uint32_t board_to_32(const board &b, color_t c);
 
 std::string print_bearoffs()
 {
@@ -38,14 +39,14 @@ std::string print_bearoffs()
     return s.str();
 }
 
-int extract_point(unsigned int b, int point)
+int extract_point(uint32_t b, int point)
 {
     int shift = (4 * point);
-    unsigned int mask = (0x0fL << shift);
+    uint32_t mask = (0x0fL << shift);
     return (b & mask) >> shift ;
 }
 
-void board_from_32(board &board, unsigned int b, color_t color)
+void board_from_32(board &board, uint32_t b, color_t color)
 {
     board.clearBoard();
     for (int i = 0; i <= 6; i++)
@@ -91,7 +92,7 @@ void perm(int hi, int n)
 /* Returns the expected number of rolls to
  * clear the position.
  */
-float bearoffExpectation(unsigned int b)
+float bearoffExpectation(uint32_t b)
 {
     return bear_off[board_to_index(b)].expectation;
 }
@@ -100,7 +101,7 @@ class bearoffCallBack  : public callBack
 {
 public:
     float best;
-    unsigned int bestBoard;
+    uint32_t bestBoard;
 
     int callBackF(const board &b) override
     {
@@ -133,7 +134,7 @@ float best_expectation_for(board b, int i, int j)
 
 // Given the current board and the roll i-j, return the best
 // board position resulting from a legal play.
-unsigned int best_board_for(unsigned int theBoard, int i, int j)
+uint32_t best_board_for(uint32_t theBoard, int i, int j)
 {
     board b;
     board_from_32(b, theBoard, white);
@@ -154,7 +155,7 @@ void calc_fewer(int n)
         if ( (k % 1000) == 0)
             std::cerr << "fewer(" << n << "): " << k << "\n";
 
-        unsigned int from = bear_off[k].board;
+        uint32_t from = bear_off[k].board;
         double f = 0.0;
         for (int i = 1; i <= 6; i++)
         {
@@ -168,7 +169,7 @@ void calc_fewer(int n)
     }
 }
 
-double compute_expectation(unsigned int bd)
+double compute_expectation(uint32_t bd)
 {
     board b;
     board_from_32(b, bd, white);
@@ -195,7 +196,7 @@ void calc_expectation()
         if ( (i % 1000) == 0)
             std::cerr << "At " << i << ".\n";
 
-        unsigned int b = bear_off[i].board;
+        uint32_t b = bear_off[i].board;
         bear_off[i].expectation = (float) compute_expectation(b);
     }
 }
