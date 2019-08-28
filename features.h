@@ -44,14 +44,14 @@ private:
 
     static float squash(const float f)
     {
-        return (float) (1 / (1 + expf(-f)) );
+        return 1 / (1 + expf(-f));
     }
 
     float *compute_pip(const color_t color, float *ib) const
     {
         int pdiff = netboard.pipCount(opponentOf(color)) - netboard.pipCount(color);
 
-        float h = squash_sse( ((float) pdiff) / 27.0f);
+        float h = squash_sse(pdiff / 27.0f);
         *ib++ = h;
         *ib++ = 1.0f - h;
         return ib;
@@ -59,7 +59,7 @@ private:
 
     float *compute_hit_danger_v3(const color_t color, float *ib) const
     {
-        float h = ((float) num_hits(color, netboard)) / 36.0f;
+        float h = num_hits(color, netboard) / 36.0f;
 
         *ib++ = h;
         *ib++ = 1.0f - h;
@@ -70,16 +70,16 @@ private:
     {
         int i, n;
 
-        *ib++ = (float) netboard.checkersOnPoint(color, 0); /* borne off */
+        *ib++ = netboard.checkersOnPoint(color, 0); /* borne off */
 
         for (i = 1; i <= 24; i++)
         {
             n = netboard.checkersOnPoint(color, i);
-            *ib++ = (float) (n == 1);                   /* blot     */
-            *ib++ = (float) (n >= 2);                   /* point    */
-            *ib++ = (float) ( (n > 2) ? (n - 2) : 0 );  /* builders */
+            *ib++ = (n == 1);                   /* blot     */
+            *ib++ = (n >= 2);                   /* point    */
+            *ib++ = ( (n > 2) ? (n - 2) : 0 );  /* builders */
         }
-        *ib++ = (float) netboard.checkersOnBar(color);          /* on bar   */
+        *ib++ = netboard.checkersOnBar(color);          /* on bar   */
         return ib;
     }
 
