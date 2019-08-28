@@ -165,7 +165,7 @@ void calc_fewer(int n)
         }
         f /= 36.0;
         int x = board_to_index(from);
-        bear_off[x].f[n-1] = (float) f;
+        bear_off[x].f[n-1] = f;
     }
 }
 
@@ -197,7 +197,7 @@ void calc_expectation()
             std::cerr << "At " << i << ".\n";
 
         uint32_t b = bear_off[i].board;
-        bear_off[i].expectation = (float) compute_expectation(b);
+        bear_off[i].expectation = compute_expectation(b);
     }
 }
 

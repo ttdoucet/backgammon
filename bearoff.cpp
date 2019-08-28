@@ -19,7 +19,7 @@ int board_to_index(uint32_t b)
 double fewerEq(uint32_t b, int n)
 {
 	if (n == 0)
-            return (float) (b == 0x0f);
+            return (b == 0x0f);
         else
         {
             int i = board_to_index(b);
@@ -71,5 +71,5 @@ float bearoffEquity(const board &b)
 {
     uint32_t onRoll = board_to_32(b, b.onRoll());
     uint32_t notOnRoll = board_to_32(b, b.notOnRoll());
-    return (float) bearoffEquity(onRoll, notOnRoll);
+    return bearoffEquity(onRoll, notOnRoll);
 }
