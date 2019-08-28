@@ -25,7 +25,7 @@ protected:
     typedef float (NeuralNetPlayer::* evalFunction)(const board& bd) const;
     evalFunction equityEstimator;
 
-    class net& neural;
+    net& neural;
     float bestEquity;
     moves bestMove;
 

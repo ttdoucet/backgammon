@@ -13,7 +13,7 @@ public:
     static net *readFile(const char *fn);
     void writeFile(const char *fn);
 
-    /* Neural net estimate for the equity of the side on roll. */
+    /* Neural net estimate of the equity for the side on roll. */
     float equity(const board &b) noexcept
     {
         features feat{b};
@@ -82,19 +82,6 @@ private:
             f( weights_2[i] );
     }
 
-    // data members
-    alignas(16) float inbuf[N_INPUTS];
-    alignas(16) float input[N_INPUTS];
-    alignas(16) float hidden[N_HIDDEN];
-    alignas(16) float pre_hidden[N_HIDDEN];
-    alignas(16) float weights_1[N_HIDDEN][stride];
-    alignas(16) float weights_2[N_HIDDEN];
-    float output;
-
-    unsigned long seed = 0;  // legacy
-    long games_trained = 0;  // legacy
-    const char *filename;
-
     /*
      * Have the network evaluate its input.
      */
@@ -136,4 +123,15 @@ private:
         return net_to_equity(output);
     }
 
+    // data members
+    alignas(16) float inbuf[N_INPUTS];
+    alignas(16) float input[N_INPUTS];
+    alignas(16) float hidden[N_HIDDEN];
+    alignas(16) float pre_hidden[N_HIDDEN];
+    alignas(16) float weights_1[N_HIDDEN][stride];
+    alignas(16) float weights_2[N_HIDDEN];
+    float output;
+
+    unsigned long seed = 0;  // legacy
+    long games_trained = 0;  // legacy
 };
