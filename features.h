@@ -110,3 +110,8 @@ private:
         assert( (ib - start) == features::count);
     }
 };
+
+inline void features_v3(const board& b, float *dest)
+{
+    features{b}.calc(dest);
+}

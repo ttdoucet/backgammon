@@ -16,11 +16,9 @@ public:
     /* Neural net estimate of the equity for the side on roll. */
     float equity(const board &b) noexcept
     {
-        features feat{b};
-
         if constexpr (full_calc)
         {
-            feat.calc(input);
+            features_v3(b, input);
 
             mtimer.start();
             auto v = feedForward();
@@ -37,7 +35,7 @@ public:
                 init_play();
                 count = 0;
             }
-            feat.calc(inbuf);
+            features_v3(b, inbuf);
 
             mtimer.start();
             auto v = feedForward_marginal();
