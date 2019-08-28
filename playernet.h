@@ -2,32 +2,75 @@
 
 #include "game.h"
 #include "net.h"
+#include "bearoff.h"
 
 class NeuralNetPlayer : public Player, public callBack
 {
 public:
-    NeuralNetPlayer(const char *player, const char *netname);
-    void chooseMove(const board& b, moves& choice) override;
+    NeuralNetPlayer(const char *player, const char *netname)
+        : Player(player),
+          neural(*net::readFile(netname))
+    {
+    }
+
+    void chooseMove(const board& b, moves& choice)
+    {
+        if (isBearingOff(b))
+            selectMove(b, choice, &NeuralNetPlayer::bearoffEquity);
+        else
+            selectMove(b, choice, &NeuralNetPlayer::littleE);
+    }
 
 protected:
-    // consider alias instead for this
-    // and do I really want "pointer to member"?
-    typedef float (NeuralNetPlayer::* evalFunction)(const board& bd);
+    typedef float (NeuralNetPlayer::* evalFunction)(const board& bd) const;
     evalFunction equityEstimator;
 
-    int callBackF(const board &b) override;
-    void selectMove(const board &b, moves& m, evalFunction func);
-
-protected:
-    class net *neural;
+    class net& neural;
     float bestEquity;
     moves bestMove;
 
-protected:
-    float littleE(const board &bd);
-    float bearoffEquity(const board &b);
+    float bearoffEquity(const board &b) const
+    {
+        return ::bearoffEquity(b);
+    }
 
-    static unsigned long board_to_32(const board &b, color_t c);
-    static bool isBearingOff(const board &bd);
+    int callBackF(const board &b)
+    {
+        float e = - (this->*equityEstimator)(b);
+        if (e > bestEquity)
+        {
+            bestEquity = e;
+            bestMove = m;   // the current move.
+        }
+        return 0;
+    }
+
+    void selectMove(const board &b, moves &mv, evalFunction func)
+    {
+        equityEstimator = func;
+        bestEquity = -10.0f;
+        bestMove.clear();
+
+        plays(b, *this);
+
+        mv = bestMove;
+    }
+
+    float littleE(const board &bd) const
+    {
+    //  assert(bd.diceInCup());
+        if (gameOver(bd))
+            return score(bd, bd.onRoll());
+
+        return  neural.equity(bd);
+    }
+
+    static bool isBearingOff(const board &bd)
+    {
+        return  bd.checkersOnPoint(white, 0) &&
+            bd.checkersOnPoint(black, 0) &&
+            (bd.highestChecker(white) <= 6) &&
+            (bd.highestChecker(black) <= 6);
+    }
 };
 

@@ -16,20 +16,17 @@ public:
     LegalPlay(const board &bb) : b(bb) {}
 
     int play(callBack &callB);
-
     int checkersToPlay();
     int numMoves();
 
 private:
     int openPoint(color_t color, int n);
-
     int duplicate_move(color_t color, moves& m);
     int move_die(int from, int to);
     void move_die(int from, int to, moves& m);
     void move_die(int f, int t, moves& m, int n);
     void unmove_die(moves& m);
     void unmove_die(moves& m, int n);
-
     int outputMove(callBack &callB);
     int doRoll(int r1, int r2, int pt, callBack &callB);
     int playNonDouble(int r1, int r2, int pt, callBack &callB);
@@ -98,7 +95,6 @@ inline void LegalPlay::move_die(int f, int t, moves& m, int n)
     while (n--)
         move_die(f, t, m);
 }
-
 
 // Undo the last move indicated by the structure.
 inline void LegalPlay::unmove_die(moves& m)

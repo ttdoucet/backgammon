@@ -1,5 +1,5 @@
-OBJS = train.o hits.o net.o move.o ttydisp.o random.o bdata.o beardll.o playernet.o human.o mathfuncs.o console.o
-BEARGEN_OBJS = beargen.o random.o move.o console.o
+OBJS = train.o hits.o net.o move.o ttydisp.o random.o bdata.o bearoff.o human.o mathfuncs.o console.o
+BEARGEN_OBJS = beargen.o bearoff.o random.o move.o console.o
 
 #CPPFLAGS = -O3 -ffast-math -fvectorize --std=c++17 -save-temps -g
 CPPFLAGS = -O3 -ffast-math -fvectorize --std=c++17
@@ -29,7 +29,7 @@ all : beargen train
 clean : 
 	-rm -f beargen train *.o *.bc *.s *.ii
 
-distclean : 
+distclean : clean
 	-rm -f beargen train bearoff.dat *.o
 
 .PHONY : clean all

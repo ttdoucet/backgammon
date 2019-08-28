@@ -1,36 +1,18 @@
-#include <algorithm>
+#include <iostream>
 #include <iomanip>
 
 #include "move.h"
 #include "bearoff.h"
 
-struct bear_off bear_off[54264];
-const int bsize = 54264;
+struct bear_off bear_off[bsize];
 
 int p_output;
 int perm_data[10];
 
-int board_to_index(unsigned int b)
-{
-    auto comparison = [](struct bear_off &lhs, unsigned int val) { return lhs.board < val; };
-
-    struct bear_off *i = std::lower_bound(bear_off, bear_off + bsize, b, comparison);
-    return i - bear_off;
-}
-
-/* Return the probability that the bearoff position denoted
-   by "b" will be cleared in n or fewer rolls.
-*/
-double fewerEq(unsigned int b, int n)
-{
-    if (n == 0)
-        return (float) (b == 0x0f);
-    else
-    {
-        int i = board_to_index(b);
-        return bear_off[i].f[n-1];
-    }
-}
+// shared between this generator and the main code
+extern int board_to_index(unsigned int b);
+extern double fewerEq(unsigned int b, int n);
+extern unsigned int board_to_32(const board &b, color_t c);
 
 std::string print_bearoffs()
 {
@@ -54,20 +36,6 @@ std::string print_bearoffs()
     s << "};\n";
 
     return s.str();
-}
-
-// Encode the current board as a 32-bit number (current, we
-// use 28 bits, although 4 are redundant.
-unsigned int board_to_32(const board &b, color_t c)
-{
-    unsigned int d6 = b.checkersOnPoint(c, 6) << (4 * 6);
-    unsigned int d5 = b.checkersOnPoint(c, 5) << (4 * 5);
-    unsigned int d4 = b.checkersOnPoint(c, 4) << (4 * 4);
-    unsigned int d3 = b.checkersOnPoint(c, 3) << (4 * 3);
-    unsigned int d2 = b.checkersOnPoint(c, 2) << (4 * 2);
-    unsigned int d1 = b.checkersOnPoint(c, 1) << (4 * 1);
-    unsigned int d0 = b.checkersOnPoint(c, 0);
-    return d0 | d1 | d2 | d3 | d4 | d5 | d6;
 }
 
 int extract_point(unsigned int b, int point)
@@ -260,6 +228,6 @@ int main()
     calc_fewer(14);
     calc_fewer(15);
 
-    console << print_bearoffs();
+    std::cout << print_bearoffs();
     return 0;
 }
