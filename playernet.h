@@ -22,14 +22,14 @@ public:
     }
 
 protected:
-    typedef float (NeuralNetPlayer::* evalFunction)(const board& bd) const;
+    typedef float (NeuralNetPlayer::* evalFunction)(const board& bd);
     evalFunction equityEstimator;
 
     net& neural;
     float bestEquity;
     moves bestMove;
 
-    float bearoffEquity(const board &b) const
+    float bearoffEquity(const board &b)
     {
         return ::bearoffEquity(b);
     }
@@ -56,7 +56,7 @@ protected:
         mv = bestMove;
     }
 
-    float littleE(const board &bd) const
+    float littleE(const board &bd)
     {
     //  assert(bd.diceInCup());
         if (gameOver(bd))
