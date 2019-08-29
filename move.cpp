@@ -112,17 +112,6 @@ inline void LegalPlay::unmove_die(moves& m, int n)
         unmove_die(m);
 }
 
-void applyMove(board& b,const moves &m)
-{
-    for (int i = 0;  i < m.count(); i++)
-    {
-        if (m[i].hit)
-            b.putOnBar(b.notOnRoll(), opponentPoint(m[i].to));
-        b.moveChecker(b.onRoll(), m[i].from, m[i].to);
-    }
-    b.pickupDice();
-}
-
 inline int LegalPlay::play(callBack &callB)
 {
     int &nmoves = callB.nMoves;
@@ -261,6 +250,17 @@ inline int LegalPlay::playDouble(int r, int n, int pt, callBack &callB)
 }
 
 // Exported routines.
+
+void applyMove(board& b,const moves &m)
+{
+    for (int i = 0;  i < m.count(); i++)
+    {
+        if (m[i].hit)
+            b.putOnBar(b.notOnRoll(), opponentPoint(m[i].to));
+        b.moveChecker(b.onRoll(), m[i].from, m[i].to);
+    }
+    b.pickupDice();
+}
 
 int plays(const board& b, callBack& callB)
 {
