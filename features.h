@@ -7,6 +7,7 @@
 #include "stopwatch.h"
 #include <cassert>
 
+template<typename iter>
 class features
 {
 public:
@@ -14,7 +15,7 @@ public:
 
     features(const board &b) : netboard(b) {}
 
-    float *calc(float *dest) const
+    iter calc(iter dest) const
     {
         extern stopwatch ftimer;
 
@@ -30,7 +31,7 @@ public:
 private:
     const board netboard;
 
-    float *compute_contact(const color_t color, float *ib) const
+    iter compute_contact(const color_t color, iter ib) const
     {
         int me = netboard.highestChecker(color);
         int him = opponentPoint(netboard.highestChecker(opponentOf(color)));
@@ -47,7 +48,7 @@ private:
         return 1 / (1 + expf(-f));
     }
 
-    float *compute_pip(const color_t color, float *ib) const
+    iter compute_pip(const color_t color, iter ib) const
     {
         int pdiff = netboard.pipCount(opponentOf(color)) - netboard.pipCount(color);
 
@@ -57,7 +58,7 @@ private:
         return ib;
     }
 
-    float *compute_hit_danger_v3(const color_t color, float *ib) const
+    iter compute_hit_danger_v3(const color_t color, iter ib) const
     {
         float h = num_hits(color, netboard) / 36.0f;
 
@@ -66,7 +67,7 @@ private:
         return ib;
     }
 
-    float *compute_input_for(const color_t color, float *ib) const
+    iter compute_input_for(const color_t color, iter ib) const
     {
         int i, n;
 
@@ -83,7 +84,7 @@ private:
         return ib;
     }
 
-    float *compute_v3_inputs(const color_t color, float *ib) const
+    iter compute_v3_inputs(const color_t color, iter ib) const
     {
         // The first two are the same as net_v2.
         ib = compute_contact(color, ib);
@@ -99,9 +100,9 @@ private:
     /*
      * Encode the board as the network input.
      */
-    void compute_input(const color_t color, float *ib) const
+    void compute_input(const color_t color, iter ib) const
     {
-        float *start = ib;
+        iter start = ib;
 
         ib = compute_input_for(color, ib);
         ib = compute_input_for(opponentOf(color), ib);
@@ -111,7 +112,8 @@ private:
     }
 };
 
-inline void features_v3(const board& b, float *dest)
+template<typename V>
+inline void features_v3(const board& b, V& dest)
 {
-    features{b}.calc(dest);
+    features<typename V::iterator>{b}.calc(dest.begin() );
 }
