@@ -10,9 +10,8 @@ public:
     {
         return v[r][c];
     }
-    
-    //  Matrix(const Matrix&) = delete;
 
+    //  Matrix(const Matrix&) = delete;
 
     int rows() const
     {

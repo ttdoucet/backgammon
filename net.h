@@ -5,52 +5,29 @@
 #include "mathfuncs.h"
 
 #include "stopwatch.h"
-extern stopwatch mtimer, ftimer, stimer;
 
 #include "vector.h"
 #include "matrix.h"
 
-inline void foobar()
-{
-    Matrix<3, 7, float>  m;
-    auto mr = m.row(1);
-}
-
 class net
 {
+    constexpr static int N_HIDDEN = 30;
+    constexpr static int N_INPUTS = 156;
+
 public:
+    typedef Vector<N_INPUTS, float> input_vector;
+//  typedef Vector<N_HIDDEN, float> hidden_vector;
+    typedef float hidden_vector[N_HIDDEN];
+
     static net *readFile(const char *fn);
     void writeFile(const char *fn);
 
-    /* Neural net estimate of the equity for the side on roll. */
-    float equity(const board &b) noexcept
+    float forward(input_vector& features)
     {
         if constexpr (full_calc)
-        {
-            features_v3(b, input);
-
-            mtimer.start();
-            auto v = feedForward();
-            mtimer.stop();
-
-            return v;
-        }
+            return feedForward(features);
         else
-        {
-            static int count = 0;
-
-            if (count++ == 100)
-            {
-                init_play();
-                count = 0;
-            }
-            features_v3(b, inbuf);
-
-            mtimer.start();
-            auto v = feedForward_marginal();
-            mtimer.stop();
-            return v;
-        }
+            return feedForward_marginal(features);
     }
 
     net()
@@ -74,11 +51,10 @@ public:
 
 
 private:
-    constexpr static int N_HIDDEN = 30;
-    constexpr static int N_INPUTS = 156;
     constexpr static int stride = N_INPUTS;
-    constexpr static bool full_calc = true;
+    constexpr static bool full_calc = false;
     constexpr static float MAX_EQUITY = 3.0f;
+
 
     constexpr static float net_to_equity(float p)
     {
@@ -87,9 +63,12 @@ private:
 
     void init_play()
     {
-        for (int i = 0; i < N_INPUTS; i++)
-            input[i] = 0.0f;
-        feedForward();
+        if constexpr (full_calc == 0)
+        {
+            for (int i = 0; i < N_INPUTS; i++)
+                prev_input[i] = 0;
+            feedForward(prev_input);
+        }
     }
 
     // Applies a functor to each weight parameter in the network.
@@ -107,50 +86,48 @@ private:
     /*
      * Have the network evaluate its input.
      */
-    float feedForward()
+    float feedForward(input_vector& input)
     {
         for (int i = 0; i < N_HIDDEN; i++)
-        {
             pre_hidden[i] = dotprod<N_INPUTS>(input.begin(), weights_1[i]);
 
-            // I think this one makes a copy of input and is a little slower.
-            // So input would come back empty but dotprod would return
-            // the correct value.
-            // pre_hidden[i] = dotprod<N_INPUTS>(input, weights_1[i]);
-        }
-
-        stimer.start();
         for (int i = 0; i < N_HIDDEN; i++)
             hidden[i] = squash_sse(pre_hidden[i]);
-        stimer.stop();
 
         output = squash_sse(dotprod<N_HIDDEN>(hidden, weights_2));
         return net_to_equity(output);
     }
 
-    float feedForward_marginal()
+    float feedForward_marginal(input_vector& input)
     {
+        static int count = 0;
+
+        if (count++ == 100)
+        {
+            init_play();
+            count = 0;
+        }
+
         for (int i = 0; i < N_INPUTS ; i++)
         {
-            if (input[i] == inbuf[i])
+            if (prev_input[i] == input[i])
                 continue;
 
-            float d = inbuf[i] - input[i] ;
-            input[i] = inbuf[i];
+            float d = input[i] - prev_input[i] ;
+            prev_input[i] = input[i];
 
             for (int j = 0; j < N_HIDDEN; j++)
                 pre_hidden[j] += d * M(j, i);
 
         }
-        stimer.start();
         for (int j = 0; j < N_HIDDEN; j++)
             hidden[j] = squash_sse(pre_hidden[j]);
-        stimer.stop();
 
         float f = dotprod<N_HIDDEN>(hidden, weights_2);
         output = squash_sse(f);
         return net_to_equity(output);
     }
+
 
     /* Model parameters.
      */
@@ -159,16 +136,27 @@ private:
 
     /* Activations.
      */
-//  alignas(16) float inbuf[N_INPUTS];
-//  alignas(16) float input[N_INPUTS];
-    alignas(16) Vector<N_INPUTS, float> inbuf;
-    alignas(16) Vector<N_INPUTS, float> input;
+    alignas(16) hidden_vector hidden;
+    alignas(16) hidden_vector pre_hidden;
 
-    alignas(16) float hidden[N_HIDDEN];
-    alignas(16) float pre_hidden[N_HIDDEN];
 
     float output;
 
+    alignas(16) input_vector prev_input;
+
+
     unsigned long seed = 0;  // legacy
     long games_trained = 0;  // legacy
+
+
+public:
+    // I am so tired of this.
+    alignas(16) input_vector features;
+
+    /* Neural net estimate of the equity for the side on roll. */
+    float equity(const board &b) noexcept
+    {
+        features_v3(b, features);
+        return forward(features);
+    }
 };
