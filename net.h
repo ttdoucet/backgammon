@@ -7,41 +7,14 @@
 #include "stopwatch.h"
 extern stopwatch mtimer, ftimer, stimer;
 
-template<int SIZE, typename T>
-class Vector
+#include "vector.h"
+#include "matrix.h"
+
+inline void foobar()
 {
-public:
-    T v[SIZE];
-
-    Vector()
-    {
-    }
-
-    Vector(const Vector&) = delete;
-
-public:
-    T& operator [](int i)
-    {
-        return v[i];
-    }
-
-    int size() const
-    {
-        return SIZE;
-    }
-
-    using iterator=T*;
-
-    T* begin()
-    {
-        return v;
-    }
-
-    T* end()
-    {
-        return v + size();
-    }
-};
+    Matrix<3, 7, float>  m;
+    auto mr = m.row(1);
+}
 
 class net
 {
@@ -104,7 +77,7 @@ private:
     constexpr static int N_HIDDEN = 30;
     constexpr static int N_INPUTS = 156;
     constexpr static int stride = N_INPUTS;
-    constexpr static bool full_calc = false;
+    constexpr static bool full_calc = true;
     constexpr static float MAX_EQUITY = 3.0f;
 
     constexpr static float net_to_equity(float p)
