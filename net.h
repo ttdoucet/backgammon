@@ -6,23 +6,19 @@
 
 #include "stopwatch.h"
 
-#include "vector.h"
-#include "matrix.h"
-
 class net
 {
     constexpr static int N_HIDDEN = 30;
     constexpr static int N_INPUTS = 156;
 
 public:
-    typedef Vector<N_INPUTS, float> input_vector;
-//  typedef Vector<N_HIDDEN, float> hidden_vector;
+    typedef float input_vector[N_INPUTS];
     typedef float hidden_vector[N_HIDDEN];
 
     static net *readFile(const char *fn);
     void writeFile(const char *fn);
 
-    float forward(input_vector& features)
+    float forward(float* features)
     {
         if constexpr (full_calc)
             return feedForward(features);
@@ -49,12 +45,10 @@ public:
         return weights_2[i];
     }
 
-
 private:
     constexpr static int stride = N_INPUTS;
     constexpr static bool full_calc = false;
     constexpr static float MAX_EQUITY = 3.0f;
-
 
     constexpr static float net_to_equity(float p)
     {
@@ -86,10 +80,10 @@ private:
     /*
      * Have the network evaluate its input.
      */
-    float feedForward(input_vector& input)
+    float feedForward(float* input)
     {
         for (int i = 0; i < N_HIDDEN; i++)
-            pre_hidden[i] = dotprod<N_INPUTS>(input.begin(), weights_1[i]);
+            pre_hidden[i] = dotprod<N_INPUTS>(input, weights_1[i]);
 
         for (int i = 0; i < N_HIDDEN; i++)
             hidden[i] = squash_sse(pre_hidden[i]);
@@ -98,7 +92,7 @@ private:
         return net_to_equity(output);
     }
 
-    float feedForward_marginal(input_vector& input)
+    float feedForward_marginal(float* input)
     {
         static int count = 0;
 
@@ -139,11 +133,9 @@ private:
     alignas(16) hidden_vector hidden;
     alignas(16) hidden_vector pre_hidden;
 
-
     float output;
 
     alignas(16) input_vector prev_input;
-
 
     unsigned long seed = 0;  // legacy
     long games_trained = 0;  // legacy

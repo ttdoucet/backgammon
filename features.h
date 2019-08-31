@@ -1,11 +1,10 @@
 #pragma once 
 
+#include <cassert>
+
 #include "board.h"
 #include "hits.h"
 #include "mathfuncs.h"
-
-#include "stopwatch.h"
-#include <cassert>
 
 template<typename iter>
 class features
@@ -17,14 +16,7 @@ public:
 
     iter calc(iter dest) const
     {
-        extern stopwatch ftimer;
-
-        ftimer.start();
-
         compute_input(netboard.onRoll(), dest);
-
-        ftimer.stop();
-
         return dest + features::count;
     }
 
@@ -113,7 +105,9 @@ private:
 };
 
 template<typename V>
-inline void features_v3(const board& b, V& dest)
+inline void features_v3(const board& b, V dest)
 {
-    features<typename V::iterator>{b}.calc(dest.begin() );
+//    features<typename V::iterator>{b}.calc(dest.begin() );
+    features<float *>{b}.calc(dest );
+
 }
