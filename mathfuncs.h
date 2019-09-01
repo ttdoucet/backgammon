@@ -6,7 +6,7 @@
 template<int N>
 inline float dotprod(float *vec1, float *vec2)
 {
-    double sum = 0;
+    float sum = 0;
     for (int i = 0; i < N; ++i)
         sum += (vec1[i] * vec2[i]);
 
