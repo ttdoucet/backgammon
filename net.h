@@ -20,7 +20,6 @@ public:
 
     net()
     {
-        init_play();
     }
 
     /*
@@ -39,7 +38,7 @@ public:
 
 private:
     constexpr static int stride = N_INPUTS;
-    constexpr static bool full_calc = false;
+    constexpr static bool full_calc = true;
     constexpr static float MAX_EQUITY = 3.0f;
 
     constexpr static float net_to_equity(float p)
@@ -47,15 +46,6 @@ private:
         return  (2 * p - 1) * MAX_EQUITY;
     }
 
-    void init_play()
-    {
-        if constexpr (full_calc == 0)
-        {
-            for (int i = 0; i < N_INPUTS; i++)
-                prev_input[i] = 0;
-            feedForward(prev_input);
-        }
-    }
 
     // Applies a functor to each weight parameter in the network.
     template<class Ftn> void applyFunction(Ftn f)
@@ -72,10 +62,10 @@ private:
     /*
      * Have the network evaluate its input.
      */
-    float feedForward(float* input)
+    float feedForward()
     {
         for (int i = 0; i < N_HIDDEN; i++)
-            pre_hidden[i] = dotprod<N_INPUTS>(input, weights_1[i]);
+            pre_hidden[i] = dotprod<N_INPUTS>(features, weights_1[i]);
 
         for (int i = 0; i < N_HIDDEN; i++)
             hidden[i] = squash_sse(pre_hidden[i]);
@@ -84,23 +74,26 @@ private:
         return net_to_equity(output);
     }
 
-    float feedForward_marginal(float* input)
+
+    float feedForward_marginal()
     {
         static int count = 0;
-
-        if (count++ == 100)
+        if (count-- == 0)
         {
-            init_play();
-            count = 0;
+            for (int i = 0; i < N_INPUTS; i++)
+                prev_input[i] = 0;
+            for (int i = 0; i < N_HIDDEN; i++)
+                pre_hidden[i] = 0;
+            count = 500;
         }
 
         for (int i = 0; i < N_INPUTS ; i++)
         {
-            if (prev_input[i] == input[i])
+            if (prev_input[i] == features[i])
                 continue;
 
-            float d = input[i] - prev_input[i] ;
-            prev_input[i] = input[i];
+            float d = features[i] - prev_input[i] ;
+            prev_input[i] = features[i];
 
             for (int j = 0; j < N_HIDDEN; j++)
                 pre_hidden[j] += d * M(j, i);
@@ -142,8 +135,8 @@ public:
         features_v3(b, features);
 
         if constexpr (full_calc)
-            return feedForward(features);
+            return feedForward();
         else
-            return feedForward_marginal(features);
+            return feedForward_marginal();
     }
 };
