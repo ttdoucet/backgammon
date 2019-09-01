@@ -12,21 +12,22 @@ class features
 public:
     constexpr static int count = 156;
 
-    features(const board &b) : netboard(b) {}
+    features(const board &bd) : b(bd) {}
 
     iter calc(iter dest) const
     {
-        compute_input(netboard.onRoll(), dest);
-        return dest + features::count;
+        iter end = compute_input(b.onRoll(), dest);
+        assert( (end - dest) == 156);
+        return end;
     }
 
 private:
-    const board netboard;
+    const board b;
 
     iter compute_contact(const color_t color, iter ib) const
     {
-        int me = netboard.highestChecker(color);
-        int him = opponentPoint(netboard.highestChecker(opponentOf(color)));
+        int me = b.highestChecker(color);
+        int him = opponentPoint(b.highestChecker(opponentOf(color)));
         int contact = me - him;
         float f = contact < 0.0f ? 0.0f : (contact / 23.0f);
 
@@ -35,14 +36,9 @@ private:
         return ib;
     }
 
-    static float squash(const float f)
-    {
-        return 1 / (1 + expf(-f));
-    }
-
     iter compute_pip(const color_t color, iter ib) const
     {
-        int pdiff = netboard.pipCount(opponentOf(color)) - netboard.pipCount(color);
+        int pdiff = b.pipCount(opponentOf(color)) - b.pipCount(color);
 
         float h = squash_sse(pdiff / 27.0f);
         *ib++ = h;
@@ -52,7 +48,7 @@ private:
 
     iter compute_hit_danger_v3(const color_t color, iter ib) const
     {
-        float h = num_hits(color, netboard) / 36.0f;
+        float h = num_hits(color, b) / 36.0f;
 
         *ib++ = h;
         *ib++ = 1.0f - h;
@@ -63,16 +59,17 @@ private:
     {
         int i, n;
 
-        *ib++ = netboard.checkersOnPoint(color, 0); /* borne off */
+        *ib++ = b.checkersOnPoint(color, 0);    /* borne off */
 
         for (i = 1; i <= 24; i++)
         {
-            n = netboard.checkersOnPoint(color, i);
+            n = b.checkersOnPoint(color, i);
             *ib++ = (n == 1);                   /* blot     */
             *ib++ = (n >= 2);                   /* point    */
             *ib++ = ( (n > 2) ? (n - 2) : 0 );  /* builders */
         }
-        *ib++ = netboard.checkersOnBar(color);          /* on bar   */
+
+        *ib++ = b.checkersOnBar(color);         /* on bar   */
         return ib;
     }
 
@@ -89,25 +86,19 @@ private:
         return ib;
     }
 
-    /*
-     * Encode the board as the network input.
+    /* Encode the board as the network input.
      */
-    void compute_input(const color_t color, iter ib) const
+    iter compute_input(const color_t color, iter ib) const
     {
-        iter start = ib;
-
         ib = compute_input_for(color, ib);
         ib = compute_input_for(opponentOf(color), ib);
         ib = compute_v3_inputs(color, ib);
-        
-        assert( (ib - start) == features::count);
+        return ib;
     }
 };
 
 template<typename V>
 inline void features_v3(const board& b, V dest)
 {
-//    features<typename V::iterator>{b}.calc(dest.begin() );
     features<float *>{b}.calc(dest );
-
 }
