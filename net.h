@@ -38,7 +38,7 @@ public:
 
 private:
     constexpr static int stride = N_INPUTS;
-    constexpr static bool full_calc = true;
+    constexpr static bool full_calc = false;
     constexpr static float MAX_EQUITY = 3.0f;
 
     constexpr static float net_to_equity(float p)
@@ -74,7 +74,6 @@ private:
         return net_to_equity(output);
     }
 
-
     float feedForward_marginal()
     {
         static int count = 0;
@@ -106,7 +105,6 @@ private:
         output = squash_sse(f);
         return net_to_equity(output);
     }
-
 
     /* Activations.
      */
