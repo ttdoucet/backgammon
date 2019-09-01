@@ -8,42 +8,12 @@
 
 using namespace std;
 
-struct fWrite
+static float read_float(istream& ifs)
 {
-    void operator() (float &f) const
-    {
-        fs.write( reinterpret_cast<char *>(&f), sizeof(f) );
-    }
-    fWrite(ofstream& ofs) : fs(ofs) { }
-    ostream& fs;
-};
-
-void net::writeFile(const char *fn)
-{
-    ofstream ofs{fn};
-    if (!ofs)
-        throw runtime_error(string("Cannot open file stream ") + fn + " for writing.");
-
-    ofs << "portable format: " << 0 << "\n"; // legacy
-    ofs << "net type: " << 3 << "\n";        // legacy
-    ofs << "hidden nodes: " << N_HIDDEN << "\n";
-    ofs << "input nodes: " << N_INPUTS << "\n";
-
-    applyFunction(fWrite(ofs));
-
-    ofs << "Current seed: " << seed << "L\n";            // legacy
-    ofs << "Games trained: " << games_trained << "L\n";  // legacy
+    float f;
+    ifs.read( reinterpret_cast<char *>(&f), sizeof(f) );
+    return f;
 }
-
-struct fRead
-{
-    void operator() (float &f) const
-    {
-        fs.read( reinterpret_cast<char *>(&f), sizeof(f) );
-    }
-    fRead(istream& ifs) : fs(ifs) { }
-    istream& fs;
-};
 
 static bool has(istream& is, const char *str)
 {
@@ -74,7 +44,13 @@ BgNet *readFile(const char *fn)
     has(ifs, "input nodes:"); ifs >> input >> ws;
 
     auto p = new BgNet();
-    p->applyFunction(fRead(ifs));
+
+    for (int i = 0; i < p->n_hidden; i++)
+        for (int j = 0; j < p->n_inputs; j++)
+            p->M(i, j) = read_float(ifs);
+
+    for (int i = 0; i < p->n_hidden; i++)
+        p->V(i) = read_float(ifs);
 
     has(ifs, "Current seed:");
     char L;

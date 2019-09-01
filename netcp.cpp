@@ -3,6 +3,7 @@
 
 int main(int argc, char *argv[])
 {
-    BgNet *neural = net::readFile("net.w");
+//    BgNet *neural = BgNet::readFile("net.w");
+    BgNet *neural = readFile("net.w");
     neural->writeFile("copy.w");
 }
