@@ -108,26 +108,26 @@ private:
     }
 
 
+    /* Activations.
+     */
+    alignas(16) input_vector features;
+    alignas(16) input_vector prev_input;
+    alignas(16) hidden_vector hidden;
+    alignas(16) hidden_vector pre_hidden;
+
+
     /* Model parameters.
      */
     alignas(16) float weights_1[N_HIDDEN][stride];
     alignas(16) float weights_2[N_HIDDEN];
 
-    /* Activations.
-     */
-    alignas(16) hidden_vector hidden;
-    alignas(16) hidden_vector pre_hidden;
-
     float output;
-
-    alignas(16) input_vector prev_input;
 
     unsigned long seed = 0;  // legacy
     long games_trained = 0;  // legacy
 
-
 public:
-    alignas(16) input_vector features;
+
 
     /* Neural net estimate of the equity for the side on roll. */
     float equity(const board &b) noexcept
