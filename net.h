@@ -4,15 +4,6 @@
 #include "features.h"
 #include "mathfuncs.h"
 
-// Does not belong here.
-#include <fstream>
-
-static void write_float(std::ostream& fs, float f)
-{
-    fs.write( reinterpret_cast<char *>(&f), sizeof(f) );
-}
-
-
 template<int N_INPUTS, int N_HIDDEN>
 class net
 {
@@ -22,31 +13,6 @@ public:
 
     typedef float input_vector[N_INPUTS];
     typedef float hidden_vector[N_HIDDEN];
-
-// I think this should be a non-member function
-// which takes a BgNet in particular to write.
-    void writeFile(const char *fn)
-    {
-        using namespace std;
-        ofstream ofs{fn};
-        if (!ofs)
-            throw runtime_error(string("Cannot open file stream ") + fn + " for writing.");
-
-        ofs << "portable format: " << 0 << "\n"; // legacy
-        ofs << "net type: " << 3 << "\n";        // legacy
-        ofs << "hidden nodes: " << n_hidden << "\n";
-        ofs << "input nodes: " << n_inputs << "\n";
-
-        for (int i = 0; i < n_hidden; i++)
-            for (int j = 0; j < n_inputs; j++)
-                write_float(ofs, M(i, j));
-
-        for (int i = 0; i < n_hidden; i++)
-            write_float(ofs, V(i));
-
-        ofs << "Current seed: " << seed << "L\n";            // legacy
-        ofs << "Games trained: " << games_trained << "L\n";  // legacy
-    }
 
     /* Access to model parameters.
      */
@@ -149,3 +115,4 @@ public:
 using BgNet = netv3_marginal;
 
 BgNet *readFile(const char *fn);
+void writeFile(BgNet& n, const char *fn);

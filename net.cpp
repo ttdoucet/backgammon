@@ -8,6 +8,33 @@
 
 using namespace std;
 
+static void write_float(std::ostream& fs, float f)
+{
+    fs.write( reinterpret_cast<char *>(&f), sizeof(f) );
+}
+
+void writeFile(BgNet& n, const char *fn)
+{
+    ofstream ofs{fn};
+    if (!ofs)
+        throw runtime_error(string("Cannot open file stream ") + fn + " for writing.");
+
+    ofs << "portable format: " << 0 << "\n"; // legacy
+    ofs << "net type: " << 3 << "\n";        // legacy
+    ofs << "hidden nodes: " << n.n_hidden << "\n";
+    ofs << "input nodes: " << n.n_inputs << "\n";
+
+    for (int i = 0; i < n.n_hidden; i++)
+        for (int j = 0; j < n.n_inputs; j++)
+            write_float(ofs, n.M(i, j));
+
+    for (int i = 0; i < n.n_hidden; i++)
+        write_float(ofs, n.V(i));
+
+    ofs << "Current seed: " << n.seed << "L\n";            // legacy
+    ofs << "Games trained: " << n.games_trained << "L\n";  // legacy
+}
+
 static float read_float(istream& ifs)
 {
     float f;
