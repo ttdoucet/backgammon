@@ -7,9 +7,6 @@
 #include "board.h"
 #include "hits.h"
 
-#include "stopwatch.h"
-stopwatch htimer;
-
 struct dice {
     char low, hi;
 };
@@ -218,15 +215,6 @@ inline int hitProblem::num_hits(color_t color)
 
 int num_hits(color_t color, const board &b)
 {
-    htimer.start();
-
     hitProblem hp(b);
-
-//  htimer.start();
-
-    auto v = hp.num_hits(color);
-
-    htimer.stop();
-
-    return v;
+    return hp.num_hits(color);
 }

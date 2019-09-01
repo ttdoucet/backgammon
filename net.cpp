@@ -8,8 +8,6 @@
 
 using namespace std;
 
-stopwatch mtimer, ftimer, stimer;
-
 struct fWrite
 {
     void operator() (float &f) const
@@ -59,7 +57,7 @@ static bool has(istream& is, const char *str)
 }
 
 // Read in a neural net from a file.
-net *net::readFile(const char *fn)
+BgNet *readFile(const char *fn)
 {
     int hidden = 40, portable = 1;
     int ntype = 0, input = 0;
@@ -75,7 +73,7 @@ net *net::readFile(const char *fn)
     has(ifs, "hidden nodes:"); ifs >> hidden >> ws;
     has(ifs, "input nodes:"); ifs >> input >> ws;
 
-    net *p = new net();
+    auto p = new BgNet();
     p->applyFunction(fRead(ifs));
 
     has(ifs, "Current seed:");

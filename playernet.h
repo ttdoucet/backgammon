@@ -9,7 +9,7 @@ class NeuralNetPlayer : public Player, public callBack
 public:
     NeuralNetPlayer(const char *player, const char *netname)
         : Player(player),
-          neural(*net::readFile(netname))
+          neural(readFile(netname))
     {
     }
 
@@ -25,7 +25,7 @@ protected:
     typedef float (NeuralNetPlayer::* evalFunction)(const board& bd);
     evalFunction equityEstimator;
 
-    net& neural;
+    BgNet *neural;
     float bestEquity;
     moves bestMove;
 
@@ -62,7 +62,7 @@ protected:
         if (gameOver(bd))
             return score(bd, bd.onRoll());
 
-        return  neural.equity(bd);
+        return  neural->equity(bd);
     }
 
     static bool isBearingOff(const board &bd)

@@ -147,10 +147,6 @@ void setupRNG()
         randomize_seed();
 }
 
-#include "stopwatch.h"
-extern stopwatch mtimer, ftimer, stimer, htimer;
-stopwatch timer;
-
 using namespace std;
 
 int main(int argc, char *argv[])
@@ -164,23 +160,7 @@ int main(int argc, char *argv[])
     NeuralNetPlayer blackPlayer("black", player_name[1]);
 //  HumanPlayer blackPlayer("black", player_name[1]);
 
-    timer.start();
     playoffSession(trials, whitePlayer, blackPlayer, display_moves);
-    timer.stop();
-
-#if 0
-    cerr << "ftimer: " << setw(12) << ftimer.elapsed() << " ns\n";
-    cerr << "htimer: " << setw(12) << htimer.elapsed() << " ns\n";
-    cerr << "\n";
-    cerr << "mtimer: " << setw(12) << mtimer.elapsed() << " ns\n";
-    cerr << "stimer: " << setw(12) << stimer.elapsed() << " ns\n";
-    cerr << "\n";
-    cerr << " timer: " <<  setw(12) << timer.elapsed() << " ns\n";
-
-    cerr << "\n";
-    cerr << "ftimer count: " << ftimer.count() << "\n";
-    cerr << "mtimer count: " << mtimer.count() << "\n";
-#endif
 
     return 0;
 }
