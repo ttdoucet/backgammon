@@ -3,8 +3,8 @@
 #include <xmmintrin.h>
 #include <cmath>
 
-template<int N, typename iter1, typename iter2>
-inline float dotprod(iter1 vec1, iter2 vec2)
+template<int N, typename T1, typename T2>
+inline float dotprod(T1 vec1, T2 vec2)
 {
     double sum = 0;
     for (int i = 0; i < N; ++i)

@@ -18,14 +18,6 @@ public:
     static net *readFile(const char *fn);
     void writeFile(const char *fn);
 
-    float forward(float* features)
-    {
-        if constexpr (full_calc)
-            return feedForward(features);
-        else
-            return feedForward_marginal(features);
-    }
-
     net()
     {
         init_play();
@@ -47,7 +39,7 @@ public:
 
 private:
     constexpr static int stride = N_INPUTS;
-    constexpr static bool full_calc = false;
+    constexpr static bool full_calc = true;
     constexpr static float MAX_EQUITY = 3.0f;
 
     constexpr static float net_to_equity(float p)
@@ -142,13 +134,16 @@ private:
 
 
 public:
-    // I am so tired of this.
     alignas(16) input_vector features;
 
     /* Neural net estimate of the equity for the side on roll. */
     float equity(const board &b) noexcept
     {
         features_v3(b, features);
-        return forward(features);
+
+        if constexpr (full_calc)
+            return feedForward(features);
+        else
+            return feedForward_marginal(features);
     }
 };
