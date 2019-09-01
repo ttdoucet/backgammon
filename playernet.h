@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 #include "game.h"
 #include "net.h"
 #include "bearoff.h"
@@ -9,7 +11,7 @@ class NeuralNetPlayer : public Player, public callBack
 public:
     NeuralNetPlayer(const char *player, const char *netname)
         : Player(player),
-          neural(readFile(netname))
+          neural( std::make_unique<BgNet>(*readFile(netname)) )
     {
     }
 
@@ -25,7 +27,7 @@ protected:
     typedef float (NeuralNetPlayer::* evalFunction)(const board& bd);
     evalFunction equityEstimator;
 
-    BgNet *neural;
+    std::unique_ptr<BgNet> neural;
     float bestEquity;
     moves bestMove;
 
@@ -62,7 +64,7 @@ protected:
         if (gameOver(bd))
             return score(bd, bd.onRoll());
 
-        return  neural->equity(bd);
+        return neural->equity(bd);
     }
 
     static bool isBearingOff(const board &bd)
