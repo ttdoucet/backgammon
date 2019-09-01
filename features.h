@@ -7,12 +7,12 @@
 #include "mathfuncs.h"
 
 template<typename iter>
-class features
+class features_v3
 {
 public:
     constexpr static int count = 156;
 
-    features(const board &bd) : b(bd) {}
+    features_v3(const board &bd) : b(bd) {}
 
     iter calc(iter dest) const
     {
@@ -97,8 +97,3 @@ private:
     }
 };
 
-template<typename V>
-inline void features_v3(const board& b, V dest)
-{
-    features<float *>{b}.calc(dest );
-}

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "board.h"
-#include "features.h"
 #include "mathfuncs.h"
 
 template<int N_INPUTS, int N_HIDDEN>
@@ -34,7 +33,7 @@ protected:
         return  (2 * p - 1) * MAX_EQUITY;
     }
 
-    /* Have the network evaluate its input.
+    /* Evaluate the net on its input.
      */
     virtual float feedForward()
     {
@@ -58,21 +57,31 @@ protected:
      */
     alignas(16) float weights_1[N_HIDDEN][N_INPUTS];
     alignas(16) float weights_2[N_HIDDEN];
-
-// backgammon stuff should go elsewhere
-public:
-    unsigned long seed = 0;  // legacy
-    long games_trained = 0;  // legacy
-
-    /* Neural net estimate of the equity for the side on roll. */
-    float equity(const board &b) noexcept
-    {
-        features_v3(b, input);
-        return feedForward();
-    }
 };
 
-using netv3 = net<156, 30>;
+
+/* Backgammon-specific class derivations.
+ */
+
+#include "features.h"
+
+template<class feature_calc, int N_HIDDEN>
+class BackgammonNet : public net<feature_calc::count, N_HIDDEN>
+{
+public:
+    /* Neural net estimate of the equity for the side on roll.
+     */
+    float equity(const board &b) noexcept
+    {
+        feature_calc{b}.calc(this->input);
+        return this->feedForward();
+    }
+
+    unsigned long seed = 0;  // legacy
+    long games_trained = 0;  // legacy
+};
+
+using netv3 = BackgammonNet<features_v3<float*>, 30>;
 
 class netv3_marginal : public netv3
 {
