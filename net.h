@@ -31,7 +31,6 @@ public:
 
 protected:
     constexpr static int stride = N_INPUTS;
-    constexpr static bool full_calc = false;
     constexpr static float MAX_EQUITY = 3.0f;
 
     constexpr static float net_to_equity(float p)
@@ -50,24 +49,20 @@ protected:
         for (int i = 0; i < N_HIDDEN; i++)
             hidden[i] = squash_sse(pre_hidden[i]);
 
-        output = squash_sse(dotprod<N_HIDDEN>(hidden, weights_2));
+        auto output = squash_sse(dotprod<N_HIDDEN>(hidden, weights_2));
         return net_to_equity(output);
     }
 
     /* Activations.
      */
     alignas(16) input_vector input;
-    alignas(16) input_vector prev_input;
-    alignas(16) hidden_vector hidden;
     alignas(16) hidden_vector pre_hidden;
-
+    alignas(16) hidden_vector hidden;
 
     /* Model parameters.
      */
     alignas(16) float weights_1[N_HIDDEN][stride];
     alignas(16) float weights_2[N_HIDDEN];
-
-    float output;
 
 public:
     // Applies a functor to each weight parameter in the network.
@@ -81,7 +76,6 @@ public:
         for (int i = 0; i < N_HIDDEN; i++)
             f( V(i) );
     }
-
 
     unsigned long seed = 0;  // legacy
     long games_trained = 0;  // legacy
@@ -99,6 +93,8 @@ public:
 
 class net_marginal : public net
 {
+    alignas(16) input_vector prev_input;
+
 public:
     float feedForward() override
     {
@@ -128,14 +124,11 @@ public:
             hidden[j] = squash_sse(pre_hidden[j]);
 
         float f = dotprod<N_HIDDEN>(hidden, weights_2);
-        output = squash_sse(f);
-        return net_to_equity(output);
+        return net_to_equity( squash_sse(f) );
     }
-
 };
 
-
-//typedef net_marginal BgNet;
-typedef net BgNet;
+//typedef net BgNet;
+typedef net_marginal BgNet;
 
 BgNet *readFile(const char *fn);
