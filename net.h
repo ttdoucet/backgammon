@@ -58,7 +58,7 @@ protected:
 
     /* Model parameters.
      */
-    Eigen::Matrix<float, N_HIDDEN, N_INPUTS> weights_1;
+    Eigen::Matrix<float, N_HIDDEN, N_INPUTS, Eigen::RowMajor> weights_1;
     Eigen::Matrix<float, N_HIDDEN, 1> weights_2;
 };
 
