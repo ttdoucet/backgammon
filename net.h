@@ -14,8 +14,8 @@ public:
     constexpr static int n_inputs = N_INPUTS;
     constexpr static int n_hidden = N_HIDDEN;
 
-    typedef float input_vector[N_INPUTS];
-    typedef float hidden_vector[N_HIDDEN];
+    using input_vector =  Eigen::Matrix<float, n_inputs, 1>;
+    using hidden_vector = Eigen::Matrix<float, n_hidden, 1>;
 
     /* Access to model parameters.
      */
@@ -26,7 +26,7 @@ public:
 
     float& V(int i)
     {
-        return weights_2(i, 0);
+        return weights_2(i);
     }
 
 protected:
@@ -43,7 +43,7 @@ protected:
     {
         pre_hidden = weights_1 * input;
         for (int i = 0; i < N_HIDDEN; i++)
-            hidden(i, 0) = squash_sse(pre_hidden(i, 0));
+            hidden(i) = squash_sse(pre_hidden(i));
 
         float output = squash_sse( hidden.dot(weights_2) );
         return net_to_equity(output);
@@ -52,14 +52,14 @@ protected:
 protected:
     /* Activations.
      */
-    Eigen::Matrix<float, N_INPUTS, 1> input;
-    Eigen::Matrix<float, N_HIDDEN, 1> pre_hidden;
-    Eigen::Matrix<float, N_HIDDEN, 1> hidden;
+    input_vector input;
+    hidden_vector pre_hidden;
+    hidden_vector hidden;
 
     /* Model parameters.
      */
     Eigen::Matrix<float, N_HIDDEN, N_INPUTS, Eigen::RowMajor> weights_1;
-    Eigen::Matrix<float, N_HIDDEN, 1> weights_2;
+    hidden_vector weights_2;
 };
 
 
