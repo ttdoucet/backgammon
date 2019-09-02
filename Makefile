@@ -2,7 +2,7 @@ OBJS = train.o hits.o net.o move.o ttydisp.o random.o bdata.o bearoff.o human.o 
 BEARGEN_OBJS = beargen.o bearoff.o move.o
 
 #CPPFLAGS = -O3 -ffast-math --std=c++17 -save-temps -g
-CPPFLAGS = -O3 -ffast-math -fvectorize --std=c++17
+CPPFLAGS = -O3 -ffast-math -fvectorize --std=c++17 -I /usr/include/eigen3
 CXX = clang++-5.0
 #CXX = clang++-8
 
