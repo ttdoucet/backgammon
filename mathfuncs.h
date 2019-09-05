@@ -1,6 +1,4 @@
 #pragma once
-#include <emmintrin.h>
-#include <xmmintrin.h>
 #include <cmath>
 
 template<int N, typename T1, typename T2>
