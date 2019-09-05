@@ -41,9 +41,9 @@ protected:
             pre_hidden[i] = dotprod<N_INPUTS>(input, weights_1[i]);
 
         for (int i = 0; i < N_HIDDEN; i++)
-            hidden[i] = squash_sse(pre_hidden[i]);
+            hidden[i] = squash(pre_hidden[i]);
 
-        auto output = squash_sse(dotprod<N_HIDDEN>(hidden, weights_2));
+        auto output = squash(dotprod<N_HIDDEN>(hidden, weights_2));
         return net_to_equity(output);
     }
 
@@ -113,10 +113,10 @@ public:
 
         }
         for (int j = 0; j < n_hidden; j++)
-            hidden[j] = squash_sse(pre_hidden[j]);
+            hidden[j] = squash(pre_hidden[j]);
 
         float f = dotprod<n_hidden>(hidden, weights_2);
-        return net_to_equity( squash_sse(f) );
+        return net_to_equity( squash(f) );
     }
 };
 

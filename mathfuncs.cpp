@@ -4,7 +4,7 @@
 
 #include "mathfuncs.h"
 
-namespace _squash_sse
+namespace detail
 {
     const __m128 maxx = _mm_set1_ps(87);
     const __m128 minx = _mm_set1_ps(-87);

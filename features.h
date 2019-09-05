@@ -40,7 +40,7 @@ private:
     {
         int pdiff = b.pipCount(opponentOf(color)) - b.pipCount(color);
 
-        float h = squash_sse(pdiff / 27.0f);
+        float h = squash(pdiff / 27.0f);
         *ib++ = h;
         *ib++ = 1.0f - h;
         return ib;
