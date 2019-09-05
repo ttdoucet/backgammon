@@ -1,4 +1,4 @@
-OBJS = train.o hits.o net.o move.o ttydisp.o random.o bdata.o bearoff.o human.o mathfuncs.o console.o
+OBJS = train.o hits.o net.o move.o ttydisp.o random.o bdata.o bearoff.o human.o console.o
 BEARGEN_OBJS = beargen.o bearoff.o move.o
 
 #CPPFLAGS = -O3 -ffast-math --std=c++17 -save-temps -g
@@ -11,7 +11,7 @@ train : $(OBJS)
 
 netcp.o : stopwatch.h
 
-NETCP_OBJS = netcp.o net.o mathfuncs.o console.o
+NETCP_OBJS = netcp.o net.o console.o
 netcp : $(NETCP_OBJS)
 	$(CXX) -O3  -o netcp $(NETCP_OBJS)
 
