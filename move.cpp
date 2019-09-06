@@ -106,7 +106,7 @@ inline void LegalPlay::unmove_die(moves& m)
 
     b.moveMyChecker(to, from);
     if (hit)
-        b.moveChecker(b.notOnRoll(), 25, opponentPoint(to));
+        b.removeFromBar(b.notOnRoll(), opponentPoint(to) );
 }
 
 inline void LegalPlay::unmove_die(moves& m, int n)
@@ -257,7 +257,11 @@ inline void LegalPlay::playDouble(int r, int n, int pt)
 void applyMove(board& b,const moves &m)
 {
     for (int i = 0;  i < m.count(); i++)
+    {
+        if (m[i].hit)
+            b.putOnBar(b.notOnRoll(), opponentPoint(m[i].to));
         b.moveMyChecker(m[i].from, m[i].to);
+    }
     b.pickupDice();
 }
 
