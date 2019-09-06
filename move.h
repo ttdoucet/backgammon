@@ -28,16 +28,18 @@ public:
 
     move pop()
     {
+#if 1
         move r = m[--cnt];
         m[cnt] = {0, 0, 0};
         return r;
+#else
+        return m[--cnt];
+#endif
     }
 
     void clear()
     {
         cnt = 0;
-        for (int i = 0; i < 4; i++)
-            m[i] = {0, 0, 0};
     }
 
 private:

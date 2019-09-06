@@ -40,6 +40,9 @@ inline bool LegalPlay::openPoint(color_t color, int n) const
 
 inline bool LegalPlay::duplicate_move(color_t color, moves& m) const
 {
+    if (m.count() != 2)
+        return false;
+
     /* moves start at the same place, use only one. */
     if (m[0].from == m[1].from && m[0].to > m[1].to)
         return true;
@@ -86,8 +89,6 @@ inline void LegalPlay::move_die(int from, int to, moves& m)
 {
     int hit = move_die(from, to);
     m.push({from, to, hit});
-
-
 }
 
 inline void LegalPlay::move_die(int f, int t, moves& m, int n)
@@ -172,14 +173,14 @@ inline void LegalPlay::outputMove(callBack &callB)
 inline void LegalPlay::doRoll(int r1, int r2, int pt, callBack &callB)
 {
     moves& m = callB.m;
-    int hi = b.highestChecker(b.onRoll());
-
-    if (b.checkersOnBar(b.onRoll()) && pt != 25)
-        return;
 
     if (r1 == 0)
         return;
 
+    if (b.checkersOnBar(b.onRoll()) && pt != 25)
+        return;
+
+    int hi = b.highestChecker(b.onRoll());
     if (r1 > hi)
         r1 = hi;
 
