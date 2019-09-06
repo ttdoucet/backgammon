@@ -125,8 +125,8 @@ public:
 
 private:
     int8_t thePoints[2][26];
-    uint16_t pip[2];
-    uint8_t die_1, die_2;
+    int32_t pip[2];
+    int32_t die_1, die_2;
     color_t on_roll;
 
     void _moveChecker(color_t color, int from, int to)
