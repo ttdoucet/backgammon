@@ -1,31 +1,20 @@
 /*
  * Copyright (C) 1993 by Todd Doucet.  All Rights Reserved.
  */
-
-#include <stdexcept>
-
 #include "board.h"
 #include "hits.h"
-
 
 class HitProblem
 {
 public:
-    struct dice { int low, hi; };
+    HitProblem(const board &b): bd(b) { }
     int num_hits(color_t color);
-
-    HitProblem(const board &b): bd(b)
-    {
-        for (int i = 0; i < 7; i++)
-            for (int j = 0; j < 7; j++)
-                rhits[i][j] = 0;
-        nhits = 0;
-    }
+    struct dice { int low, hi; };
 
 private:
     const board &bd;
-    char rhits[7][7];
-    char nhits;
+    char rhits[7][7] = {0};
+    char nhits = 0;
 
     int blocked(color_t color, int attacker, int low, int hi) const;
     int hops_blocked(color_t color, int attacker, int n, int r) const;
@@ -127,9 +116,6 @@ inline int HitProblem::can_hit(color_t color, int blot, int distance, char low, 
         }
         return !hops_blocked(oc, opponentPoint(attacker),
                              hit_using - 1, low);
-
-    default:
-        throw std::runtime_error("Error in can_hit()");
     }
     return 0;
 }
@@ -176,7 +162,6 @@ inline void HitProblem::record_hit(char low, char hi)
         nhits += (1 + (low != hi)) ;
 }
 
-
 /*  We have a blot and an opponent's checker located distance away.
  *  Find all the numbers that hit.
  */
@@ -191,7 +176,6 @@ inline void HitProblem::find_hits(color_t color, int blot, int distance)
             record_hit(low, hi);
     }
 }
-
 
 /* Compute how many numbers hit color, given that
  * color's opponent rolls next.
