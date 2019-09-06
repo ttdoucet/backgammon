@@ -85,13 +85,6 @@ void HumanPlayer::parseUserMove(const board& fromBoard, board& toBoard, char *s)
         if (!point_ok(from) || !point_ok(to))
             return;
 
-// will simplify with new moveChecker() semantics...
-        int ck;
-        if ( (ck = bd.checkersOnPoint( opponentOf(color), opponentPoint(to) )) > 0)
-        {
-            while (ck--)
-                bd.putOnBar(opponentOf(color), opponentPoint(to));
-        }
         bd.moveChecker(color, from, to);
         while(*s==' ')
             s++;
@@ -139,7 +132,6 @@ public:
 bool HumanPlayer::legalToMove(board fromBoard, board toBoard, moves& mv)
 {
     enumerate en(toBoard);
-//      fromBoard.play(en);
     plays(fromBoard, en);
     if (en.foundLegalMove())
     {
