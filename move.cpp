@@ -35,7 +35,7 @@ private:
 
 inline bool LegalPlay::openPoint(color_t color, int n) const
 {
-    return n==0 || b.checkersOnPoint(opponentOf(color), opponentPoint(n)) <= 1 ;
+    return n==0 || b.checkersOnPoint(opponentOf(color), opponentPoint(n)) <= 1;
 }
 
 inline bool LegalPlay::duplicate_move(color_t color) const
@@ -184,7 +184,7 @@ inline void LegalPlay::doRoll(int r1, int r2, int pt)
     if (r1 > hi)
         r1 = hi;
 
-    if ( ((pt - r1 > 0) || ((pt - r1 == 0) && (hi <= 6)) ) && openPoint(b.onRoll(), pt - r1))
+    if ( ((pt > r1) || ((pt == r1) && (hi <= 6)) ) && openPoint(b.onRoll(), pt - r1))
     {
         moves& m = callB.m;
 
