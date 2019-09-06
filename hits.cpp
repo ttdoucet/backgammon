@@ -39,8 +39,6 @@ private:
                       h7[ ],  h8[ ],  h9[ ], h10[ ], h11[ ], h12[ ],
                      h15[ ], h16[ ], h18[ ], h20[ ], h24[ ],
                    hnone[ ];
-
-//    static int danger[];
 };
 
 /* Color has a checker located at attacker.  Return whether
@@ -156,8 +154,6 @@ const dice hitProblem::h20[] = { {5,5}, {0,0} };
 const dice hitProblem::h24[] = { {6,6}, {0,0} };
 const dice hitProblem::hnone[] = { {0,0} };
 
-//int hitProblem::danger[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 15, 16, 18, 20, 24};
-
 const dice *(hitProblem::hits[]) =
 {
     hnone, h1, h2, h3, h4, h5, h6, h7, h8, h9, h10, h11, h12,
@@ -205,17 +201,17 @@ inline void hitProblem::find_hits(color_t color, int blot, int distance)
  */
 inline int hitProblem::num_hits(color_t color)
 {
-    int i, j;
-
-    for (i = 24; i; i--)
+    for (int i = 24; i; i--)
     {
         if (bd.checkersOnPoint(color, i) != 1)
             continue;
         // we have a blot on i
-        for (j = 1; j <= i; j++)
+        const color_t opponent = opponentOf(color);
+        const int opp_point = opponentPoint(i);
+        for (int dist = 1; dist <= i; dist++)
         {
-            if (possibleHit[j] && bd.checkersOnPoint(opponentOf(color), opponentPoint(i-j)))
-                find_hits(color, i, j);
+            if (possibleHit[dist] && bd.checkersOnPoint(opponent, opp_point + dist))
+                find_hits(color, i, dist);
         }
     }
     return nhits;
