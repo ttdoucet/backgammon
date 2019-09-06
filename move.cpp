@@ -35,7 +35,7 @@ private:
 
 inline bool LegalPlay::openPoint(int n) const
 {
-    return n==0 || b.checkersOnPoint(b.notOnRoll(), opponentPoint(n)) <= 1;
+    return n==0 || b.hisCheckersOnMyPoint(n) <= 1;
 }
 
 inline bool LegalPlay::duplicate_move() const
@@ -60,9 +60,7 @@ inline bool LegalPlay::duplicate_move() const
         const int m0_dist = m[0].to - m[0].from;
         if (!m[0].hit
             && 
-            !b.checkersOnPoint(b.notOnRoll(),
-                               opponentPoint(m[0].from + m1_dist)
-                              )
+            !b.hisCheckersOnMyPoint(m[0].from + m1_dist)
             &&
             (m0_dist > m1_dist) )
         {
@@ -76,15 +74,14 @@ inline bool LegalPlay::duplicate_move() const
 // return whether the move hits.
 inline int LegalPlay::move_die(int from, int to)
 {
-    int op = opponentPoint(to);
     int hit = 0;
 
-    if (to && b.checkersOnPoint(b.notOnRoll(), op))
+    if (to && b.hisCheckersOnMyPoint(to))
     {
         hit = 1;
-        b.putOnBar(b.notOnRoll(), op);
+        b.putOnBar(b.notOnRoll(), opponentPoint(to));
     }
-    b.moveChecker(b.onRoll(), from, to);
+    b.moveMyChecker(from, to);
     return hit;
 }
 
@@ -107,7 +104,7 @@ inline void LegalPlay::unmove_die(moves& m)
 {
     auto [from, to, hit] = m.pop();
 
-    b.moveChecker(b.onRoll(), to, from);
+    b.moveMyChecker(to, from);
     if (hit)
         b.removeFromBar(b.notOnRoll(), opponentPoint(to) );
 }
@@ -207,7 +204,7 @@ inline void LegalPlay::playNonDouble(int r1, int r2, int pt)
 
     for (; pt; pt--)
     {
-        if (b.checkersOnPoint(b.onRoll(), pt))
+        if (b.myCheckersOnMyPoint(pt))
         {
             doRoll(r1, r2, pt);
             doRoll(r2, r1, pt);
@@ -234,7 +231,7 @@ inline void LegalPlay::playDouble(int r, int n, int pt)
         int can_move = ((dest > 0) || ((dest == 0) && (hi <= 6))) &&
             openPoint(dest);
                         
-        if ( (checkers = b.checkersOnPoint(b.onRoll(), pt)) && can_move )
+        if ( (checkers = b.myCheckersOnMyPoint(pt)) && can_move )
             break;
     }
     if (pt <= 0)
@@ -263,7 +260,7 @@ void applyMove(board& b,const moves &m)
     {
         if (m[i].hit)
             b.putOnBar(b.notOnRoll(), opponentPoint(m[i].to));
-        b.moveChecker(b.onRoll(), m[i].from, m[i].to);
+        b.moveMyChecker(m[i].from, m[i].to);
     }
     b.pickupDice();
 }

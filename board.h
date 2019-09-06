@@ -44,6 +44,26 @@ public:
         return thePoints[color][point];
     }
 
+    inline int myCheckersOnMyPoint(int point) const
+    {
+        return thePoints[ onRoll() ][point];
+    }
+
+    inline int myCheckersOnHisPoint(int point) const
+    {
+        return thePoints[ onRoll() ][ opponentPoint(point) ];
+    }
+
+    inline int hisCheckersOnMyPoint(int point) const
+    {
+        return thePoints[ notOnRoll() ][ opponentPoint(point) ];
+    }
+
+    inline int hisCheckersOnHisPoint(int point) const
+    {
+        return thePoints[ notOnRoll() ][ point ];
+    }
+
     int moveChecker(color_t color, int from, int to)
     {
         if ( (to == 0) || (to == 25) )
@@ -60,6 +80,11 @@ public:
         }
         _moveChecker(color, from, to);
         return hit;
+    }
+
+    int moveMyChecker(int from, int to)
+    {
+        return moveChecker(onRoll(), from, to);
     }
 
     void putOnBar(color_t color, int pt)
