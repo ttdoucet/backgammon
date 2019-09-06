@@ -9,8 +9,17 @@ class moves
 public:
     struct move { int from, to, hit; };
 
-    move& operator[](int i)       { return m[i]; }
-    move  operator[](int i) const { return m[i]; }
+    move& operator[](int i)
+    {
+//      assert(cnt > i);
+        return m[i];
+    }
+
+    move  operator[](int i) const
+    {
+//      assert(cnt > i);
+        return m[i];
+    }
 
     int count() const { return cnt; }
     moves() { }

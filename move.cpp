@@ -20,8 +20,8 @@ public:
     int numMoves();
 
 private:
-    int openPoint(color_t color, int n);
-    int duplicate_move(color_t color, moves& m);
+    bool openPoint(color_t color, int n) const;
+    bool duplicate_move(color_t color, moves& m) const;
     int move_die(int from, int to);
     void move_die(int from, int to, moves& m);
     void move_die(int f, int t, moves& m, int n);
@@ -29,20 +29,20 @@ private:
     void unmove_die(moves& m, int n);
     int outputMove(callBack &callB);
     int doRoll(int r1, int r2, int pt, callBack &callB);
-    int playNonDouble(int r1, int r2, int pt, callBack &callB);
+    void playNonDouble(int r1, int r2, int pt, callBack &callB);
     int playDouble(int r, int n, int pt, callBack &callB);
 };
 
-inline int LegalPlay::openPoint(color_t color, int n)
+inline bool LegalPlay::openPoint(color_t color, int n) const
 {
     return n==0 || b.checkersOnPoint(opponentOf(color), opponentPoint(n)) <= 1 ;
 }
 
-inline int LegalPlay::duplicate_move(color_t color, moves& m)
+inline bool LegalPlay::duplicate_move(color_t color, moves& m) const
 {
     /* moves start at the same place, use only one. */
     if (m[0].from == m[1].from && m[0].to > m[1].to)
-        return 1;
+        return true;
 
     assert(m[0].from != m[1].to);
 
@@ -58,10 +58,10 @@ inline int LegalPlay::duplicate_move(color_t color, moves& m)
             &&
             ((m[0].to - m[0].from) > (m[1].to - m[1].from)) )
         {
-            return 1;
+            return true;
         } 
     }
-    return 0;
+    return false;
 }
 
 // Move the indicated checker, and
@@ -192,12 +192,15 @@ inline int LegalPlay::doRoll(int r1, int r2, int pt, callBack &callB)
     return 0;
 }
 
-inline int LegalPlay::playNonDouble(int r1, int r2, int pt, callBack& callB)
+inline void LegalPlay::playNonDouble(int r1, int r2, int pt, callBack& callB)
 {
     moves& m = callB.m;
 
     if (r1 == 0  && !duplicate_move(b.onRoll(), m))
-        return outputMove(callB);
+    {
+        outputMove(callB);
+        return;
+    }
 
     for (; pt; pt--)
     {
@@ -206,7 +209,6 @@ inline int LegalPlay::playNonDouble(int r1, int r2, int pt, callBack& callB)
         doRoll(r1, r2, pt, callB);
         doRoll(r2, r1, pt, callB);
     }
-    return 0;
 }
 
 inline int LegalPlay::playDouble(int r, int n, int pt, callBack &callB)
