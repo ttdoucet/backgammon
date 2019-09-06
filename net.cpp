@@ -1,5 +1,4 @@
-/*
- * Copyright (C) 1993, 2019 by Todd Doucet.  All Rights Reserved.
+/* Written by Todd Doucet.  See file copyright.txt.
  */
 #include <stdexcept>
 #include <fstream>

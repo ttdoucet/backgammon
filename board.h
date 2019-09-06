@@ -1,8 +1,5 @@
-/*
- * Copyright (C) 1993, 1997, 2008, 2013 by Todd Doucet.
- *                 All Rights Reserved.
+/* Written by Todd Doucet.  See file copyright.txt.
  */
-
 #pragma once
 #include <cstring>
 #include <cstdint>

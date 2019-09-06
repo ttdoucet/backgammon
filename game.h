@@ -1,5 +1,5 @@
-// Written by Todd Doucet.
-
+/* Written by Todd Doucet.  See file copyright.txt.
+ */
 #pragma once
 
 #include "move.h"

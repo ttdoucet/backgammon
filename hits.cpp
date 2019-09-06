@@ -1,5 +1,4 @@
-/*
- * Copyright (C) 1993 by Todd Doucet.  All Rights Reserved.
+/* Written by Todd Doucet.  See file copyright.txt.
  */
 #include "board.h"
 #include "hits.h"

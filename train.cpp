@@ -1,7 +1,3 @@
-/*
- * Copyright (C) 1993, 2008 by Todd Doucet.  All Rights Reserved.
- */
-
 #include <iostream>
 #include <iomanip>
 

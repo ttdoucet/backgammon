@@ -1,7 +1,5 @@
-/*
- * Written by Todd Doucet in 2019.
+/* Written by Todd Doucet.  See file copyright.txt.
  */
-
 #include <random>
 #include <chrono>
 using namespace std;

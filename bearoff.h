@@ -1,3 +1,5 @@
+/* Written by Todd Doucet.  See file copyright.txt.
+ */
 #include "board.h"
 
 struct bear_off

@@ -1,0 +1,12 @@
+All the source files in this directory were written by Todd Doucet, and
+are copyrighted as an unpublished work.
+
+Most of the source files were originally written by me starting in 1993 and
+updated from time to time thereafter.  All the rest were were written by me
+at some time since 1993.
+
+Major work occurred in the years immediately following 1993, and then in 2008, 2013,
+and 2019.
+
+Todd Doucet
+Pittsburgh, PA
