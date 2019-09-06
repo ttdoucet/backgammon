@@ -5,6 +5,7 @@
 
 #pragma once
 #include <cstring>
+#include <cstdint>
 #include <cassert>
 
 enum color_t { white = 0, black = 1};
@@ -123,9 +124,9 @@ public:
     }
 
 private:
-    signed char thePoints[2][32];
-    int pip[2];
-    int die_1, die_2;
+    int8_t thePoints[2][26];
+    uint16_t pip[2];
+    uint8_t die_1, die_2;
     color_t on_roll;
 
     void _moveChecker(color_t color, int from, int to)
