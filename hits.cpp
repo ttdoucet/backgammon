@@ -9,32 +9,65 @@ class HitProblem
 public:
     HitProblem(const board &b): bd(b) { }
     int num_hits(color_t color);
-    struct dice { int low, hi; };
 
 private:
     const board &bd;
-    char rhits[7][7] = {0};
-    char nhits = 0;
+    int rhits[7][7] = {0};
+    int nhits = 0;
 
-    int blocked(color_t color, int attacker, int low, int hi) const;
-    int hops_blocked(color_t color, int attacker, int n, int r) const;
-    int can_hit(color_t color, int blot, int distance, char low, char hi) const;
+    bool blocked(color_t color, int attacker, int low, int hi) const;
+    bool hops_blocked(color_t color, int attacker, int n, int r) const;
+    bool can_hit(color_t color, int blot, int distance, int low, int hi) const;
 
-    void record_hit(char low, char hi);
+    void record_hit(int low, int hi);
     void find_hits(color_t color, int blot, int distance);
 
-    static const int possibleHit[];
-    static const dice *hits[];
-    static const dice h1[],  h2[],  h3[],  h4[],  h5[],  h6[],
-                      h7[],  h8[],  h9[], h10[], h11[], h12[],
-                     h15[], h16[], h18[], h20[], h24[],
-                   hnone[];
 };
+
+namespace hits_detail
+{
+    struct dice { int low, hi; };
+
+    const dice h1[] =  { {1,1}, {1,2}, {1,3}, {1,4}, {1,5}, {1,6}, {0,0} };
+    const dice h2[] =  { {1,2}, {2,2}, {2,3}, {2,4}, {2,5}, {2,6}, {1,1}, {0,0} };
+    const dice h3[] =  { {1,3}, {2,3}, {3,3}, {3,4}, {3,5}, {3,6}, {1,2}, {1,1}, {0,0}};
+    const dice h4[] =  { {1,4}, {2,4}, {3,4}, {4,4}, {4,5}, {4,6}, {1,3}, {2,2},
+                                     {1,1}, {0,0} };
+    const dice h5[] =  { {1,5}, {2,5}, {3,5}, {4,5}, {5,5}, {5,6}, {1,4}, {2,3}, {0,0}};
+    const dice h6[] =  { {1,6}, {2,6}, {3,6}, {4,6}, {5,6}, {6,6}, {1,5}, {2,4},
+                                     {3,3}, {2,2}, {0,0} };
+    const dice h7[] =  { {1,6}, {2,5}, {3,4}, {0,0} };
+    const dice h8[] =  { {2,6}, {3,5}, {4,4}, {2,2}, {0,0} };
+    const dice h9[] =  { {3,6}, {4,5}, {3,3}, {0,0} };
+    const dice h10[] = { {4,6}, {5,5}, {0,0} };
+    const dice h11[] = { {5,6}, {0,0} };
+    const dice h12[] = { {6,6}, {3,3}, {4,4}, {0,0} };
+    const dice h15[] = { {5,5}, {0,0} };
+    const dice h16[] = { {4,4}, {0,0} };
+    const dice h18[] = { {6,6}, {0,0} };
+    const dice h20[] = { {5,5}, {0,0} };
+    const dice h24[] = { {6,6}, {0,0} };
+    const dice hnone[] = { {0,0} };
+
+    const dice *hits[] =
+    {
+        hnone, h1, h2, h3, h4, h5, h6, h7, h8, h9, h10, h11, h12,
+        hnone, hnone, h15, h16, hnone, h18, hnone, h20, hnone,
+        hnone, hnone, h24
+    };
+
+    const int possibleHit[ ] =
+    {
+        0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
+        0, 0, 15, 16, 0, 18, 0, 20, 0, 0, 0, 24
+    };
+}
+using namespace hits_detail;
 
 /* Color has a checker located at attacker.  Return whether
  * he is blocked from using both dice from that position.
  */
-inline int HitProblem::blocked(color_t color, int attacker, int low, int hi)
+inline bool HitProblem::blocked(color_t color, int attacker, int low, int hi)
     const
 {
     color_t opponent = opponentOf(color);
@@ -46,21 +79,21 @@ inline int HitProblem::blocked(color_t color, int attacker, int low, int hi)
  * he is blocked from using n rolls of r from
  * that position.
  */
-inline int HitProblem::hops_blocked(color_t color, int attacker, int n, int r)
+inline bool HitProblem::hops_blocked(color_t color, int attacker, int n, int r)
     const
 {
     color_t oc = opponentOf(color);
     for (; n; n--)
         if (bd.checkersOnPoint(oc, opponentPoint(attacker - n*r)) >= 2)
-            return 1;
-    return 0;
+            return true;
+    return false;
 }
 
 /*  We have a blot and an opposing checker located
  *  distance away.  Return whether that checker can
  *  hit our blot.
  */
-inline int HitProblem::can_hit(color_t color, int blot, int distance, char low, char hi)
+inline bool HitProblem::can_hit(color_t color, int blot, int distance, int low, int hi)
     const
 {
     color_t oc = opponentOf(color);
@@ -93,7 +126,7 @@ inline int HitProblem::can_hit(color_t color, int blot, int distance, char low, 
         if (men_on_bar == 1) return 1;
         if (low != hi) return 0;
         if (men_on_bar >= 4) return 0;
-        return 1;
+        return true;
 
     case 2:
         if (low != hi)
@@ -110,53 +143,17 @@ inline int HitProblem::can_hit(color_t color, int blot, int distance, char low, 
         if (men_on_bar)
         {
             if (bd.checkersOnPoint(color, low) >= 2)
-                return 0;
+                return false;
             if ((men_on_bar + hit_using - (attacker == 0)) > 4)
-                return 0;
+                return false;
         }
         return !hops_blocked(oc, opponentPoint(attacker),
                              hit_using - 1, low);
     }
-    return 0;
+    return false;
 }
 
-using dice = HitProblem::dice;
-
-const dice HitProblem::h1[] =  { {1,1}, {1,2}, {1,3}, {1,4}, {1,5}, {1,6}, {0,0} };
-const dice HitProblem::h2[] =  { {1,2}, {2,2}, {2,3}, {2,4}, {2,5}, {2,6}, {1,1}, {0,0} };
-const dice HitProblem::h3[] =  { {1,3}, {2,3}, {3,3}, {3,4}, {3,5}, {3,6}, {1,2}, {1,1}, {0,0}};
-const dice HitProblem::h4[] =  { {1,4}, {2,4}, {3,4}, {4,4}, {4,5}, {4,6}, {1,3}, {2,2},
-                                 {1,1}, {0,0} };
-const dice HitProblem::h5[] =  { {1,5}, {2,5}, {3,5}, {4,5}, {5,5}, {5,6}, {1,4}, {2,3}, {0,0}};
-const dice HitProblem::h6[] =  { {1,6}, {2,6}, {3,6}, {4,6}, {5,6}, {6,6}, {1,5}, {2,4},
-                                 {3,3}, {2,2}, {0,0} };
-const dice HitProblem::h7[] =  { {1,6}, {2,5}, {3,4}, {0,0} };
-const dice HitProblem::h8[] =  { {2,6}, {3,5}, {4,4}, {2,2}, {0,0} };
-const dice HitProblem::h9[] =  { {3,6}, {4,5}, {3,3}, {0,0} };
-const dice HitProblem::h10[] = { {4,6}, {5,5}, {0,0} };
-const dice HitProblem::h11[] = { {5,6}, {0,0} };
-const dice HitProblem::h12[] = { {6,6}, {3,3}, {4,4}, {0,0} };
-const dice HitProblem::h15[] = { {5,5}, {0,0} };
-const dice HitProblem::h16[] = { {4,4}, {0,0} };
-const dice HitProblem::h18[] = { {6,6}, {0,0} };
-const dice HitProblem::h20[] = { {5,5}, {0,0} };
-const dice HitProblem::h24[] = { {6,6}, {0,0} };
-const dice HitProblem::hnone[] = { {0,0} };
-
-const dice *(HitProblem::hits[]) =
-{
-    hnone, h1, h2, h3, h4, h5, h6, h7, h8, h9, h10, h11, h12,
-    hnone, hnone, h15, h16, hnone, h18, hnone, h20, hnone,
-    hnone, hnone, h24
-};
-
-const int HitProblem::possibleHit[ ] =
-{
-    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
-    0, 0, 15, 16, 0, 18, 0, 20, 0, 0, 0, 24
-};
-
-inline void HitProblem::record_hit(char low, char hi)
+inline void HitProblem::record_hit(int low, int hi)
 {
     if (rhits[low][hi]++ == 0)
         nhits += (1 + (low != hi)) ;
