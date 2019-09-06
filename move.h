@@ -8,39 +8,15 @@ class moves
 {
 public:
     struct move { int from, to, hit; };
+    moves() = default;
 
-    move& operator[](int i)
-    {
-//      assert(cnt > i);
-        return m[i];
-    }
+    move& operator[](int i)        { return m[i]; }
+    move  operator[](int i) const  { return m[i]; }
 
-    move  operator[](int i) const
-    {
-//      assert(cnt > i);
-        return m[i];
-    }
-
-    int count() const { return cnt; }
-    moves() { }
-
+    int count() const  { return cnt; }
     void push(move mp) { m[cnt++] = mp; }
-
-    move pop()
-    {
-#if 1
-        move r = m[--cnt];
-        m[cnt] = {0, 0, 0};
-        return r;
-#else
-        return m[--cnt];
-#endif
-    }
-
-    void clear()
-    {
-        cnt = 0;
-    }
+    move pop()         { return m[--cnt]; }
+    void clear()       { cnt = 0; }
 
 private:
     move m[4] = {0};
