@@ -7,13 +7,11 @@
 #include "board.h"
 #include "hits.h"
 
-struct dice {
-    char low, hi;
-};
 
 class HitProblem
 {
 public:
+    struct dice { int low, hi; };
     int num_hits(color_t color);
 
     HitProblem(const board &b): bd(b)
@@ -136,6 +134,8 @@ inline int HitProblem::can_hit(color_t color, int blot, int distance, char low, 
     return 0;
 }
 
+using dice = HitProblem::dice;
+
 const dice HitProblem::h1[] =  { {1,1}, {1,2}, {1,3}, {1,4}, {1,5}, {1,6}, {0,0} };
 const dice HitProblem::h2[] =  { {1,2}, {2,2}, {2,3}, {2,4}, {2,5}, {2,6}, {1,1}, {0,0} };
 const dice HitProblem::h3[] =  { {1,3}, {2,3}, {3,3}, {3,4}, {3,5}, {3,6}, {1,2}, {1,1}, {0,0}};
@@ -185,8 +185,10 @@ inline void HitProblem::find_hits(color_t color, int blot, int distance)
     const dice *h;
     for (h = hits[distance]; h->low; h++)
     {
-        if (!rhits[h->low][h->hi] && can_hit(color, blot, distance, h->low, h->hi))
-            record_hit(h->low, h->hi);
+        const int& low = h->low;
+        const int& hi = h->hi;
+        if (!rhits[low][hi] && can_hit(color, blot, distance, low, hi))
+            record_hit(low, hi);
     }
 }
 
