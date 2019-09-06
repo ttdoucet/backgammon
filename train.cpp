@@ -151,16 +151,11 @@ using namespace std;
 
 int main(int argc, char *argv[])
 {
-    console << "before cmdline\n";
     cmdline(argc, argv);
-    console << "after cmdline: numPlayers=" << numPlayers << "\n";
     setupRNG();
 
-    console << "before white\n";
-//  NeuralNetPlayer whitePlayer("white", player_name[0]);
-    HumanPlayer whitePlayer("white");
-    console << "after white\n";
-
+    NeuralNetPlayer whitePlayer("white", player_name[0]);
+//  HumanPlayer whitePlayer("white");
 
     NeuralNetPlayer blackPlayer("black", player_name[1]);
 
