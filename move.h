@@ -13,7 +13,7 @@ public:
     move  operator[](int i) const { return m[i]; }
 
     int count() const { return cnt; }
-    moves() { clear(); }
+    moves() { }
 
     void push(move mp) { m[cnt++] = mp; }
 
@@ -32,8 +32,8 @@ public:
     }
 
 private:
-    move m[4];
-    int cnt;
+    move m[4] = {0};
+    int cnt = 0;
 };
 
 class callBack
