@@ -5,32 +5,32 @@
 
 #include <assert.h>
 #include <iomanip>
-
 #include "move.h"
 
 class LegalPlay
 {
     board b;
+    callBack& callB;
 
 public:
-    LegalPlay(const board &bb) : b(bb) {}
+    LegalPlay(const board &bb, callBack& cb) : b(bb), callB(cb) {}
 
-    int play(callBack &callB);
+    int play();
     int checkersToPlay();
     int numMoves();
 
 private:
     bool openPoint(color_t color, int n) const;
-    bool duplicate_move(color_t color, moves& m) const;
+    bool duplicate_move(color_t color) const;
     int move_die(int from, int to);
     void move_die(int from, int to, moves& m);
     void move_die(int f, int t, moves& m, int n);
     void unmove_die(moves& m);
     void unmove_die(moves& m, int n);
-    void outputMove(callBack &callB);
-    void doRoll(int r1, int r2, int pt, callBack &callB);
-    void playNonDouble(int r1, int r2, int pt, callBack &callB);
-    void playDouble(int r, int n, int pt, callBack &callB);
+    void outputMove();
+    void doRoll(int r1, int r2, int pt);
+    void playNonDouble(int r1, int r2, int pt);
+    void playDouble(int r, int n, int pt);
 };
 
 inline bool LegalPlay::openPoint(color_t color, int n) const
@@ -38,8 +38,10 @@ inline bool LegalPlay::openPoint(color_t color, int n) const
     return n==0 || b.checkersOnPoint(opponentOf(color), opponentPoint(n)) <= 1 ;
 }
 
-inline bool LegalPlay::duplicate_move(color_t color, moves& m) const
+inline bool LegalPlay::duplicate_move(color_t color) const
 {
+    const moves& m = callB.m;
+
     if (m.count() != 2)
         return false;
 
@@ -113,7 +115,7 @@ inline void LegalPlay::unmove_die(moves& m, int n)
         unmove_die(m);
 }
 
-inline int LegalPlay::play(callBack &callB)
+inline int LegalPlay::play()
 {
     int &nmoves = callB.nMoves;
     int &ctp = callB.checkersToPlay;
@@ -126,26 +128,26 @@ inline int LegalPlay::play(callBack &callB)
         for (int i = 4; i && nmoves == 0 ; i--)
         {
             ctp = i;
-            playDouble(b.d1(), i, 25, callB);
+            playDouble(b.d1(), i, 25);
         }
     } else {
         ctp = 2;
-        playNonDouble(b.d1(), b.d2(), 25, callB);
+        playNonDouble(b.d1(), b.d2(), 25);
         if (nmoves == 0)
         {
             ctp = 1;
-            playNonDouble(std::max(b.d1(), b.d2()), 0, 25, callB);
+            playNonDouble(std::max(b.d1(), b.d2()), 0, 25);
         }
         if (nmoves == 0)
         {
             ctp = 1;
-            playNonDouble(std::min(b.d1(), b.d2()), 0, 25, callB);
+            playNonDouble(std::min(b.d1(), b.d2()), 0, 25);
         }
     }
 
     if (nmoves == 0)
     {
-        outputMove(callB);
+        outputMove();
         nmoves = 0;     // Dancing doesn't count.
         ctp = 0;        // No checkers to play.
     }
@@ -154,7 +156,7 @@ inline int LegalPlay::play(callBack &callB)
     return nmoves;
 }
 
-inline void LegalPlay::outputMove(callBack &callB)
+inline void LegalPlay::outputMove()
 {
     callB.nMoves++;
 
@@ -170,10 +172,8 @@ inline void LegalPlay::outputMove(callBack &callB)
     b.setDice(s1, s2);
 }
 
-inline void LegalPlay::doRoll(int r1, int r2, int pt, callBack &callB)
+inline void LegalPlay::doRoll(int r1, int r2, int pt)
 {
-    moves& m = callB.m;
-
     if (r1 == 0)
         return;
 
@@ -186,19 +186,19 @@ inline void LegalPlay::doRoll(int r1, int r2, int pt, callBack &callB)
 
     if ( ((pt - r1 > 0) || ((pt - r1 == 0) && (hi <= 6)) ) && openPoint(b.onRoll(), pt - r1))
     {
+        moves& m = callB.m;
+
         move_die(pt, pt - r1, m);
-        playNonDouble(r2, 0, pt, callB);
+        playNonDouble(r2, 0, pt);
         unmove_die(m);
     }
 }
 
-inline void LegalPlay::playNonDouble(int r1, int r2, int pt, callBack& callB)
+inline void LegalPlay::playNonDouble(int r1, int r2, int pt)
 {
-    moves& m = callB.m;
-
-    if (r1 == 0  && !duplicate_move(b.onRoll(), m))
+    if (r1 == 0  && !duplicate_move(b.onRoll()))
     {
-        outputMove(callB);
+        outputMove();
         return;
     }
 
@@ -206,19 +206,19 @@ inline void LegalPlay::playNonDouble(int r1, int r2, int pt, callBack& callB)
     {
         if (!b.checkersOnPoint(b.onRoll(), pt))
             continue;
-        doRoll(r1, r2, pt, callB);
-        doRoll(r2, r1, pt, callB);
+        doRoll(r1, r2, pt);
+        doRoll(r2, r1, pt);
     }
 }
 
-inline void LegalPlay::playDouble(int r, int n, int pt, callBack &callB)
+inline void LegalPlay::playDouble(int r, int n, int pt)
 {
     int hi, i, checkers;
     moves& m = callB.m;
 
     if (n == 0)
     {
-        outputMove(callB);
+        outputMove();
         return;
     }
 
@@ -246,7 +246,7 @@ inline void LegalPlay::playDouble(int r, int n, int pt, callBack &callB)
     for (i = 0; i <= checkers; i++)
     {
         move_die(pt, pt-r, m, i);
-        playDouble(r, n - i, pt - 1, callB);
+        playDouble(r, n - i, pt - 1);
         unmove_die(m, i);
     }
 }
@@ -266,8 +266,8 @@ void applyMove(board& b,const moves &m)
 
 int plays(const board& b, callBack& callB)
 {
-    LegalPlay plays(b);
-    return plays.play(callB);
+    LegalPlay plays(b, callB);
+    return plays.play();
 }
 
 int numMoves(board& b)
