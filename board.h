@@ -17,7 +17,7 @@ inline color_t opponentOf(color_t color)
 
 inline int opponentPoint(int x)
 {
-    return (25 - (x));
+    return 25 - x;
 }
 
 class board

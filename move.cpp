@@ -20,8 +20,8 @@ public:
     int numMoves();
 
 private:
-    bool openPoint(color_t color, int n) const;
-    bool duplicate_move(color_t color) const;
+    bool openPoint(int n) const;
+    bool duplicate_move() const;
     int move_die(int from, int to);
     void move_die(int from, int to, moves& m);
     void move_die(int f, int t, moves& m, int n);
@@ -33,12 +33,12 @@ private:
     void playDouble(int r, int n, int pt);
 };
 
-inline bool LegalPlay::openPoint(color_t color, int n) const
+inline bool LegalPlay::openPoint(int n) const
 {
-    return n==0 || b.checkersOnPoint(opponentOf(color), opponentPoint(n)) <= 1;
+    return n==0 || b.checkersOnPoint(b.notOnRoll(), opponentPoint(n)) <= 1;
 }
 
-inline bool LegalPlay::duplicate_move(color_t color) const
+inline bool LegalPlay::duplicate_move() const
 {
     const moves& m = callB.m;
 
@@ -56,12 +56,15 @@ inline bool LegalPlay::duplicate_move(color_t color) const
      */
     if (m[0].to == m[1].from)
     {
-        if (!m[0].hit && 
-            !b.checkersOnPoint(opponentOf(color),
-                               opponentPoint(m[0].from + (m[1].to - m[1].from))
+        const int m1_dist = m[1].to - m[1].from;
+        const int m0_dist = m[0].to - m[0].from;
+        if (!m[0].hit
+            && 
+            !b.checkersOnPoint(b.notOnRoll(),
+                               opponentPoint(m[0].from + m1_dist)
                               )
             &&
-            ((m[0].to - m[0].from) > (m[1].to - m[1].from)) )
+            (m0_dist > m1_dist) )
         {
             return true;
         } 
@@ -184,7 +187,7 @@ inline void LegalPlay::doRoll(int r1, int r2, int pt)
     if (r1 > hi)
         r1 = hi;
 
-    if ( ((pt > r1) || ((pt == r1) && (hi <= 6)) ) && openPoint(b.onRoll(), pt - r1))
+    if ( ((pt > r1) || ((pt == r1) && (hi <= 6)) ) && openPoint(pt - r1))
     {
         moves& m = callB.m;
 
@@ -196,7 +199,7 @@ inline void LegalPlay::doRoll(int r1, int r2, int pt)
 
 inline void LegalPlay::playNonDouble(int r1, int r2, int pt)
 {
-    if (r1 == 0  && !duplicate_move(b.onRoll()))
+    if (r1 == 0  && !duplicate_move())
     {
         outputMove();
         return;
@@ -204,10 +207,11 @@ inline void LegalPlay::playNonDouble(int r1, int r2, int pt)
 
     for (; pt; pt--)
     {
-        if (!b.checkersOnPoint(b.onRoll(), pt))
-            continue;
-        doRoll(r1, r2, pt);
-        doRoll(r2, r1, pt);
+        if (b.checkersOnPoint(b.onRoll(), pt))
+        {
+            doRoll(r1, r2, pt);
+            doRoll(r2, r1, pt);
+        }
     }
 }
 
@@ -229,7 +233,7 @@ inline void LegalPlay::playDouble(int r, int n, int pt)
     {
         const int dest = pt - r;
         int can_move = ((dest > 0) || ((dest == 0) && (hi <= 6))) &&
-            openPoint(b.onRoll(), dest);
+            openPoint(dest);
                         
         if ( (checkers = b.checkersOnPoint(b.onRoll(), pt)) && can_move )
             break;
