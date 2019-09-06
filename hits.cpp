@@ -15,9 +15,13 @@ class hitProblem
 {
 public:
     int num_hits(color_t color);
+
     hitProblem(const board &b): bd(b)
     {
-        clear_hits();
+        for (int i = 0; i < 7; i++)
+            for (int j = 0; j < 7; j++)
+                rhits[i][j] = 0;
+        nhits = 0;
     }
 
 private:
@@ -29,16 +33,15 @@ private:
     int hops_blocked(color_t color, int attacker, int n, int r) const;
     int can_hit(color_t color, int blot, int distance, char low, char hi) const;
 
-    void clear_hits();
     void record_hit(char low, char hi);
     void find_hits(color_t color, int blot, int distance);
 
-    static const int possibleHit[ ];
-    static const dice *(hits[ ]);
-    static const dice h1[ ],  h2[ ],  h3[ ],  h4[ ],  h5[ ],  h6[ ],
-                      h7[ ],  h8[ ],  h9[ ], h10[ ], h11[ ], h12[ ],
-                     h15[ ], h16[ ], h18[ ], h20[ ], h24[ ],
-                   hnone[ ];
+    static const int possibleHit[];
+    static const dice *hits[];
+    static const dice h1[],  h2[],  h3[],  h4[],  h5[],  h6[],
+                      h7[],  h8[],  h9[], h10[], h11[], h12[],
+                     h15[], h16[], h18[], h20[], h24[],
+                   hnone[];
 };
 
 /* Color has a checker located at attacker.  Return whether
@@ -166,14 +169,6 @@ const int hitProblem::possibleHit[ ] =
     0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
     0, 0, 15, 16, 0, 18, 0, 20, 0, 0, 0, 24
 };
-
-inline void hitProblem::clear_hits()
-{
-    for (int i = 0; i < 7; i++)
-        for (int j = 0; j < 7; j++)
-            rhits[i][j] = 0;
-    nhits = 0;
-}
 
 inline void hitProblem::record_hit(char low, char hi)
 {
