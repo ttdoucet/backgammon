@@ -217,18 +217,17 @@ inline void LegalPlay::playNonDouble(int r1, int r2, int pt)
 
 inline void LegalPlay::playDouble(int r, int n, int pt)
 {
-    int hi, i, checkers;
-    moves& m = callB.m;
-
     if (n == 0)
     {
         outputMove();
         return;
     }
 
+    int hi;
     if (r > (hi = b.highestChecker(b.onRoll())) )
         r = hi;
 
+    int checkers;
     for (; pt; pt--)
     {
         const int dest = pt - r;
@@ -247,7 +246,8 @@ inline void LegalPlay::playDouble(int r, int n, int pt)
     if (n < checkers)
         checkers  = n;
 
-    for (i = 0; i <= checkers; i++)
+    moves& m = callB.m;
+    for (int i = 0; i <= checkers; i++)
     {
         move_die(pt, pt-r, m, i);
         playDouble(r, n - i, pt - 1);
