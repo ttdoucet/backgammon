@@ -3,7 +3,6 @@
 #pragma once
 
 #include <string>
-
 #include "board.h"
 
 class moves

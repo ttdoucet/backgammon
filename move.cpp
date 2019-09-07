@@ -148,8 +148,7 @@ inline int LegalPlay::play()
         nmoves = 0;     // Dancing doesn't count.
         ctp = 0;        // No checkers to play.
     }
-
-    assert(memcmp(&save, &b, sizeof(save)) == 0);
+    assert(save == b);
     return nmoves;
 }
 
