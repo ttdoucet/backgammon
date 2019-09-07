@@ -102,8 +102,8 @@ public:
     int highestChecker(color_t color) const
     {
         int i;
-        for (i = 25; i >= 0; i--)
-            if (checkersOnPoint(color, i) > 0)
+        for (i = 25; i; i--)
+            if (checkersOnPoint(color, i))
                 break;
         return i;
     }
