@@ -12,7 +12,7 @@ beargen_src = beargen.cpp bearoff.cpp move.cpp
 : {beargen-objs} |> !link |> beargen
 
 # Actually generate the  bearoff database.
-# 
+#
 : | beargen |> ./beargen > %o |> bearoff.dat
 
 # Main executable
@@ -27,9 +27,7 @@ src = train.cpp hits.cpp net.cpp move.cpp ttydisp.cpp random.cpp \
 #
 netcp_src = netcp.cpp net.cpp console.cpp
 : foreach $(netcp_src)  |> !compile |> %B.ncp.o {netcp-objs}
-: {netcp-objs} |> !link |> netcp 
-
-
+: {netcp-objs} |> !link |> netcp
 
 
 
