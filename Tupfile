@@ -25,10 +25,8 @@ src = train.cpp hits.cpp net.cpp move.cpp ttydisp.cpp random.cpp \
 
 # Utility
 #
-netcp_src = netcp.cpp net.cpp console.cpp
-: foreach $(netcp_src)  |> !compile |> %B.ncp.o {netcp-objs}
-: {netcp-objs} |> !link |> netcp
-
+: netcp.cpp  |> !compile |> %B.o
+: netcp.o net.o console.o |> !link |> netcp
 
 
 
