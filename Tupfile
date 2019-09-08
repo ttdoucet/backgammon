@@ -1,0 +1,37 @@
+cxx = clang++-5.0
+#cxx = clang++-8
+cppflags = -O3 -ffast-math -fvectorize --std=c++17
+
+!compile = |> $(cxx) $(cppflags) -c %f -o %o |>
+!link = |> $(cxx) $(cppflags) %f -o %o |>
+
+# The beargen program generates the bearoff database.
+#
+beargen_src = beargen.cpp bearoff.cpp move.cpp
+: foreach $(beargen_src)  |> !compile |> %B.bearoff.o {beargen-objs}
+: {beargen-objs} |> !link |> beargen
+
+# Actually generate the  bearoff database.
+# 
+: | beargen |> ./beargen > %o |> bearoff.dat
+
+# Main executable
+#
+src = train.cpp hits.cpp net.cpp move.cpp ttydisp.cpp random.cpp \
+      bdata.cpp bearoff.cpp human.cpp console.cpp
+
+: foreach $(src) | bearoff.dat |> !compile |> %B.o {objs}
+: {objs} |> !link |> train
+
+# Utility
+#
+netcp_src = netcp.cpp net.cpp console.cpp
+: foreach $(netcp_src)  |> !compile |> %B.ncp.o {netcp-objs}
+: {netcp-objs} |> !link |> netcp 
+
+
+
+
+
+
+

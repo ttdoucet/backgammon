@@ -30,6 +30,6 @@ clean :
 	-rm -f beargen train *.o *.bc *.s *.ii
 
 distclean : clean
-	-rm -f beargen train bearoff.dat *.o
+	-rm -f beargen train netcp bearoff.dat *.o
 
 .PHONY : clean all
