@@ -5,15 +5,8 @@ cppflags = -O3 -ffast-math -fvectorize --std=c++17
 !compile = |> $(cxx) $(cppflags) -c %f -o %o |>
 !link = |> $(cxx) $(cppflags) %f -o %o |>
 
-# The beargen program generates the bearoff database.
-#
-beargen_src = beargen.cpp bearoff.cpp move.cpp
-: foreach $(beargen_src)  |> !compile |> %B.bearoff.o {beargen-objs}
-: {beargen-objs} |> !link |> beargen
-
-# Actually generate the  bearoff database.
-#
-: | beargen |> ./beargen > %o |> bearoff.dat
+# Generate the bearoff database.
+: | ./bearoff/beargen |> ./bearoff/beargen > %o |> bearoff.dat
 
 # Main executable
 #
