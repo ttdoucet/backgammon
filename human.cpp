@@ -8,7 +8,8 @@
 #include "human.h"
 #include "math.h"
 #include "ttydisp.h"
-#include "console.h"
+
+using std::cout;
 
 void HumanPlayer::chooseMove(const board& fromBoard, moves& choice)
 {
@@ -19,13 +20,13 @@ void HumanPlayer::chooseMove(const board& fromBoard, moves& choice)
         if (legalToMove(fromBoard, toBoard, choice) )
             return;
         else
-            console << "Move not legal.\n";
+            cout << "Move not legal.\n";
     }
 }
 
 void HumanPlayer::prepareToPlay()
 {
-    console << "Starting new game.\n";
+    cout << "Starting new game.\n";
 }
 
 void HumanPlayer::finalEquity(double e)
@@ -40,7 +41,7 @@ void HumanPlayer::finalEquity(double e)
     else
         buf << "Game over, and it is an exact tie.\n";
 
-    console << buf.str();
+    cout << buf.str();
 }
 
 
@@ -56,7 +57,7 @@ static bool point_ok(int p)
 {
     if (p > 25 || p < 0)
     {
-        console << "Illegal checker position.\n";
+        cout << "Illegal checker position.\n";
         return false;
     }
     return true;
@@ -98,7 +99,7 @@ void HumanPlayer::parseUserMove(const board& fromBoard, board& toBoard, char *s)
 void HumanPlayer::getUserBoard(board& bd)
 {
     display_board(bd, bd.onRoll());
-    console << "You roll " << bd.d1() << " and " << bd.d2() << "> ";
+    cout << "You roll " << bd.d1() << " and " << bd.d2() << "> ";
 
     char userString[80];
     char  *ignore = fgets(userString, sizeof(userString), stdin);

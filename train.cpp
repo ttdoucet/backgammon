@@ -6,7 +6,8 @@
 #include "game.h"
 #include "playernet.h"
 #include "human.h"
-#include "console.h"
+
+using std::cout;
 
 class AnnotatedGame : public Game
 {
@@ -17,9 +18,9 @@ protected:
     void reportMove(board bd, moves mv) override
     {
         std::string s = moveStr(mv);
-        console << board::colorname(b.onRoll()) << " rolls "
-                << bd.d1() << " " <<  bd.d2()
-                << " and moves " << s << '\n';
+        cout << board::colorname(b.onRoll()) << " rolls "
+             << bd.d1() << " " <<  bd.d2()
+             << " and moves " << s << '\n';
     }
 };
 
@@ -46,7 +47,7 @@ void playoffSession(int trials, Player& whitePlayer, Player& blackPlayer, bool v
            << std::setprecision(2) << whitePoints
            << ")\n";
 
-        console << ss.str();
+        cout << ss.str();
     }
 }
 
@@ -56,10 +57,10 @@ void playoffSession(int trials, Player& whitePlayer, Player& blackPlayer, bool v
  */
 void usage()
 {
-    console << "usage: train  [flags] [playerOne] [playerTwo]\n";
-    console << "\t-d display moves.\n";
-    console << "\t-nTrials.\n";
-    console << "\t-Sseedval\n";
+    cout << "usage: train  [flags] [playerOne] [playerTwo]\n";
+    cout << "\t-d display moves.\n";
+    cout << "\t-nTrials.\n";
+    cout << "\t-Sseedval\n";
     std::exit(1);
 }
 
@@ -89,12 +90,12 @@ void cmdline(int argc, char *argv[])
                 break;
             case 'a':
                 alpha = std::stof(argv[i] + 2);
-                console << "alpha: " << alpha << "\n";
+                cout << "alpha: " << alpha << "\n";
                 break;
 
             case 'l':
                 lambda = std::stof(argv[i] + 2);
-                console << "lambda: " << lambda << "\n";
+                cout << "lambda: " << lambda << "\n";
                 break;
 
             case 'S':
@@ -138,7 +139,7 @@ void setupRNG()
 {
     if (explicitSeed == true)
     {
-        console << "RNG using user-specified seed: " << user_seed << "\n";
+        cout << "RNG using user-specified seed: " << user_seed << "\n";
         set_seed(user_seed);
     }
     else

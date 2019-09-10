@@ -10,8 +10,8 @@ cppflags = -O3 -ffast-math -fvectorize --std=c++17
 
 # Main executable
 #
-src = train.cpp hits.cpp net.cpp move.cpp ttydisp.cpp random.cpp \
-      bdata.cpp bearoff.cpp human.cpp console.cpp
+src = train.cpp hits.cpp net.cpp move.cpp ttydisp.cpp \
+      random.cpp bdata.cpp bearoff.cpp human.cpp
 
 : foreach $(src) | bearoff.dat |> !compile |> %B.o {objs}
 : {objs} |> !link |> train
@@ -19,7 +19,7 @@ src = train.cpp hits.cpp net.cpp move.cpp ttydisp.cpp random.cpp \
 # Utility
 #
 : netcp.cpp  |> !compile |> %B.o
-: netcp.o net.o console.o |> !link |> netcp
+: netcp.o net.o |> !link |> netcp
 
 
 
