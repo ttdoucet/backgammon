@@ -2,6 +2,10 @@ cxx = clang++-5.0
 #cxx = clang++-8
 cppflags = -O3 -ffast-math -fvectorize --std=c++17
 
+#cxx = g++-9
+#cppflags = -O3 -ffast-math --std=c++17
+
+
 !compile = |> $(cxx) $(cppflags) -c %f -o %o |>
 !link = |> $(cxx) $(cppflags) %f -o %o |>
 
