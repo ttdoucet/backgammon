@@ -24,4 +24,3 @@ src = train.cpp hits.cpp net.cpp move.cpp ttydisp.cpp \
 #
 : netcp.cpp  |> !compile |> %B.o
 : netcp.o net.o |> !link |> netcp
-
