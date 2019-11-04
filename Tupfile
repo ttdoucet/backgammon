@@ -14,11 +14,11 @@ cppflags = -O3 -ffast-math -fvectorize --std=c++17
 
 # Main executable
 #
-src = train.cpp hits.cpp net.cpp move.cpp ttydisp.cpp \
+src = playoff.cpp hits.cpp net.cpp move.cpp ttydisp.cpp \
       random.cpp bdata.cpp bearoff.cpp human.cpp
 
 : foreach $(src) | bearoff.dat |> !compile |> {objs}
-: {objs} |> !link |> train
+: {objs} |> !link |> playoff
 
 # Utility
 #
