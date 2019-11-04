@@ -6,8 +6,9 @@
 #include "game.h"
 #include "playernet.h"
 #include "human.h"
+#include "cmdline.h"
 
-using std::cout;
+using namespace std;
 
 class AnnotatedGame : public Game
 {
@@ -51,93 +52,9 @@ void playoffSession(int trials, Player& whitePlayer, Player& blackPlayer, bool v
     }
 }
 
-
-/*
- * Command-line stuff
- */
-void usage()
+void setupRNG(unsigned long user_seed)
 {
-    cout << "usage: train  [flags] [playerOne] [playerTwo]\n";
-    cout << "\t-d display moves.\n";
-    cout << "\t-nTrials.\n";
-    cout << "\t-Sseedval\n";
-    std::exit(1);
-}
-
-int numPlayers;
-const char *player_name[2];
-
-float alpha = 0.02f;  // not hooked up
-float lambda = 0.85f; // not hooked up
-int trials = 500;
-int isTraining;  // not hooked up
-int display_moves;  // hack
-
-unsigned long user_seed;
-bool explicitSeed = false;
-
-void cmdline(int argc, char *argv[])
-{
-    int i;
-    for (i = 1; i < argc; i++)
-    {
-        if (argv[i][0] == '-')
-        {
-            switch (argv[i][1])
-            {
-            case 'n':
-                trials = std::stoi(argv[i] + 2);
-                break;
-            case 'a':
-                alpha = std::stof(argv[i] + 2);
-                cout << "alpha: " << alpha << "\n";
-                break;
-
-            case 'l':
-                lambda = std::stof(argv[i] + 2);
-                cout << "lambda: " << lambda << "\n";
-                break;
-
-            case 'S':
-                user_seed = std::stoi(argv[i] + 2);
-                explicitSeed = true;
-                break;
-
-            case 'd':
-                display_moves++;
-                break;
-
-            default:
-            case '?':
-                usage();
-                break;
-            }
-        }
-        else
-        {
-            if (numPlayers == 2)
-                usage();
-            player_name[numPlayers] = argv[i];
-            numPlayers++;
-        }
-    }
-
-    if (numPlayers == 0)
-    {
-        player_name[numPlayers++] = "net.w";
-        isTraining = 1;
-    }
-    else if (numPlayers == 1)
-        isTraining = 1;
-    else if (numPlayers == 2)
-        isTraining = 0;
-    else
-        usage();
-}
-
-void setupRNG()
-{
-    if (explicitSeed == true)
+    if (user_seed != -1)
     {
         cout << "RNG using user-specified seed: " << user_seed << "\n";
         set_seed(user_seed);
@@ -146,19 +63,56 @@ void setupRNG()
         randomize_seed();
 }
 
-using namespace std;
+class cmdopts : public cmdline
+{
+public:
+    int trials = 500;
+    bool display_moves = false;
+    bool explicit_seed = false;
+    unsigned long user_seed = -1;
+
+    cmdopts()
+    {
+        setopt('n', "--games", trials,        "number of trials.");
+        setopt('s', "--seed",  user_seed,     "seed for random-number generator.");
+        setopt('d',            display_moves, "display moves.");
+    }
+
+};
 
 int main(int argc, char *argv[])
 {
-    cmdline(argc, argv);
-    setupRNG();
+    string player_name[2];
 
-    NeuralNetPlayer whitePlayer("white", player_name[0]);
+    cmdopts opts;
+    opts.parse(argc, argv);
+    if (opts.ExtraArgs.size() == 1)
+    {
+        player_name[0] = "net.w";
+        player_name[1] = "net.w";
+    }
+    else if (opts.ExtraArgs.size() == 2)
+    {
+        player_name[0] = opts.ExtraArgs[1];
+        player_name[1] = "net.w";
+    }
+    else if (opts.ExtraArgs.size() == 3)
+    {
+        player_name[0] = opts.ExtraArgs[1];
+        player_name[1] = opts.ExtraArgs[2];
+    }
+
+    setupRNG(opts.user_seed);
+
+    cout << "white: " << player_name[0].c_str() << endl;
+    cout << "black: " << player_name[1].c_str() << endl;
+
+    NeuralNetPlayer whitePlayer("white", player_name[0].c_str());
 //  HumanPlayer whitePlayer("white");
 
-    NeuralNetPlayer blackPlayer("black", player_name[1]);
+    NeuralNetPlayer blackPlayer("black", player_name[1].c_str());
 
-    playoffSession(trials, whitePlayer, blackPlayer, display_moves);
+    playoffSession(opts.trials, whitePlayer, blackPlayer, opts.display_moves);
 
     return 0;
 }
