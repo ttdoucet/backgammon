@@ -1,3 +1,7 @@
+#
+# Backgammon playing and training via a neural network.
+#
+
 $ ./playoff --help
 Usage: ./playoff [options] [args]
 
