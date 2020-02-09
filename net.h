@@ -79,8 +79,8 @@ public:
         return this->feedForward();
     }
 
-    unsigned long seed = 0;  // legacy
-    long games_trained = 0;  // legacy
+    uint64_t seed = 0;  // legacy
+    int64_t games_trained = 0;  // legacy
 };
 
 using netv3 = BackgammonNet<features_v3<float*>, 30>;

@@ -1,16 +1,12 @@
-cxx = clang++-5.0
-#cxx = clang++-8
-cppflags = -O3 -ffast-math -fvectorize --std=c++17
-
-#cxx = g++-9
-#cppflags = -O3 -ffast-math --std=c++17
-
+# Use version 9 or later.
+cxx = clang++
+cppflags = -O3 -ffast-math --std=c++17
 
 !compile = |> $(cxx) $(cppflags) -c %f -o %o |> %B.o
 !link = |> $(cxx) $(cppflags) %f -o %o |>
 
 # Generate the bearoff database.
-: | ./bearoff/beargen |> ./bearoff/beargen > %o |> bearoff.dat
+: | ./bearoff/beargen.exe |> ./bearoff/beargen.exe > %o |> bearoff.dat
 
 # Main executable
 #

@@ -29,7 +29,7 @@ int throw_die()
     return dice(generator);
 }
 
-void set_seed(unsigned long s)
+void set_seed(uint64_t s)
 {
     generator.seed(s);
 }

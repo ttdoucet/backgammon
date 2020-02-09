@@ -1,5 +1,6 @@
-cxx = clang++-5.0
-cppflags = -O3 -ffast-math -fvectorize --std=c++17
+cxx = g++
+#cxx = clang++-5.0
+cppflags = -O3 -ffast-math --std=c++17
 
 !compile = |> $(cxx) $(cppflags) -c %f -o %o |>
 !link = |> $(cxx) $(cppflags) %f -o %o |>
@@ -8,4 +9,4 @@ cppflags = -O3 -ffast-math -fvectorize --std=c++17
 #
 beargen_src = beargen.cpp bearoff.cpp move.cpp
 : foreach $(beargen_src)  |> !compile |> %B.o {beargen-objs}
-: {beargen-objs} |> !link |> beargen
+: {beargen-objs} |> !link |> beargen.exe

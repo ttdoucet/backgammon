@@ -1,7 +1,9 @@
 /* Written by Todd Doucet.  See file copyright.txt.
  */
 #pragma once
+#define _USE_MATH_DEFINES
 #include <cmath>
+#include <cstdint>
 
 template<int N, typename T1, typename T2>
 inline float dotprod(T1 vec1, T2 vec2)
@@ -36,7 +38,7 @@ namespace detail
         return floatify( a * y + K );
     }
 
-    inline double floatify_d(const long&& i)
+    inline double floatify_d(const int64_t&& i)
     {
         return *(double *)&i;
     }
@@ -44,10 +46,10 @@ namespace detail
     inline double exp_fast_d(float y)
     {
         constexpr double ln2 = M_LN2;
-        constexpr double a = (1L << (20 + 32)) / ln2;
-        constexpr long k = ((1L<<10) - 1) << (20 + 32);
-        constexpr long c = 60801L << 32; // lowest rms relative error
-        constexpr long K = k - c;
+        constexpr double a = (1LL << (20 + 32)) / ln2;
+        constexpr int64_t k = ((1LL<<10) - 1) << (20 + 32);
+        constexpr int64_t c = 60801LL << 32; // lowest rms relative error
+        constexpr int64_t K = k - c;
 
         return floatify_d( a * y + K );
     }

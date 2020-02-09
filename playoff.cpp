@@ -52,7 +52,7 @@ void playoffSession(int trials, Player& whitePlayer, Player& blackPlayer, bool v
     }
 }
 
-void setupRNG(unsigned long user_seed)
+void setupRNG(uint64_t user_seed)
 {
     if (user_seed != -1)
     {
@@ -69,7 +69,7 @@ public:
     int trials = 500;
     bool display_moves = false;
     bool explicit_seed = false;
-    unsigned long user_seed = -1;
+    uint64_t user_seed = -1;
 
     cmdopts()
     {
