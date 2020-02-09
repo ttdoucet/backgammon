@@ -1,5 +1,4 @@
-cxx = g++
-#cxx = clang++-5.0
+cxx = clang++
 cppflags = -O3 -ffast-math --std=c++17
 
 !compile = |> $(cxx) $(cppflags) -c %f -o %o |>
