@@ -39,14 +39,14 @@ protected:
      */
     virtual float feedForward()
     {
+        // invites vectorization
         for (int i = 0; i < N_HIDDEN; i++)
             pre_hidden[i] = dotprod<N_INPUTS>(input, weights_1[i]);
 
         for (int i = 0; i < N_HIDDEN; i++)
             hidden[i] = squash(pre_hidden[i]);
 
-        auto output = squash(dotprod<N_HIDDEN>(hidden, weights_2));
-        return net_to_equity(output);
+        return squash(dotprod<N_HIDDEN>(hidden, weights_2));
     }
 
     /* Activations.
@@ -85,45 +85,7 @@ public:
 
 using netv3 = BackgammonNet<features_v3<float*>, 30>;
 
-class netv3_marginal : public netv3
-{
-    alignas(16) input_vector prev_input;
-
-public:
-    float feedForward() override
-    {
-        static int count = 0;
-        if (count-- == 0)
-        {
-            for (int i = 0; i < n_inputs; i++)
-                prev_input[i] = 0;
-            for (int i = 0; i < n_hidden; i++)
-                pre_hidden[i] = 0;
-            count = 500;
-        }
-
-        for (int i = 0; i < n_inputs ; i++)
-        {
-            if (prev_input[i] == input[i])
-                continue;
-
-            float d = input[i] - prev_input[i] ;
-            prev_input[i] = input[i];
-
-            for (int j = 0; j < n_hidden; j++)
-                pre_hidden[j] += d * M(j, i);
-
-        }
-        for (int j = 0; j < n_hidden; j++)
-            hidden[j] = squash(pre_hidden[j]);
-
-        float f = dotprod<n_hidden>(hidden, weights_2);
-        return net_to_equity( squash(f) );
-    }
-};
-
-//using BgNet = netv3;
-using BgNet = netv3_marginal;
+using BgNet = netv3;
 
 BgNet *readFile(const char *fn);
 void writeFile(BgNet& n, const char *fn);
