@@ -17,7 +17,7 @@ public:
     typedef matrix<N_HIDDEN, 1> hidden_vector;
 
 protected:
-    virtual float feedForward()
+    float feedForward()
     {
         auto hidden = M * input;
 
