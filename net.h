@@ -55,7 +55,7 @@ protected:
 
     constexpr static float equity_to_net(float e)
     {
-        return  (e + 1) / 2;
+        return  (e/MAX_EQUITY + 1) / 2;
     }
 
 public:
