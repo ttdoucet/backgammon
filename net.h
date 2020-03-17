@@ -65,6 +65,11 @@ public:
         return this->feedForward();
     }
 
+    BackgammonNet()
+    {
+        assert( feature_calc::count == this->input.Rows() * this->input.Cols() );
+    }
+
     uint64_t seed = 0;  // legacy
     int64_t games_trained = 0;  // legacy
 };
