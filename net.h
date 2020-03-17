@@ -27,8 +27,6 @@ protected:
         return squash( V * hidden );
     }
 
-    /* Activations.
-     */
     input_vector input;
 
 public:
@@ -48,11 +46,16 @@ template<class feature_calc, int N_HIDDEN>
 class BackgammonNet : public net<feature_calc::count, N_HIDDEN>
 {
 protected:
-    constexpr static float MAX_EQUITY = 3.0f;
+    constexpr static int MAX_EQUITY = 3;
 
     constexpr static float net_to_equity(float p)
     {
-        return  (2 * p - 1) * MAX_EQUITY;
+        return  (2*p - 1) * MAX_EQUITY;
+    }
+
+    constexpr static float equity_to_net(float e)
+    {
+        return  (e + 1) / 2;
     }
 
 public:
@@ -61,7 +64,7 @@ public:
     float equity(const board &b) noexcept
     {
         feature_calc{b}.calc(this->input.Data());
-        return this->feedForward();
+        return net_to_equity( this->feedForward() );
     }
 
     BackgammonNet()
