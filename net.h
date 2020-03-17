@@ -26,10 +26,10 @@ protected:
 
     virtual float feedForward()
     {
-        pre_hidden = M * input;
+        auto hidden = M * input;
 
         for (int i = 0; i < N_HIDDEN; i++)
-            hidden(i) = squash(pre_hidden(i));
+            hidden(i) = squash(hidden(i));
 
         return squash( hidden.Transpose() * V );
     }
@@ -37,8 +37,6 @@ protected:
     /* Activations.
      */
     input_vector input;
-    hidden_vector pre_hidden;
-    hidden_vector hidden;
 
 public:
     /* Model parameters.
