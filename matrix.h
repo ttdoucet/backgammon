@@ -1,15 +1,11 @@
 #pragma once
-
 #include <cassert>
 #include <initializer_list>
 
-/*
- * Written by Todd Doucet.
- *
+/* Written by Todd Doucet.
  * Intended for relatively small matrices whose sizes are known
  * at compile-time.   Intended to be fast and efficient.
  */ 
-
 template<int R, int C=1> class matrix
 {
     typedef float Array[R][C];
@@ -61,7 +57,6 @@ template<int R, int C=1> class matrix
         return *this;
     }
 
-
     matrix<R,C>& operator *=(float scale)
     {
         for (int r = 0; r < Rows(); r++)
@@ -84,14 +79,12 @@ template<int R, int C=1> class matrix
         return (v *= scale);
     }
 
-
     matrix<R,C> operator /(float scale) const
     {
         matrix<R,C> v(*this);
         return (v /= scale);
     }
 
-    
     // unary minus
     matrix<R,C> operator-() const
     {
@@ -118,12 +111,10 @@ template<int R, int C=1> class matrix
         return !(*this == rhs);
     } 
 
-
     /*
      * These construct and return appropriate matrices,
      * copying the data as necessary.
      */
-
     matrix<1,C> RowVector(int r) const
     {
         matrix<1,C> dest;
@@ -165,7 +156,6 @@ template<>  inline matrix<1, 1>::operator float() const
 
 /* Multiplication of two matrices.
  */
-
 template<int S1, int S2, int S3>
    matrix<S1,S3> operator *(const matrix<S1, S2> &lhs, const matrix<S2, S3> &rhs)
 {
@@ -184,7 +174,6 @@ template<int S1, int S2, int S3>
 
 /* Multiplication of a matrix by a scalar.
  */
-
 template<int R, int C> matrix<R,C> operator *(float scale, const matrix<R,C> rhs)
 {
     matrix<R,C> v(rhs);
@@ -194,7 +183,6 @@ template<int R, int C> matrix<R,C> operator *(float scale, const matrix<R,C> rhs
 
 /* Addition of two matrices.
  */
-
 template<int R, int C>  matrix<R,C> operator+(const matrix<R,C> &lhs, const matrix<R,C> &rhs)
 {
     matrix<R,C> v(lhs);
