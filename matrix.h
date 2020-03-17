@@ -153,7 +153,6 @@ template<>  inline matrix<1, 1>::operator float() const
   return data[0][0];
 }
 
-
 /* Multiplication of two matrices.
  */
 template<int S1, int S2, int S3>
@@ -179,7 +178,6 @@ template<int R, int C> matrix<R,C> operator *(float scale, const matrix<R,C> rhs
     matrix<R,C> v(rhs);
     return v *= scale;
 }
-
 
 /* Addition of two matrices.
  */
