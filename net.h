@@ -16,18 +16,6 @@ public:
     typedef matrix<N_INPUTS, 1> input_vector;
     typedef matrix<N_HIDDEN, 1> hidden_vector;
 
-    /* Access to model parameters.
-     */
-    float& M(int r, int c)
-    {
-        return weights_1(r, c);
-    }
-
-    float& V(int i)
-    {
-        return weights_2(i);
-    }
-
 protected:
     constexpr static float MAX_EQUITY = 3.0f;
 
@@ -38,24 +26,25 @@ protected:
 
     virtual float feedForward()
     {
-        pre_hidden = weights_1 * input;
+        pre_hidden = M * input;
 
         for (int i = 0; i < N_HIDDEN; i++)
             hidden(i) = squash(pre_hidden(i));
-        
-        return squash( hidden.Transpose() * weights_2 );
+
+        return squash( hidden.Transpose() * V );
     }
 
     /* Activations.
      */
-    alignas(16) input_vector input;
-    alignas(16) hidden_vector pre_hidden;
-    alignas(16) hidden_vector hidden;
+    input_vector input;
+    hidden_vector pre_hidden;
+    hidden_vector hidden;
 
+public:
     /* Model parameters.
      */
-    matrix<N_HIDDEN, N_INPUTS> weights_1;
-    matrix<N_HIDDEN, 1> weights_2;
+    matrix<N_HIDDEN, N_INPUTS> M;
+    matrix<N_HIDDEN, 1> V;
 };
 
 
@@ -72,9 +61,7 @@ public:
      */
     float equity(const board &b) noexcept
     {
-//        feature_calc{b}.calc(this->input);
-        // hacky-hack
-        feature_calc{b}.calc(&(this->input(0,0)));
+        feature_calc{b}.calc(this->input.Data());
         return this->feedForward();
     }
 

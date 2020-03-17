@@ -149,6 +149,7 @@ template<int R, int C=1> class matrix
         return dest;
     }
 
+    float *Data() { return &data[0][0]; }
     operator float() const;
 
  private:
