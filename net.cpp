@@ -28,7 +28,7 @@ void writeFile(BgNet& n, const char *fn)
             write_float(ofs, n.M(i, j));
 
     for (int i = 0; i < n.n_hidden; i++)
-        write_float(ofs, n.V(i));
+        write_float(ofs, n.V(0, i));
 
     ofs << "Current seed: " << n.seed << "L\n";            // legacy
     ofs << "Games trained: " << n.games_trained << "L\n";  // legacy
