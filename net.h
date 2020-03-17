@@ -4,6 +4,7 @@
 
 #include "board.h"
 #include "mathfuncs.h"
+#include "matrix.h"
 
 template<int N_INPUTS, int N_HIDDEN>
 class net
@@ -12,19 +13,19 @@ public:
     constexpr static int n_inputs = N_INPUTS;
     constexpr static int n_hidden = N_HIDDEN;
 
-    typedef float input_vector[N_INPUTS];
-    typedef float hidden_vector[N_HIDDEN];
+    typedef matrix<N_INPUTS, 1> input_vector;
+    typedef matrix<N_HIDDEN, 1> hidden_vector;
 
     /* Access to model parameters.
      */
     float& M(int r, int c)
     {
-        return weights_1[r][c];
+        return weights_1(r, c);
     }
 
     float& V(int i)
     {
-        return weights_2[i];
+        return weights_2(i);
     }
 
 protected:
@@ -35,18 +36,14 @@ protected:
         return  (2 * p - 1) * MAX_EQUITY;
     }
 
-    /* Evaluate the net on its input.
-     */
     virtual float feedForward()
     {
-        // invites vectorization
-        for (int i = 0; i < N_HIDDEN; i++)
-            pre_hidden[i] = dotprod<N_INPUTS>(input, weights_1[i]);
+        pre_hidden = weights_1 * input;
 
         for (int i = 0; i < N_HIDDEN; i++)
-            hidden[i] = squash(pre_hidden[i]);
-
-        return squash(dotprod<N_HIDDEN>(hidden, weights_2));
+            hidden(i) = squash(pre_hidden(i));
+        
+        return squash( hidden.Transpose() * weights_2 );
     }
 
     /* Activations.
@@ -57,8 +54,8 @@ protected:
 
     /* Model parameters.
      */
-    alignas(16) float weights_1[N_HIDDEN][N_INPUTS];
-    alignas(16) float weights_2[N_HIDDEN];
+    matrix<N_HIDDEN, N_INPUTS> weights_1;
+    matrix<N_HIDDEN, 1> weights_2;
 };
 
 
@@ -75,7 +72,9 @@ public:
      */
     float equity(const board &b) noexcept
     {
-        feature_calc{b}.calc(this->input);
+//        feature_calc{b}.calc(this->input);
+        // hacky-hack
+        feature_calc{b}.calc(&(this->input(0,0)));
         return this->feedForward();
     }
 
