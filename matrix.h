@@ -3,6 +3,7 @@
 #include <initializer_list>
 
 /* Written by Todd Doucet.
+ *
  * Intended for relatively small matrices whose sizes are known
  * at compile-time.   Intended to be fast and efficient.
  */ 
@@ -110,35 +111,6 @@ template<int R, int C=1> class matrix
     {
         return !(*this == rhs);
     } 
-
-    /*
-     * These construct and return appropriate matrices,
-     * copying the data as necessary.
-     */
-    matrix<1,C> RowVector(int r) const
-    {
-        matrix<1,C> dest;
-        for (int c = 0; c < Cols(); c++)
-            dest(0, c) = data[r][c];
-        return dest;
-    }
-
-    matrix<R,1> ColumnVector(int c) const
-    {
-        matrix<R,1> dest;
-        for (int r = 0; r < Rows(); r++)
-            dest(r, 0) = data[r][c];
-        return dest;
-    }
-
-    matrix<C,R> Transpose() const
-    {
-        matrix<C,R> dest;
-        for (int r = 0; r < Rows(); r++)
-            for (int c = 0; c < Cols(); c++)
-                dest(c,r) = data[r][c];
-        return dest;
-    }
 
     float *Data() { return &data[0][0]; }
     operator float() const;

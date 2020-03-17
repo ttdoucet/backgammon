@@ -76,7 +76,7 @@ BgNet *readFile(const char *fn)
             p->M(i, j) = read_float(ifs);
 
     for (int i = 0; i < p->n_hidden; i++)
-        p->V(i) = read_float(ifs);
+        p->V(0, i) = read_float(ifs);
 
     has(ifs, "Current seed:");
     char L;

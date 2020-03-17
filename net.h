@@ -17,13 +17,6 @@ public:
     typedef matrix<N_HIDDEN, 1> hidden_vector;
 
 protected:
-    constexpr static float MAX_EQUITY = 3.0f;
-
-    constexpr static float net_to_equity(float p)
-    {
-        return  (2 * p - 1) * MAX_EQUITY;
-    }
-
     virtual float feedForward()
     {
         auto hidden = M * input;
@@ -31,7 +24,7 @@ protected:
         for (int i = 0; i < N_HIDDEN; i++)
             hidden(i) = squash(hidden(i));
 
-        return squash( hidden.Transpose() * V );
+        return squash( V * hidden );
     }
 
     /* Activations.
@@ -42,7 +35,7 @@ public:
     /* Model parameters.
      */
     matrix<N_HIDDEN, N_INPUTS> M;
-    matrix<N_HIDDEN, 1> V;
+    matrix<1, N_HIDDEN> V;
 };
 
 
@@ -54,6 +47,14 @@ public:
 template<class feature_calc, int N_HIDDEN>
 class BackgammonNet : public net<feature_calc::count, N_HIDDEN>
 {
+protected:
+    constexpr static float MAX_EQUITY = 3.0f;
+
+    constexpr static float net_to_equity(float p)
+    {
+        return  (2 * p - 1) * MAX_EQUITY;
+    }
+
 public:
     /* Neural net estimate of the equity for the side on roll.
      */
