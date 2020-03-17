@@ -5,16 +5,6 @@
 #include <cmath>
 #include <cstdint>
 
-template<int N, typename T1, typename T2>
-inline float dotprod(T1 vec1, T2 vec2)
-{
-    float sum = 0;
-    for (int i = 0; i < N; ++i)
-        sum += (vec1[i] * vec2[i]);
-
-    return sum;
-}
-
 namespace detail
 {
     /* These fast approximations of exp() are based on Nicol N. Schraudolph,
