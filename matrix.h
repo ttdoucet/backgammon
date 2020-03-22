@@ -112,6 +112,23 @@ template<int R, int C=1> class matrix
         return !(*this == rhs);
     } 
 
+    /*
+     * This constructs and returns and appropriate matrix,
+     * copying the data as necessary.  But in practice
+     * the copy is often optimized away.
+     */
+
+    matrix<C,R> Transpose() const
+    {
+        matrix<C,R> dest;
+        for (int r = 0; r < Rows(); r++)
+            for (int c = 0; c < Cols(); c++)
+                dest(c,r) = data[r][c];
+        return dest;
+    }
+
+
+
     float *Data() { return &data[0][0]; }
     operator float() const;
 
