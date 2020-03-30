@@ -12,8 +12,8 @@ template<int R, int C=1> class matrix
     typedef float Array[R][C];
 
  public:
-    int Rows() const { return R; }
-    int Cols() const { return C; }
+    constexpr int Rows() const { return R; }
+    constexpr int Cols() const { return C; }
 
     // initialize to zeros.
     matrix<R,C>()
