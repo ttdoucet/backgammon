@@ -46,10 +46,21 @@ protected:
     input_vector input;
 
 public:
-    /* Model parameters & parameter gradients.
+    /* Model parameters.
      */
-    matrix<N_HIDDEN, N_INPUTS> M, M_grad;
-    matrix<1, N_HIDDEN> V, V_grad;
+    matrix<N_HIDDEN, N_INPUTS> M;
+    matrix<1, N_HIDDEN> V;
+
+private:
+    /* Gradients.
+     */
+    matrix<N_HIDDEN, N_INPUTS> M_grad;
+    matrix<1, N_HIDDEN> V_grad;
+
+    /* Accumulated gradients.
+     */
+    matrix<N_HIDDEN, N_INPUTS> M_grads;
+    matrix<1, N_HIDDEN> V_grads;
 };
 
 
