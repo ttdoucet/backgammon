@@ -17,23 +17,36 @@ public:
     typedef matrix<N_HIDDEN, 1> hidden_vector;
 
 protected:
-    float feedForward()
+    float feedForward(bool learn=false)
     {
         auto hidden = M * input;
 
         for (int i = 0; i < N_HIDDEN; i++)
             hidden(i) = squash(hidden(i));
 
-        return squash( V * hidden );
+        auto out = squash( V * hidden );
+
+        if (learn)
+        {
+            auto const f = out * (1 - out);
+            V_grad = f * hidden.Transpose();
+
+            auto lhs = f * V.Transpose();
+            for (int i = 0; i < lhs.Cols(); i++)
+                lhs *= ( hidden(i) * (1 - hidden(i)) );
+            M_grad = lhs * input.Transpose();
+        }
+
+        return out;
     }
 
     input_vector input;
 
 public:
-    /* Model parameters.
+    /* Model parameters & gradients of parameters.
      */
-    matrix<N_HIDDEN, N_INPUTS> M;
-    matrix<1, N_HIDDEN> V;
+    matrix<N_HIDDEN, N_INPUTS> M, M_grad;
+    matrix<1, N_HIDDEN> V, V_grad;
 };
 
 
