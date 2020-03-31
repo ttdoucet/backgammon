@@ -20,39 +20,42 @@ public:
     typedef matrix<1, N_HIDDEN> W2;
 
 protected:
-    float feedForward(bool backprop=true)
+    float feedForward()
     {
-        auto hidden = M * input;
+        hidden = M * input;
 
         for (int i = 0; i < N_HIDDEN; i++)
             hidden(i) = squash(hidden(i));
 
-        auto out = squash( V * hidden );
+        return  out = squash( V * hidden );
+    }
 
-        if (backprop)
-        {
-            auto const f = out * (1 - out);
-            V_grad = f * hidden.Transpose();
+    void backprop(float previous)
+    {
+        auto const f = out * (1 - out);
+        V_grad = f * hidden.Transpose();
 
-            auto lhs = f * V.Transpose();
-            static_assert(lhs.Rows() == N_HIDDEN);
+        auto lhs = f * V.Transpose();
+        static_assert(lhs.Rows() == N_HIDDEN);
 
-            for (int i = 0; i < lhs.Rows(); i++)
-                lhs(i) *= ( hidden(i) * (1 - hidden(i)) );
+        for (int i = 0; i < lhs.Rows(); i++)
+            lhs(i) *= ( hidden(i) * (1 - hidden(i)) );
 
-            M_grad = lhs * input.Transpose();
+        M_grad = lhs * input.Transpose();
 
-            M_grads *= lambda;
-            M_grads += M_grad;
+        M_grads *= lambda;
+        M_grads += M_grad;
 
-            V_grads *= lambda;
-            V_grads += V_grad;
+        V_grads *= lambda;
+        V_grads += V_grad;
 
-            // todo: multiplication by error to accumulate
+        // todo: update model with adj.
+        // todo: clear grad, grads, adj.
 
-        }
+        const float err = out - previous;
+        M_adj += err * M_grads;
+        V_adj += err * V_grads;
 
-        return out;
     }
 
     input_vector input;
@@ -64,18 +67,24 @@ public:
     W2 V;
 
 private:
-    /* Gradients.
+    /* State activations  maintained after 
+     * feedForward() for backpropagation.
+     */
+    hidden_vector hidden;
+    float out;
+
+    /* Gradients: derivative of output with respect
+     * to model parameters.
      */
     W1 M_grad;
     W2 V_grad;
 
-    /* Accumulated gradients.
+    /* Sum of gradients with lambda-discount.
      */
     W1 M_grads;
     W2 V_grads;
 
-    /* Accumulated adjustments
-     * to weights.
+    /* Accumulated adjustments to weights.
      */
     W1 M_adj;
     W2 V_adj;
