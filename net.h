@@ -27,9 +27,6 @@ protected:
         for (int i = 0; i < N_HIDDEN; i++)
             hidden(i) = squash(hidden(i));
 
-
-        backprop(0.7);
-
         return  out = squash( V * hidden );
     }
 
