@@ -16,6 +16,9 @@ public:
     typedef matrix<N_INPUTS, 1> input_vector;
     typedef matrix<N_HIDDEN, 1> hidden_vector;
 
+    typedef matrix<N_HIDDEN, N_INPUTS> W1;
+    typedef matrix<1, N_HIDDEN> W2;
+
 protected:
     float feedForward(bool backprop=true)
     {
@@ -39,18 +42,13 @@ protected:
 
             M_grad = lhs * input.Transpose();
 
-            // missing: multiplication by error
-
-#if 0
-            M_grads = lambda * M_grads + M_grad;
-            V_grads = lambda * V_grads + V_grad;
-#else
             M_grads *= lambda;
             M_grads += M_grad;
 
             V_grads *= lambda;
             V_grads += V_grad;
-#endif
+
+            // todo: multiplication by error to accumulate
 
         }
 
@@ -62,21 +60,30 @@ protected:
 public:
     /* Model parameters.
      */
-    matrix<N_HIDDEN, N_INPUTS> M;
-    matrix<1, N_HIDDEN> V;
+    W1 M;
+    W2 V;
 
 private:
     /* Gradients.
      */
-    matrix<N_HIDDEN, N_INPUTS> M_grad;
-    matrix<1, N_HIDDEN> V_grad;
+    W1 M_grad;
+    W2 V_grad;
 
     /* Accumulated gradients.
      */
-    matrix<N_HIDDEN, N_INPUTS> M_grads;
-    matrix<1, N_HIDDEN> V_grads;
+    W1 M_grads;
+    W2 V_grads;
 
-    float lambda = 0.9;
+    /* Accumulated adjustments
+     * to weights.
+     */
+    W1 M_adj;
+    W2 V_adj;
+
+    // Temporal discount.
+    float lambda = 1.0;
+    // Learning rate.
+    float alpha = 0.01;
 };
 
 
