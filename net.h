@@ -27,13 +27,16 @@ protected:
         for (int i = 0; i < N_HIDDEN; i++)
             hidden(i) = squash(hidden(i));
 
+
+        backprop(0.7);
+
         return  out = squash( V * hidden );
     }
 
     void backprop(float previous)
     {
         auto const f = out * (1 - out);
-        V_grad = f * hidden.Transpose();
+        auto V_grad = f * hidden.Transpose();
 
         auto lhs = f * V.Transpose();
         static_assert(lhs.Rows() == N_HIDDEN);
@@ -41,7 +44,7 @@ protected:
         for (int i = 0; i < lhs.Rows(); i++)
             lhs(i) *= ( hidden(i) * (1 - hidden(i)) );
 
-        M_grad = lhs * input.Transpose();
+        auto M_grad = lhs * input.Transpose();
 
         M_grads *= lambda;
         M_grads += M_grad;
@@ -67,17 +70,11 @@ public:
     W2 V;
 
 private:
-    /* State activations  maintained after 
+    /* State activations maintained after 
      * feedForward() for backpropagation.
      */
     hidden_vector hidden;
     float out;
-
-    /* Gradients: derivative of output with respect
-     * to model parameters.
-     */
-    W1 M_grad;
-    W2 V_grad;
 
     /* Sum of gradients with lambda-discount.
      */
