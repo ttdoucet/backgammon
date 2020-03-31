@@ -33,7 +33,10 @@ protected:
     void backprop(float previous)
     {
         auto const f = out * (1 - out);
+
         auto V_grad = f * hidden.Transpose();
+        V_grads *= lambda;
+        V_grads += V_grad;
 
         auto lhs = f * V.Transpose();
         static_assert(lhs.Rows() == N_HIDDEN);
@@ -46,8 +49,6 @@ protected:
         M_grads *= lambda;
         M_grads += M_grad;
 
-        V_grads *= lambda;
-        V_grads += V_grad;
 
         // todo: update model with adj.
         // todo: clear grad, grads, adj.
