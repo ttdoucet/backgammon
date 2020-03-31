@@ -17,7 +17,7 @@ public:
     typedef matrix<N_HIDDEN, 1> hidden_vector;
 
 protected:
-    float feedForward(bool backprop=false)
+    float feedForward(bool backprop=true)
     {
         auto hidden = M * input;
 
@@ -38,6 +38,20 @@ protected:
                 lhs(i) *= ( hidden(i) * (1 - hidden(i)) );
 
             M_grad = lhs * input.Transpose();
+
+            // missing: multiplication by error
+
+#if 0
+            M_grads = lambda * M_grads + M_grad;
+            V_grads = lambda * V_grads + V_grad;
+#else
+            M_grads *= lambda;
+            M_grads += M_grad;
+
+            V_grads *= lambda;
+            V_grads += V_grad;
+#endif
+
         }
 
         return out;
@@ -61,6 +75,8 @@ private:
      */
     matrix<N_HIDDEN, N_INPUTS> M_grads;
     matrix<1, N_HIDDEN> V_grads;
+
+    float lambda = 0.9;
 };
 
 
