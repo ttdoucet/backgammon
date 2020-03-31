@@ -67,6 +67,11 @@ public:
     W1 M;
     W2 V;
 
+    // Temporal discount.
+    float lambda = 1.0;
+    // Learning rate.
+    float alpha = 0.01;
+
 private:
     /* State activations maintained after 
      * feedForward() for backpropagation.
@@ -74,7 +79,7 @@ private:
     hidden_vector hidden;
     float out;
 
-    /* Sum of gradients with lambda-discount.
+    /* Sum of gradients with lambda temporal discount.
      */
     W1 M_grads;
     W2 V_grads;
@@ -83,11 +88,6 @@ private:
      */
     W1 M_adj;
     W2 V_adj;
-
-    // Temporal discount.
-    float lambda = 1.0;
-    // Learning rate.
-    float alpha = 0.01;
 };
 
 

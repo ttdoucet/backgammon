@@ -13,11 +13,10 @@ protected:
 
 public:
     Player(const char *nameOfPlayer) : playerName(nameOfPlayer) {};
-    void setColor(color_t clr){ myColor = clr; }
     virtual void prepareToPlay() { }
-    virtual void finalEquity(double e) { }
+    virtual void finalEquity(float e) { }
     virtual void chooseMove(const board& b, moves& choice) = 0;
-    virtual void presentBoard(const board&b) {}
+    virtual void presentBoard(const board& b) {}
     virtual ~Player(){}
 };
 
@@ -64,31 +63,32 @@ public:
     // Returns the equity of white at the end of the game.
     double playGame(bool verbose)
     {
-        whitePlayer.setColor(white);
-        blackPlayer.setColor(black);
-
         whitePlayer.prepareToPlay();
         blackPlayer.prepareToPlay();
 
         setupGame();
-        moves m;
 
+        moves m;
         while( gameOver(b) == false )
         {
-            playerFor(b.onRoll()).chooseMove(b, m);
+            playerOnRoll().chooseMove(b, m);
 
             if (verbose)
                 reportMove(b, m);
             applyMove(b, m);
-    //      if (verbose)
-    //          display_board(b, white);
+
+            playerOnRoll().presentBoard(b);
             b.setDice( throw_die(), throw_die() );
         }
 
-        return score(b, white);
+        auto white_equity = score(b, white);
+        whitePlayer.finalEquity( white_equity);
+        blackPlayer.finalEquity(-white_equity);
+
+        return white_equity;
     }
 
-    Player& setupGame()
+    void setupGame()
     {
         b.clearBoard();
         // Set up the checkers.
@@ -105,8 +105,8 @@ public:
             dblack = throw_die();
         }
         b.setRoller( (dwhite > dblack) ? white : black);
+        playerOnRoll().presentBoard(b);
         b.setDice(dwhite, dblack);
-        return playerFor(b.onRoll());
     }
 
 protected:
@@ -116,12 +116,13 @@ protected:
 
     virtual void reportMove(board bd, moves mv) { }
 
-    Player& playerFor(color_t color) const
+    Player& playerOnRoll() const
     {
-        if (color == white)
+        if (b.onRoll() == white)
             return whitePlayer;
         else
             return blackPlayer;
+
     }
 
     void both(int pt, int num)

@@ -29,7 +29,7 @@ void HumanPlayer::prepareToPlay()
     cout << "Starting new game.\n";
 }
 
-void HumanPlayer::finalEquity(double e)
+void HumanPlayer::finalEquity(float e)
 {
     std::ostringstream buf;
     buf << std::fixed << std::setprecision(3);

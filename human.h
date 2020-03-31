@@ -10,7 +10,7 @@ public:
     HumanPlayer(const char *name): Player(name){}
 
     void prepareToPlay() override;
-    void finalEquity(double e) override;
+    void finalEquity(float e) override;
     void chooseMove(const board& b, moves& choice) override;
 
 protected:
