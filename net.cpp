@@ -53,7 +53,7 @@ static bool has(istream& is, const char *str)
 }
 
 // Read in a neural net from a file.
-BgNet *readFile(const char *fn)
+BgNet *readFile(std::string fn)
 {
     int hidden = 40, portable = 1;
     int ntype = 0, input = 0;

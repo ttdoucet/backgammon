@@ -8,11 +8,10 @@
 class Player
 {
 protected:
-    const char *playerName;
-    color_t myColor;
+    std::string playerName;
 
 public:
-    Player(const char *nameOfPlayer) : playerName(nameOfPlayer) {};
+    Player(std::string nameOfPlayer) : playerName(nameOfPlayer) {};
     virtual void prepareToPlay() { }
     virtual void presentBoard(const board& b) {}
     virtual void chooseMove(const board& b, moves& choice) = 0;

@@ -82,36 +82,36 @@ public:
 
 int main(int argc, char *argv[])
 {
-    string player_name[2];
+    string net_name[2];
 
     cmdopts opts;
     opts.parse(argc, argv);
     if (opts.ExtraArgs.size() == 1)
     {
-        player_name[0] = "net.w";
-        player_name[1] = "net.w";
+        net_name[0] = "net.w";
+        net_name[1] = "net.w";
     }
     else if (opts.ExtraArgs.size() == 2)
     {
-        player_name[0] = opts.ExtraArgs[1];
-        player_name[1] = "net.w";
+        net_name[0] = opts.ExtraArgs[1];
+        net_name[1] = "net.w";
     }
     else if (opts.ExtraArgs.size() == 3)
     {
-        player_name[0] = opts.ExtraArgs[1];
-        player_name[1] = opts.ExtraArgs[2];
+        net_name[0] = opts.ExtraArgs[1];
+        net_name[1] = opts.ExtraArgs[2];
     }
 
     setupRNG(opts.user_seed);
 
-    cout << "white: " << player_name[0].c_str() << endl;
-    cout << "black: " << player_name[1].c_str() << endl;
+    cout << "white: " << net_name[0] << endl;
+    cout << "black: " << net_name[1] << endl;
 
-    Learner whitePlayer("white", player_name[0].c_str());
-//  NeuralNetPlayer whitePlayer("white", player_name[0].c_str());
+//  Learner whitePlayer("white", net_name[0]);
+    NeuralNetPlayer whitePlayer("white", net_name[0]);
 //  HumanPlayer whitePlayer("white");
 
-    NeuralNetPlayer blackPlayer("black", player_name[1].c_str());
+    NeuralNetPlayer blackPlayer("black", net_name[1]);
 
     playoffSession(opts.trials, whitePlayer, blackPlayer, opts.display_moves);
 
