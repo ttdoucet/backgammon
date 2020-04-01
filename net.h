@@ -6,6 +6,8 @@
 #include "mathfuncs.h"
 #include "matrix.h"
 
+#include <iostream>
+
 template<int N_INPUTS, int N_HIDDEN>
 class net
 {
@@ -51,9 +53,6 @@ protected:
 
         M_adj += err * M_grads;
         V_adj += err * V_grads;
-
-        // todo: update model with adj.
-        // todo: clear grad, grads, adj.
     }
 
     input_vector input;
@@ -64,8 +63,8 @@ public:
     W1 M;
     W2 V;
 
-    float lambda = 0.70;    // Temporal discount.
-    float alpha = 0.001;    // Learning rate.
+    float lambda = 0.85f;    // Temporal discount.
+    float alpha = 0.001f;    // Learning rate.
 
     void clear_gradients()
     {
@@ -78,11 +77,15 @@ public:
 
     void update_model()
     {
-        M += alpha * M_adj;
-        V += alpha * V_adj;
+//      std::cout << "alpha * V_adj: " << (alpha * V_adj) << "\n";
+//      std::cout << "V_adj: " << V_adj << "\n";
+
+        M -= alpha * M_adj;
+        V -= alpha * V_adj;
     }
 
 private:
+public: // public for debugging
     /* State activations maintained after 
      * feedForward() for backpropagation.
      */
@@ -131,9 +134,9 @@ public:
         return net_to_equity( this->feedForward() );
     }
 
-    void reconsider(float error)
+    void reconsider(float err)
     {
-        this->backprop( equity_to_net(error) );
+        this->backprop( equity_to_net(err) );
     }
 
     BackgammonNet()

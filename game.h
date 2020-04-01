@@ -13,7 +13,7 @@ protected:
 
 public:
     Player(const char *nameOfPlayer) : playerName(nameOfPlayer) {};
-    virtual void prepareToPlay(const board& b) { }
+    virtual void prepareToPlay() { }
     virtual void presentBoard(const board& b) {}
     virtual void chooseMove(const board& b, moves& choice) = 0;
     virtual void finalEquity(float e) { }
@@ -63,8 +63,8 @@ public:
     // Returns the equity of white at the end of the game.
     double playGame(bool verbose)
     {
-        whitePlayer.prepareToPlay(b);
-        blackPlayer.prepareToPlay(b);
+        whitePlayer.prepareToPlay();
+        blackPlayer.prepareToPlay();
 
         setupGame();
 
@@ -105,7 +105,6 @@ public:
             dblack = throw_die();
         }
         b.setRoller( (dwhite > dblack) ? white : black);
-        playerOnRoll().presentBoard(b);
         b.setDice(dwhite, dblack);
     }
 

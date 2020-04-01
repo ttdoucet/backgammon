@@ -80,6 +80,8 @@ protected:
 };
 
 
+#include <iostream>
+
 class Learner : public NeuralNetPlayer
 {
 public:
@@ -88,30 +90,39 @@ public:
     {
     }
 
-    void prepareToPlay(const board& b) override
+    void prepareToPlay() override
     {
         neural->clear_gradients();
-        previous = neural->equity(b);
+        started = false;
+
+//      std::cout << "start V: " << neural->V << "\n";
+
     }
 
     void presentBoard(const board& b) override
     {
-        float present = neural->equity(b);
-        float error = present - previous;
+        float desired = neural->equity(b);
 
-// no, i think this might not start off right at the beginning of the game.
-        neural->reconsider(error);
-
-        previous = present;
+        if (started)
+        {
+            float err = previous - desired;
+            neural->reconsider(err);
+        }
+        previous = desired;
+        started = true;
     }
 
     void finalEquity(float e) override
     {
-        neural->update_model();
+        if (started)
+        {
+            neural->reconsider(previous - e);
+            neural->update_model();
+        }
     }
 
 private:
-    float previous = 0;
-
+    float previous;
+    bool started;
 };
 

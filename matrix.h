@@ -188,3 +188,19 @@ template<int R, int C>  matrix<R,C> operator-(const matrix<R,C> &lhs, const matr
     matrix<R,C> v(lhs);
     return v -= rhs;
 }
+
+#include <iostream>
+
+template<int R, int C>
+std::ostream& operator<<(std::ostream& s, const matrix<R,C>& m)
+{
+    for (int r = 0; r < m.Rows(); r++)
+    {
+        for (int c = 0; c < m.Cols(); c++)
+            s << m(r, c) << " ";
+        s << "\n";
+    }
+    return s;
+}
+
+    
