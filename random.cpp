@@ -2,13 +2,13 @@
  */
 #include <random>
 #include <chrono>
-using namespace std;
+#include <iostream>
 
 #include "random.h"
 
-//using engine = mt19937;
-using engine = default_random_engine;
-using distribution = uniform_int_distribution<>;
+//using engine = std::mt19937;
+using engine = std::default_random_engine;
+using distribution = std::uniform_int_distribution<>;
 
 static engine generator{};
 static distribution dice{1,6};
@@ -38,4 +38,15 @@ void set_seed(uint64_t s)
 float random_float()
 {
     return std::generate_canonical<float, 20>(generator);
+}
+
+void setupRNG(uint64_t user_seed)
+{
+    if (user_seed != -1)
+    {
+        std::cout << "RNG using user-specified seed: " << user_seed << "\n";
+        set_seed(user_seed);
+    }
+    else
+        randomize_seed();
 }

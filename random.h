@@ -9,3 +9,4 @@ float random_float();
 void set_seed(uint64_t s);
 void randomize_seed();
 
+void setupRNG(uint64_t user_seed);

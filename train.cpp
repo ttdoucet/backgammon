@@ -10,6 +10,10 @@
 
 using namespace std;
 
+// To do: save the result of training
+// To do: options for alpha and lambda
+
+
 class cmdopts : public cmdline
 {
 public:
@@ -23,7 +27,6 @@ public:
         setopt('s', "--seed",  user_seed,     "seed for random-number generator.");
         setopt('v', "--verbose", verbose,     "Report the result of each game.");
     }
-
 };
 
 cmdopts opts;
@@ -43,7 +46,6 @@ static void report(int numGames, double whitePoints)
 {
             ostringstream ss;
 
-
             ss << "white equity/game = "
                << std::setprecision(3) << whitePoints/numGames
                << " (total "
@@ -53,7 +55,7 @@ static void report(int numGames, double whitePoints)
             cout << ss.str();
 }
 
-void trainingSession(int games, Player& whitePlayer, Player& blackPlayer)
+static void trainingSession(int games, Player& whitePlayer, Player& blackPlayer)
 {
     TrainingGame game(whitePlayer, blackPlayer);
 
@@ -82,18 +84,6 @@ void trainingSession(int games, Player& whitePlayer, Player& blackPlayer)
         report(numGames, whitePoints);
     }
 }
-
-void setupRNG(uint64_t user_seed)
-{
-    if (user_seed != -1)
-    {
-        cout << "RNG using user-specified seed: " << user_seed << "\n";
-        set_seed(user_seed);
-    }
-    else
-        randomize_seed();
-}
-
 
 int main(int argc, char *argv[])
 {

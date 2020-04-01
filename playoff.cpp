@@ -73,18 +73,6 @@ void playoffSession(int trials, Player& whitePlayer, Player& blackPlayer)
     }
 }
 
-void setupRNG(uint64_t user_seed)
-{
-    if (user_seed != -1)
-    {
-        cout << "RNG using user-specified seed: " << user_seed << "\n";
-        set_seed(user_seed);
-    }
-    else
-        randomize_seed();
-}
-
-
 int main(int argc, char *argv[])
 {
     string net_name[2];
