@@ -153,4 +153,4 @@ using netv3 = BackgammonNet<features_v3<float*>, 30>;
 using BgNet = netv3;
 
 BgNet *readFile(std::string fn);
-void writeFile(BgNet& n, const char *fn);
+void writeFile(BgNet& n, std::string fn);

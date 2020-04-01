@@ -7,7 +7,7 @@
 class HumanPlayer : public Player
 {
 public:
-    HumanPlayer(const char *name): Player(name){}
+    HumanPlayer(std::string name): Player(name){}
 
     void prepareToPlay() override;
     void finalEquity(float e) override;

@@ -11,7 +11,7 @@
 class NeuralNetPlayer : public Player, public callBack
 {
 public:
-    NeuralNetPlayer(const char *player, std::string netname)
+    NeuralNetPlayer(std::string player, std::string netname)
         : Player(player),
           neural( std::make_unique<BgNet>(*readFile(netname)) )
     {
@@ -81,7 +81,7 @@ protected:
 class Learner : public NeuralNetPlayer
 {
 public:
-    Learner(const char *player, std::string netname)
+    Learner(std::string player, std::string netname)
         : NeuralNetPlayer(player, netname)
     {
     }

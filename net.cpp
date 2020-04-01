@@ -12,7 +12,7 @@ static void write_float(std::ostream& fs, float f)
     fs.write( reinterpret_cast<char *>(&f), sizeof(f) );
 }
 
-void writeFile(BgNet& n, const char *fn)
+void writeFile(BgNet& n, std::string fn)
 {
     ofstream ofs{fn};
     if (!ofs)
