@@ -60,7 +60,7 @@ public:
     }
 
     // Returns the equity of white at the end of the game.
-    double playGame(bool verbose)
+    double playGame()
     {
         whitePlayer.prepareToPlay();
         blackPlayer.prepareToPlay();
@@ -72,8 +72,7 @@ public:
         {
             playerOnRoll().chooseMove(b, m);
 
-            if (verbose)
-                reportMove(b, m);
+            reportMove(b, m);
             applyMove(b, m);
 
             playerOnRoll().presentBoard(b);

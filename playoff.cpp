@@ -10,6 +10,25 @@
 
 using namespace std;
 
+class cmdopts : public cmdline
+{
+public:
+    int trials = 500;
+    bool display_moves = false;
+    bool explicit_seed = false;
+    uint64_t user_seed = -1;
+
+    cmdopts()
+    {
+        setopt('n', "--games", trials,        "number of trials.");
+        setopt('s', "--seed",  user_seed,     "seed for random-number generator.");
+        setopt('d',            display_moves, "display moves.");
+    }
+
+};
+
+cmdopts opts;
+
 class AnnotatedGame : public Game
 {
 public:
@@ -18,6 +37,9 @@ public:
 protected:
     void reportMove(board bd, moves mv) override
     {
+        if (opts.display_moves == false)
+            return;
+
         std::string s = moveStr(mv);
         cout << board::colorname(b.onRoll()) << " rolls "
              << bd.d1() << " " <<  bd.d2()
@@ -25,7 +47,7 @@ protected:
     }
 };
 
-void playoffSession(int trials, Player& whitePlayer, Player& blackPlayer, bool verbose)
+void playoffSession(int trials, Player& whitePlayer, Player& blackPlayer)
 {
     AnnotatedGame game(whitePlayer, blackPlayer);
 
@@ -34,7 +56,7 @@ void playoffSession(int trials, Player& whitePlayer, Player& blackPlayer, bool v
 
     for (numGames = 1; numGames <= trials ; numGames++)
     {
-        double white_eq = game.playGame(verbose);
+        double white_eq = game.playGame();
         whitePoints += white_eq;
 
         std::ostringstream ss;
@@ -63,28 +85,12 @@ void setupRNG(uint64_t user_seed)
         randomize_seed();
 }
 
-class cmdopts : public cmdline
-{
-public:
-    int trials = 500;
-    bool display_moves = false;
-    bool explicit_seed = false;
-    uint64_t user_seed = -1;
-
-    cmdopts()
-    {
-        setopt('n', "--games", trials,        "number of trials.");
-        setopt('s', "--seed",  user_seed,     "seed for random-number generator.");
-        setopt('d',            display_moves, "display moves.");
-    }
-
-};
 
 int main(int argc, char *argv[])
 {
     string net_name[2];
 
-    cmdopts opts;
+
     opts.parse(argc, argv);
     if (opts.ExtraArgs.size() == 1)
     {
@@ -113,7 +119,7 @@ int main(int argc, char *argv[])
 
     NeuralNetPlayer blackPlayer("black", net_name[1]);
 
-    playoffSession(opts.trials, whitePlayer, blackPlayer, opts.display_moves);
+    playoffSession(opts.trials, whitePlayer, blackPlayer);
 
     return 0;
 }
