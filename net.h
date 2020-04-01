@@ -30,7 +30,7 @@ protected:
         return  out = squash( V * hidden );
     }
 
-    void backprop(float previous)
+    void backprop(float err)
     {
         auto const f = out * (1 - out);
 
@@ -49,14 +49,11 @@ protected:
         M_grads *= lambda;
         M_grads += M_grad;
 
-
-        // todo: update model with adj.
-        // todo: clear grad, grads, adj.
-
-        const float err = out - previous;
         M_adj += err * M_grads;
         V_adj += err * V_grads;
 
+        // todo: update model with adj.
+        // todo: clear grad, grads, adj.
     }
 
     input_vector input;
@@ -67,10 +64,23 @@ public:
     W1 M;
     W2 V;
 
-    // Temporal discount.
-    float lambda = 1.0;
-    // Learning rate.
-    float alpha = 0.01;
+    float lambda = 0.70;    // Temporal discount.
+    float alpha = 0.001;    // Learning rate.
+
+    void clear_gradients()
+    {
+        M_grads.clear();
+        V_grads.clear();
+
+        M_adj.clear();
+        V_adj.clear();
+    }
+
+    void update_model()
+    {
+        M += alpha * M_adj;
+        V += alpha * V_adj;
+    }
 
 private:
     /* State activations maintained after 
@@ -119,6 +129,11 @@ public:
     {
         feature_calc{b}.calc(this->input.Data());
         return net_to_equity( this->feedForward() );
+    }
+
+    void reconsider(float error)
+    {
+        this->backprop( equity_to_net(error) );
     }
 
     BackgammonNet()

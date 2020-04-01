@@ -8,6 +8,7 @@
 #include "net.h"
 #include "bearoff.h"
 
+
 class NeuralNetPlayer : public Player, public callBack
 {
 public:
@@ -76,5 +77,41 @@ protected:
             (bd.highestChecker(white) <= 6) &&
             (bd.highestChecker(black) <= 6);
     }
+};
+
+
+class Learner : public NeuralNetPlayer
+{
+public:
+    Learner(const char *player, const char *netname)
+        : NeuralNetPlayer(player, netname)
+    {
+    }
+
+    void prepareToPlay(const board& b) override
+    {
+        neural->clear_gradients();
+        previous = neural->equity(b);
+    }
+
+    void presentBoard(const board& b) override
+    {
+        float present = neural->equity(b);
+        float error = present - previous;
+
+// no, i think this might not start off right at the beginning of the game.
+        neural->reconsider(error);
+
+        previous = present;
+    }
+
+    void finalEquity(float e) override
+    {
+        neural->update_model();
+    }
+
+private:
+    float previous = 0;
+
 };
 

@@ -107,7 +107,8 @@ int main(int argc, char *argv[])
     cout << "white: " << player_name[0].c_str() << endl;
     cout << "black: " << player_name[1].c_str() << endl;
 
-    NeuralNetPlayer whitePlayer("white", player_name[0].c_str());
+    Learner whitePlayer("white", player_name[0].c_str());
+//  NeuralNetPlayer whitePlayer("white", player_name[0].c_str());
 //  HumanPlayer whitePlayer("white");
 
     NeuralNetPlayer blackPlayer("black", player_name[1].c_str());

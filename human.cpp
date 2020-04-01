@@ -24,7 +24,7 @@ void HumanPlayer::chooseMove(const board& fromBoard, moves& choice)
     }
 }
 
-void HumanPlayer::prepareToPlay()
+void HumanPlayer::prepareToPlay(const board& b)
 {
     cout << "Starting new game.\n";
 }
