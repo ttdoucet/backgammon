@@ -13,63 +13,73 @@ using namespace std;
 class cmdopts : public cmdline
 {
 public:
-    int trials = 500;
-    bool display_moves = false;
+    int games = 1000;
+    bool verbose = false;
     uint64_t user_seed = -1;
 
     cmdopts()
     {
-        setopt('n', "--games", trials,        "number of trials.");
+        setopt('n', "--games", games,         "number of games.");
         setopt('s', "--seed",  user_seed,     "seed for random-number generator.");
-        setopt('d',            display_moves, "display moves.");
+        setopt('v', "--verbose", verbose,     "Report the result of each game.");
     }
 
 };
 
 cmdopts opts;
 
-class AnnotatedGame : public Game
+class TrainingGame : public Game
 {
 public:
-    AnnotatedGame(Player& wh, Player& bl) : Game(wh, bl) {}
+    TrainingGame(Player& wh, Player& bl) : Game(wh, bl) {}
 
 protected:
     void reportMove(board bd, moves mv) override
     {
-        if (opts.display_moves == false)
-            return;
-
-        std::string s = moveStr(mv);
-        cout << board::colorname(b.onRoll()) << " rolls "
-             << bd.d1() << " " <<  bd.d2()
-             << " and moves " << s << '\n';
     }
 };
 
-void playoffSession(int trials, Player& whitePlayer, Player& blackPlayer)
+static void report(int numGames, double whitePoints)
 {
-    AnnotatedGame game(whitePlayer, blackPlayer);
+            ostringstream ss;
+
+
+            ss << "white equity/game = "
+               << std::setprecision(3) << whitePoints/numGames
+               << " (total "
+               << std::setprecision(2) << whitePoints
+               << ")\n";
+
+            cout << ss.str();
+}
+
+void trainingSession(int games, Player& whitePlayer, Player& blackPlayer)
+{
+    TrainingGame game(whitePlayer, blackPlayer);
 
     int numGames;
     double whitePoints = 0.0;
 
-    for (numGames = 1; numGames <= trials ; numGames++)
+    for (numGames = 1; numGames <= games ; numGames++)
     {
         double white_eq = game.playGame();
         whitePoints += white_eq;
 
-        std::ostringstream ss;
+        if (opts.verbose)
+        {
+            ostringstream ss;
+            ss << std::fixed << "Game: " << numGames << ": "
+               << std::setprecision(2) << std::setw(5) << white_eq << "... ";
+            cout << ss.str();
 
-        ss << std::fixed << "Game " << numGames << ": "
-           << std::setprecision(2) << std::setw(5) << white_eq << "... ";
+            report(numGames, whitePoints);
+        }
+    }
 
-        ss << "white equity/game = "
-           << std::setprecision(3) << whitePoints/numGames
-           << " (total "
-           << std::setprecision(2) << whitePoints
-           << ")\n";
-
-        cout << ss.str();
+    if (opts.verbose == false)
+    {
+        cout << "Games: " << (numGames - 1)  << ": ";
+        report(numGames, whitePoints);
     }
 }
 
@@ -112,12 +122,10 @@ int main(int argc, char *argv[])
     cout << "white: " << net_name[0] << endl;
     cout << "black: " << net_name[1] << endl;
 
-    NeuralNetPlayer whitePlayer("white", net_name[0]);
-//  HumanPlayer whitePlayer("white");
-
+    Learner whitePlayer("white", net_name[0]);
     NeuralNetPlayer blackPlayer("black", net_name[1]);
 
-    playoffSession(opts.trials, whitePlayer, blackPlayer);
+    trainingSession(opts.games, whitePlayer, blackPlayer);
 
     return 0;
 }
