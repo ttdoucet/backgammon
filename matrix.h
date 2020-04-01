@@ -127,7 +127,12 @@ template<int R, int C=1> class matrix
         return dest;
     }
 
-
+    void clear()
+    {
+        for (int r = 0; r < Rows(); r++)
+            for (int c = 0; c < Cols(); c++)
+                data[r][c] = 0;
+    }
 
     float *Data() { return &data[0][0]; }
     operator float() const;
