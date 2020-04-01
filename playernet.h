@@ -8,7 +8,6 @@
 #include "net.h"
 #include "bearoff.h"
 
-
 class NeuralNetPlayer : public Player, public callBack
 {
 public:
@@ -79,9 +78,6 @@ protected:
     }
 };
 
-
-#include <iostream>
-
 class Learner : public NeuralNetPlayer
 {
 public:
@@ -94,14 +90,12 @@ public:
     {
         neural->clear_gradients();
         started = false;
-
-//      std::cout << "start V: " << neural->V << "\n";
-
     }
 
     void presentBoard(const board& b) override
     {
         float desired = neural->equity(b);
+        assert( !b.d1() && !b.d2() );
 
         if (started)
         {

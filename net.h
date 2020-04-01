@@ -120,9 +120,9 @@ protected:
         return  (2*p - 1) * MAX_EQUITY;
     }
 
-    constexpr static float equity_to_net(float e)
+    constexpr static float delta_equity_to_delta_net(float ediff)
     {
-        return  (e/MAX_EQUITY + 1) / 2;
+        return  ediff / (2 * MAX_EQUITY);
     }
 
 public:
@@ -136,7 +136,7 @@ public:
 
     void reconsider(float err)
     {
-        this->backprop( equity_to_net(err) );
+        this->backprop( delta_equity_to_delta_net(err) );
     }
 
     BackgammonNet()
