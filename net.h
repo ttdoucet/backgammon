@@ -6,8 +6,6 @@
 #include "mathfuncs.h"
 #include "matrix.h"
 
-#include <iostream>
-
 template<int N_INPUTS, int N_HIDDEN>
 class net
 {
@@ -77,9 +75,6 @@ public:
 
     void update_model()
     {
-//      std::cout << "alpha * V_adj: " << (alpha * V_adj) << "\n";
-//      std::cout << "V_adj: " << V_adj << "\n";
-
         M -= alpha * M_adj;
         V -= alpha * V_adj;
     }

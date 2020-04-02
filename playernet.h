@@ -8,10 +8,12 @@
 #include "net.h"
 #include "bearoff.h"
 
+using std::string;
+
 class NeuralNetPlayer : public Player, public callBack
 {
 public:
-    NeuralNetPlayer(std::string player, std::string netname)
+    NeuralNetPlayer(string player, string netname)
         : Player(player),
           neural( std::make_unique<BgNet>(*readFile(netname)) )
     {
@@ -25,7 +27,7 @@ public:
             selectMove(b, choice, &NeuralNetPlayer::littleE);
     }
 
-    void Save(std::string filename)
+    void Save(string filename)
     {
         writeFile(*neural, filename);
     }
@@ -86,7 +88,7 @@ protected:
 class Learner : public NeuralNetPlayer
 {
 public:
-    Learner(std::string player, std::string netname, float alpha, float lambda)
+    Learner(string player, string netname, float alpha, float lambda)
         : NeuralNetPlayer(player, netname)
     {
         neural->alpha = alpha;

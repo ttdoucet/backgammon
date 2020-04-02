@@ -23,7 +23,6 @@ public:
         setopt('s', "--seed",  user_seed,     "seed for random-number generator.");
         setopt('d',            display_moves, "display moves.");
     }
-
 };
 
 cmdopts opts;
