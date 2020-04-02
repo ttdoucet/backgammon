@@ -119,7 +119,6 @@ protected:
             return whitePlayer;
         else
             return blackPlayer;
-
     }
 
     void both(int pt, int num)

@@ -3,6 +3,7 @@
 #pragma once
 
 #include <memory>
+#include <cmath>
 
 #include "game.h"
 #include "net.h"
@@ -48,6 +49,8 @@ protected:
     int callBackF(const board &b)
     {
         float e = - (this->*equityEstimator)(b);
+
+        assert( std::isnan(e) == false);
         if (e > bestEquity)
         {
             bestEquity = e;
