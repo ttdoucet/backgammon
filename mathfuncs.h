@@ -46,13 +46,12 @@ namespace detail
 
     inline float squash(float x)
     {
-        return 1 / (1 + exp_fast(-x));
+        return 1 / (1 + expf(-x));
     }
 
-
-    inline float squash_full(float x)
+    inline float squash_fast(float x)
     {
-        return 1 / (1 + expf(-x));
+        return 1 / (1 + exp_fast(-x));
     }
 
     inline double squash_fast_d(float x)
@@ -63,4 +62,4 @@ namespace detail
 }
 
 using detail::squash;
-using detail::squash_full;
+using detail::squash_fast;
