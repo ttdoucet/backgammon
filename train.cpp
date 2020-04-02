@@ -15,6 +15,7 @@ class cmdopts : public cmdline
 public:
     int games = 1000;
     bool verbose = false;
+    int every = 0;
     uint64_t user_seed = -1;
     string whitenet = "white.w";
     string blacknet = "black.w";
@@ -23,15 +24,17 @@ public:
 
     cmdopts()
     {
-        setopt('n', "--games",   games,        "number of games.");
-        setopt('s', "--seed",    user_seed,    "seed for random-number generator.");
-        setopt('v', "--verbose", verbose,     "Report the result of each game.");
+        setopt('n', "--games",   games,       "number of games.");
+        setopt('s', "--seed",    user_seed,   "seed for random-number generator.");
 
         setopt('w', "--white",   whitenet,    "Filename for white network, default white.w");
         setopt('b', "--black",   blacknet,    "Filename for black network, default black.w");
 
         setopt('a', "--alpha",   alpha,       "Learning rate.");
         setopt('a', "--lambda",  lambda,      "Temporal discount.");
+
+        setopt('e', "--every",   every,       "Report every n games.");
+
     }
 };
 
@@ -62,7 +65,8 @@ static void trainingSession(Player& whitePlayer, Player& blackPlayer)
         double white_eq = game.playGame();
         whitePoints += white_eq;
 
-        if (opts.verbose)
+
+        if (opts.every && !(numGames % opts.every))
         {
             ostringstream ss;
             ss << std::fixed << "Game: " << numGames << ": "
@@ -73,11 +77,8 @@ static void trainingSession(Player& whitePlayer, Player& blackPlayer)
         }
     }
 
-    if (opts.verbose == false)
-    {
-        cout << "Games: " << (numGames - 1)  << ": ";
-        report(numGames, whitePoints);
-    }
+    cout << "Games: " << (numGames - 1)  << ": ";
+    report(numGames, whitePoints);
 }
 
 int main(int argc, char *argv[])
@@ -90,11 +91,13 @@ int main(int argc, char *argv[])
     cout << "black: " << opts.blacknet  << endl;
 
     Learner         whitePlayer("white", opts.whitenet, opts.alpha, opts.lambda);
-    NeuralNetPlayer blackPlayer("black", opts.blacknet);
+    Learner         blackPlayer("black", opts.blacknet, opts.alpha, opts.lambda);
+//  NeuralNetPlayer blackPlayer("black", opts.blacknet);
 
     trainingSession(whitePlayer, blackPlayer);
 
     whitePlayer.Save("white.w");
+    blackPlayer.Save("black.w");
 
     return 0;
 }

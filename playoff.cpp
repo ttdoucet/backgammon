@@ -13,7 +13,7 @@ using namespace std;
 class cmdopts : public cmdline
 {
 public:
-    int trials = 500;
+    int trials = 1000;
     bool display_moves = false;
     uint64_t user_seed = -1;
 
