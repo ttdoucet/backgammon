@@ -25,6 +25,11 @@ public:
             selectMove(b, choice, &NeuralNetPlayer::littleE);
     }
 
+    void Save(std::string filename)
+    {
+        writeFile(*neural, filename);
+    }
+
 protected:
     typedef float (NeuralNetPlayer::* evalFunction)(const board& bd);
     evalFunction equityEstimator;
@@ -81,9 +86,11 @@ protected:
 class Learner : public NeuralNetPlayer
 {
 public:
-    Learner(std::string player, std::string netname)
+    Learner(std::string player, std::string netname, float alpha, float lambda)
         : NeuralNetPlayer(player, netname)
     {
+        neural->alpha = alpha;
+        neural->lambda = lambda;
     }
 
     void prepareToPlay() override

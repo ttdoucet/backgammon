@@ -77,7 +77,6 @@ int main(int argc, char *argv[])
 {
     string net_name[2];
 
-
     opts.parse(argc, argv);
     if (opts.ExtraArgs.size() == 1)
     {
@@ -101,8 +100,6 @@ int main(int argc, char *argv[])
     cout << "black: " << net_name[1] << endl;
 
     NeuralNetPlayer whitePlayer("white", net_name[0]);
-//  HumanPlayer whitePlayer("white");
-
     NeuralNetPlayer blackPlayer("black", net_name[1]);
 
     playoffSession(opts.trials, whitePlayer, blackPlayer);

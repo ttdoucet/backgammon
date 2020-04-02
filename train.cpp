@@ -10,37 +10,32 @@
 
 using namespace std;
 
-// To do: save the result of training
-// To do: options for alpha and lambda
-
-
 class cmdopts : public cmdline
 {
 public:
     int games = 1000;
     bool verbose = false;
     uint64_t user_seed = -1;
+    string whitenet = "white.w";
+    string blacknet = "black.w";
+    float alpha = 0.01f;
+    float lambda = 0.85f;
 
     cmdopts()
     {
-        setopt('n', "--games", games,         "number of games.");
-        setopt('s', "--seed",  user_seed,     "seed for random-number generator.");
+        setopt('n', "--games",   games,        "number of games.");
+        setopt('s', "--seed",    user_seed,    "seed for random-number generator.");
         setopt('v', "--verbose", verbose,     "Report the result of each game.");
+
+        setopt('w', "--white",   whitenet,    "Filename for white network, default white.w");
+        setopt('b', "--black",   blacknet,    "Filename for black network, default black.w");
+
+        setopt('a', "--alpha",   alpha,       "Learning rate.");
+        setopt('a', "--lambda",  lambda,      "Temporal discount.");
     }
 };
 
 cmdopts opts;
-
-class TrainingGame : public Game
-{
-public:
-    TrainingGame(Player& wh, Player& bl) : Game(wh, bl) {}
-
-protected:
-    void reportMove(board bd, moves mv) override
-    {
-    }
-};
 
 static void report(int numGames, double whitePoints)
 {
@@ -55,14 +50,14 @@ static void report(int numGames, double whitePoints)
             cout << ss.str();
 }
 
-static void trainingSession(int games, Player& whitePlayer, Player& blackPlayer)
+static void trainingSession(Player& whitePlayer, Player& blackPlayer)
 {
-    TrainingGame game(whitePlayer, blackPlayer);
+    Game game(whitePlayer, blackPlayer);
 
     int numGames;
     double whitePoints = 0.0;
 
-    for (numGames = 1; numGames <= games ; numGames++)
+    for (numGames = 1; numGames <= opts.games ; numGames++)
     {
         double white_eq = game.playGame();
         whitePoints += white_eq;
@@ -87,35 +82,19 @@ static void trainingSession(int games, Player& whitePlayer, Player& blackPlayer)
 
 int main(int argc, char *argv[])
 {
-    string net_name[2];
-
-
     opts.parse(argc, argv);
-    if (opts.ExtraArgs.size() == 1)
-    {
-        net_name[0] = "net.w";
-        net_name[1] = "net.w";
-    }
-    else if (opts.ExtraArgs.size() == 2)
-    {
-        net_name[0] = opts.ExtraArgs[1];
-        net_name[1] = "net.w";
-    }
-    else if (opts.ExtraArgs.size() == 3)
-    {
-        net_name[0] = opts.ExtraArgs[1];
-        net_name[1] = opts.ExtraArgs[2];
-    }
 
     setupRNG(opts.user_seed);
 
-    cout << "white: " << net_name[0] << endl;
-    cout << "black: " << net_name[1] << endl;
+    cout << "white: " << opts.whitenet << endl;
+    cout << "black: " << opts.blacknet  << endl;
 
-    Learner whitePlayer("white", net_name[0]);
-    NeuralNetPlayer blackPlayer("black", net_name[1]);
+    Learner         whitePlayer("white", opts.whitenet, opts.alpha, opts.lambda);
+    NeuralNetPlayer blackPlayer("black", opts.blacknet);
 
-    trainingSession(opts.games, whitePlayer, blackPlayer);
+    trainingSession(whitePlayer, blackPlayer);
+
+    whitePlayer.Save("white.w");
 
     return 0;
 }
