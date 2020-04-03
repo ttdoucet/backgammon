@@ -32,12 +32,12 @@ template<int R, int C=1> class matrix
                 data[r][c] = *it++;
     }
 
-    float& operator() (int r, int c=0)
+    float& operator() (int r, int c)
     {
          return data[r][c];
     }
 
-    float operator() (int r, int c=0) const
+    float operator() (int r, int c) const
     {
          return data[r][c];
     }
