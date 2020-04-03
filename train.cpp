@@ -31,7 +31,7 @@ public:
         setopt('b', "--black",   blacknet,    "Filename for black network, default black.w");
 
         setopt('a', "--alpha",   alpha,       "Learning rate.");
-        setopt('a', "--lambda",  lambda,      "Temporal discount.");
+        setopt('l', "--lambda",  lambda,      "Temporal discount.");
 
         setopt('e', "--every",   every,       "Report every n games.");
 
