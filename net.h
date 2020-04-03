@@ -5,6 +5,7 @@
 #include "board.h"
 #include "mathfuncs.h"
 #include "matrix.h"
+#include "random.h"
 
 template<int N_INPUTS, int N_HIDDEN>
 class net
@@ -25,7 +26,7 @@ protected:
         hidden = M * input;
 
         for (int i = 0; i < N_HIDDEN; i++)
-            hidden(i) = squash(hidden(i));
+            hidden(i, 0) = squash(hidden(i, 0));
 
         return  out = squash( V * hidden );
     }
@@ -40,9 +41,10 @@ protected:
 
         auto lhs = f * V.Transpose();
         static_assert(lhs.Rows() == N_HIDDEN);
+        static_assert(lhs.Cols() == 1);
 
         for (int i = 0; i < lhs.Rows(); i++)
-            lhs(i) *= ( hidden(i) * (1 - hidden(i)) );
+            lhs(i, 0) *= ( hidden(i, 0) * (1 - hidden(i, 0)) );
 
         auto M_grad = lhs * input.Transpose();
 
@@ -79,8 +81,19 @@ public:
         V -= alpha * V_adj;
     }
 
+    net()
+    {
+        RNG_normal rand1(0, 1.0 / N_INPUTS);
+        for (int r = 0; r < N_HIDDEN; r++)
+            for (int c = 0; c < N_INPUTS; c++)
+                M(r, c) = rand1.random();
+
+        RNG_normal rand2(0, 1.0 / N_HIDDEN);
+        for (int c = 0; c < N_HIDDEN; c++)
+            V(0, c) = rand2.random();
+    }
+
 private:
-public: // public for debugging
     /* State activations maintained after 
      * feedForward() for backpropagation.
      */
