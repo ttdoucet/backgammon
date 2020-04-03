@@ -53,7 +53,7 @@ static void report(int numGames, double whitePoints)
             cout << ss.str();
 }
 
-static void trainingSession(Player& whitePlayer, Player& blackPlayer)
+static void trainingSession(Learner& whitePlayer, NeuralNetPlayer& blackPlayer)
 {
     Game game(whitePlayer, blackPlayer);
 
@@ -65,6 +65,7 @@ static void trainingSession(Player& whitePlayer, Player& blackPlayer)
         double white_eq = game.playGame();
         whitePoints += white_eq;
 
+        blackPlayer = (NeuralNetPlayer) whitePlayer;
 
         if (opts.every && !(numGames % opts.every))
         {
@@ -91,13 +92,14 @@ int main(int argc, char *argv[])
     cout << "black: " << opts.blacknet  << endl;
 
     Learner         whitePlayer("white", opts.whitenet, opts.alpha, opts.lambda);
-    Learner         blackPlayer("black", opts.blacknet, opts.alpha, opts.lambda);
-//  NeuralNetPlayer blackPlayer("black", opts.blacknet);
+    // Learner         blackPlayer("black", opts.blacknet, opts.alpha, opts.lambda);
+    NeuralNetPlayer blackPlayer("black", opts.blacknet);
 
     trainingSession(whitePlayer, blackPlayer);
 
-    whitePlayer.Save("white.w");
-    blackPlayer.Save("black.w");
+
+    whitePlayer.save("white.w");
+//  blackPlayer.save("black.w");
 
     return 0;
 }
