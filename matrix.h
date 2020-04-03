@@ -113,10 +113,26 @@ template<int R, int C=1> class matrix
     } 
 
     /*
-     * This constructs and returns and appropriate matrix,
+     * These construct and return an appropriate matrix,
      * copying the data as necessary.  But in practice
      * the copy is often optimized away.
      */
+
+    matrix<1,C> RowVector(int r) const
+    {
+        matrix<1,C> dest;
+        for (int c = 0; c < Cols(); c++)
+            dest(0, c) = data[r][c];
+        return dest;
+    }
+
+    matrix<R,1> ColumnVector(int c) const
+    {
+        matrix<R,1> dest;
+        for (int r = 0; r < Rows(); r++)
+            dest(r, 0) = data[r][c];
+        return dest;
+    }
 
     matrix<C,R> Transpose() const
     {
@@ -132,6 +148,16 @@ template<int R, int C=1> class matrix
         for (int r = 0; r < Rows(); r++)
             for (int c = 0; c < Cols(); c++)
                 data[r][c] = 0;
+    }
+
+    double magnitude()
+    {
+        double sum = 0;
+        for (int r = 0; r < Rows(); r++)
+            for (int c = 0; c < Cols(); c++)
+                sum += (data[r][c] * data[r][c]);
+
+        return sqrt(sum);
     }
 
     float *Data() { return &data[0][0]; }
