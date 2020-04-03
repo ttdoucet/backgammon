@@ -15,9 +15,9 @@ class NeuralNetPlayer : public Player, public callBack
 {
 public:
     NeuralNetPlayer(string player, string netname)
-        : Player(player),
-          neural( std::make_unique<BgNet>(*readFile(netname)) )
+        : Player(player)
     {
+        readFile(neural, netname);
     }
 
     void chooseMove(const board& b, moves& choice)
@@ -28,16 +28,17 @@ public:
             selectMove(b, choice, &NeuralNetPlayer::littleE);
     }
 
-    void Save(string filename)
+    void save(string filename)
     {
-        writeFile(*neural, filename);
+        writeFile(neural, filename);
     }
 
 protected:
     typedef float (NeuralNetPlayer::* evalFunction)(const board& bd);
     evalFunction equityEstimator;
 
-    std::unique_ptr<BgNet> neural;
+    BgNet neural;
+
     float bestEquity;
     moves bestMove;
 
@@ -76,7 +77,7 @@ protected:
         if (gameOver(bd))
             return score(bd, bd.onRoll());
 
-        return neural->equity(bd);
+        return neural.equity(bd);
     }
 
     static bool isBearingOff(const board &bd)
@@ -94,25 +95,25 @@ public:
     Learner(string player, string netname, float alpha, float lambda)
         : NeuralNetPlayer(player, netname)
     {
-        neural->alpha = alpha;
-        neural->lambda = lambda;
+        neural.alpha = alpha;
+        neural.lambda = lambda;
     }
 
     void prepareToPlay() override
     {
-        neural->clear_gradients();
+        neural.clear_gradients();
         started = false;
     }
 
     void presentBoard(const board& b) override
     {
-        float desired = neural->equity(b);
+        float desired = neural.equity(b);
         assert( !b.d1() && !b.d2() );
 
         if (started)
         {
             float err = previous - desired;
-            neural->reconsider(err);
+            neural.reconsider(err);
         }
         previous = desired;
         started = true;
@@ -122,8 +123,10 @@ public:
     {
         if (started)
         {
-            neural->reconsider(previous - e);
-            neural->update_model();
+//          std::cout << "finalEquity: V_adj magnitude: " << neural.V_adj.magnitude() << "\n";
+//          std::cout << "finalEquity: M_adj magnitude: " << neural.M_adj.magnitude() << "\n";
+            neural.reconsider(previous - e);
+            neural.update_model();
         }
     }
 
