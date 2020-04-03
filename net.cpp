@@ -53,7 +53,7 @@ static bool has(istream& is, const char *str)
 }
 
 // Read in a neural net from a file.
-BgNet *readFile(std::string fn)
+void readFile(BgNet &n, std::string fn)
 {
     int hidden = 40, portable = 1;
     int ntype = 0, input = 0;
@@ -69,19 +69,15 @@ BgNet *readFile(std::string fn)
     has(ifs, "hidden nodes:"); ifs >> hidden >> ws;
     has(ifs, "input nodes:"); ifs >> input >> ws;
 
-    auto p = new BgNet();
+    for (int i = 0; i < n.n_hidden; i++)
+        for (int j = 0; j < n.n_inputs; j++)
+            n.M(i, j) = read_float(ifs);
 
-    for (int i = 0; i < p->n_hidden; i++)
-        for (int j = 0; j < p->n_inputs; j++)
-            p->M(i, j) = read_float(ifs);
-
-    for (int i = 0; i < p->n_hidden; i++)
-        p->V(0, i) = read_float(ifs);
+    for (int i = 0; i < n.n_hidden; i++)
+        n.V(0, i) = read_float(ifs);
 
     has(ifs, "Current seed:");
     char L;
-    ifs >> p->seed >> L >> ws;
-    has(ifs, "Games trained:"); ifs >> p->games_trained;
-
-    return p;
+    ifs >> n.seed >> L >> ws;
+    has(ifs, "Games trained:"); ifs >> n.games_trained;
 }
