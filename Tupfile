@@ -21,5 +21,5 @@ common-src = hits.cpp net.cpp move.cpp ttydisp.cpp random.cpp bdata.cpp bearoff.
 
 # Utility
 #
-: netcp.cpp  |> !compile |> %B.o
-: netcp.o net.o |> !link |> netcp
+: nnstat.cpp  |> !compile |> %B.o
+: nnstat.o net.o |> !link |> nnstat
