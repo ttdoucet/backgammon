@@ -25,7 +25,6 @@ public:
     cmdopts()
     {
         setopt('n', "--games",   games,       "number of games.");
-        setopt('s', "--seed",    user_seed,   "seed for random-number generator.");
 
         setopt('w', "--white",   whitenet,    "Filename for white network, default white.w");
         setopt('b', "--black",   blacknet,    "Filename for black network, default black.w");
@@ -85,8 +84,6 @@ static void trainingSession(Learner& whitePlayer, NeuralNetPlayer& blackPlayer)
 int main(int argc, char *argv[])
 {
     opts.parse(argc, argv);
-
-    setupRNG(opts.user_seed);
 
     cout << "white: " << opts.whitenet << endl;
     cout << "black: " << opts.blacknet  << endl;

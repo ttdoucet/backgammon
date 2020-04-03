@@ -10,7 +10,7 @@ cppflags = -O3 -ffast-math --std=c++17
 
 # Main executable
 #
-common-src = hits.cpp net.cpp move.cpp ttydisp.cpp random.cpp bdata.cpp bearoff.cpp human.cpp
+common-src = hits.cpp net.cpp move.cpp ttydisp.cpp bdata.cpp bearoff.cpp human.cpp
 : foreach $(common-src) | bearoff.dat |> !compile |> {common-objs}
 
 : playoff.cpp |> !compile |> playoff.o

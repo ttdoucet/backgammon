@@ -54,7 +54,10 @@ inline int score(const board& b, color_t color)
 class Game
 {
 public:
-    Game(Player& wh, Player& bl) : whitePlayer(wh), blackPlayer(bl)
+    Game(Player& wh, Player& bl, uint64_t seed = -1)
+        : whitePlayer(wh),
+          blackPlayer(bl),
+          die(seed)
     {
         b.clearBoard();
     }
@@ -76,7 +79,7 @@ public:
             applyMove(b, m);
 
             playerOnRoll().presentBoard(b);
-            b.setDice( throw_die(), throw_die() );
+            b.setDice( die.roll(), die.roll() );
         }
 
         auto white_equity = score(b, white);
@@ -99,8 +102,8 @@ public:
         int dwhite = 0, dblack = 0;
         while (dwhite == dblack)
         {
-            dwhite = throw_die();
-            dblack = throw_die();
+            dwhite = die.roll();
+            dblack = die.roll();
         }
         b.setRoller( (dwhite > dblack) ? white : black);
         b.setDice(dwhite, dblack);
@@ -110,6 +113,7 @@ protected:
     Player& whitePlayer;
     Player& blackPlayer;
     board b;
+    RNG_die die;
 
     virtual void reportMove(board bd, moves mv) { }
 

@@ -5,13 +5,33 @@
 #include <chrono>
 #include <cstdint>
 
-int throw_die();
-float random_float();
+class RNG_die
+{
 
-void set_seed(uint64_t s);
-void randomize_seed();
+public:
+    RNG_die(unsigned seed = -1)
+        : dice{1, 6},
+          seed(0)
+    {
+        if (seed == -1)
+        {
+            using namespace std::chrono;
+            auto now = high_resolution_clock::now();
+            seed = now.time_since_epoch().count();
+        }
+        generator.seed(seed);
+    }
 
-void setupRNG(uint64_t user_seed);
+    int roll()
+    {
+        return dice(generator);
+    }
+
+private:
+    std::uniform_int_distribution<> dice;
+    unsigned seed;
+    std::default_random_engine generator;
+};
 
 class RNG_normal
 {
@@ -29,7 +49,7 @@ public:
     }
 
 private:
-    std::normal_distribution<float>  distribution;
+    std::normal_distribution<float> distribution;
     unsigned seed;
     std::default_random_engine generator;
 };

@@ -30,7 +30,7 @@ cmdopts opts;
 class AnnotatedGame : public Game
 {
 public:
-    AnnotatedGame(Player& wh, Player& bl) : Game(wh, bl) {}
+    AnnotatedGame(Player& wh, Player& bl, uint64_t seed) : Game(wh, bl, seed) {}
 
 protected:
     void reportMove(board bd, moves mv) override
@@ -45,9 +45,9 @@ protected:
     }
 };
 
-void playoffSession(int trials, Player& whitePlayer, Player& blackPlayer)
+void playoffSession(int trials, Player& whitePlayer, Player& blackPlayer, uint64_t seed)
 {
-    AnnotatedGame game(whitePlayer, blackPlayer);
+    AnnotatedGame game(whitePlayer, blackPlayer, seed);
 
     int numGames;
     double whitePoints = 0.0;
@@ -93,15 +93,13 @@ int main(int argc, char *argv[])
         net_name[1] = opts.ExtraArgs[2];
     }
 
-    setupRNG(opts.user_seed);
-
     cout << "white: " << net_name[0] << endl;
     cout << "black: " << net_name[1] << endl;
 
     NeuralNetPlayer whitePlayer("white", net_name[0]);
     NeuralNetPlayer blackPlayer("black", net_name[1]);
 
-    playoffSession(opts.trials, whitePlayer, blackPlayer);
+    playoffSession(opts.trials, whitePlayer, blackPlayer, opts.user_seed);
 
     return 0;
 }
