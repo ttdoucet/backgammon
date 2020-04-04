@@ -33,31 +33,12 @@ protected:
         return  out = squash( V * hidden );
     }
 
-    // Temporary code to check the gradient calculations.
-    void grads_check(W2 &Vg, W1 &Mg)
-    {
-            int i, j;
-            float oprime, hprime;
-
-            oprime = out * (1 - out) ;
-            for (i = 0; i < N_HIDDEN; i++)
-                Vg(0, i) = oprime * hidden(i, 0);
-
-            for (i = 0; i < N_HIDDEN; i++){
-		hprime = hidden(i, 0) * (1 - hidden(i, 0)) ;
-		for (j = 0; j < N_INPUTS; j++)
-                    Mg(i,j) = hprime * oprime * input(j, 0) * V(0, i); 
-            }
-    }
-
     void backprop(float err)
     {
         auto const f = out * (1 - out);
         auto V_grad = f * hidden.Transpose();
 
-        auto lhs = f * V.Transpose();
-        static_assert(lhs.Rows() == N_HIDDEN);
-        static_assert(lhs.Cols() == 1);
+        matrix<N_HIDDEN, 1> lhs = f * V.Transpose();
 
         for (int i = 0; i < lhs.Rows(); i++)
             lhs(i, 0) *= ( hidden(i, 0) * (1 - hidden(i, 0)) );
