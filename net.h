@@ -7,6 +7,8 @@
 #include "matrix.h"
 #include "random.h"
 
+#include <iostream>
+
 template<int N_INPUTS, int N_HIDDEN>
 class net
 {
@@ -31,9 +33,29 @@ protected:
         return  out = squash( V * hidden );
     }
 
+
+    void grads_check(W2 &Vg, W1 &Mg)
+    {
+            int i, j;
+            float oprime, hprime;
+
+            oprime = out * (1 - out) ;
+            for (i = 0; i < N_HIDDEN; i++)
+                Vg(0, i) = oprime * hidden(i, 0);
+
+            for (i = 0; i < N_HIDDEN; i++){
+		hprime = hidden(i, 0) * (1 - hidden(i, 0)) ;
+		for (j = 0; j < N_INPUTS; j++)
+                    Mg(i,j) = hprime * oprime * input(j, 0) * V(0, i); 
+            }
+    }
+
     void backprop(float err)
     {
         auto const f = out * (1 - out);
+
+        W1 MM_grad;
+        W2 VV_grad;
 
         auto V_grad = f * hidden.Transpose();
         V_grads *= lambda;
@@ -47,6 +69,13 @@ protected:
             lhs(i, 0) *= ( hidden(i, 0) * (1 - hidden(i, 0)) );
 
         auto M_grad = lhs * input.Transpose();
+
+        grads_check(VV_grad, MM_grad);
+
+//      std::cout << "V grad diff mag: " << (VV_grad - V_grad).magnitude() << "\n";
+//      std::cout << "M grad diff mag: " << (MM_grad - MM_grad).magnitude() << "\n";
+        assert( (VV_grad - V_grad).magnitude() == 0 );
+        assert( (MM_grad - MM_grad).magnitude() == 0 );
 
         M_grads *= lambda;
         M_grads += M_grad;
