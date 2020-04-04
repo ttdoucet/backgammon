@@ -33,7 +33,7 @@ protected:
         return  out = squash( V * hidden );
     }
 
-
+    // Temporary code to check the gradient calculations.
     void grads_check(W2 &Vg, W1 &Mg)
     {
             int i, j;
@@ -53,13 +53,7 @@ protected:
     void backprop(float err)
     {
         auto const f = out * (1 - out);
-
-        W1 MM_grad;
-        W2 VV_grad;
-
         auto V_grad = f * hidden.Transpose();
-        V_grads *= lambda;
-        V_grads += V_grad;
 
         auto lhs = f * V.Transpose();
         static_assert(lhs.Rows() == N_HIDDEN);
@@ -70,18 +64,14 @@ protected:
 
         auto M_grad = lhs * input.Transpose();
 
-        grads_check(VV_grad, MM_grad);
-
-//      std::cout << "V grad diff mag: " << (VV_grad - V_grad).magnitude() << "\n";
-//      std::cout << "M grad diff mag: " << (MM_grad - MM_grad).magnitude() << "\n";
-        assert( (VV_grad - V_grad).magnitude() == 0 );
-        assert( (MM_grad - MM_grad).magnitude() == 0 );
+        M_adj += err * M_grads;
+        V_adj += err * V_grads;
 
         M_grads *= lambda;
         M_grads += M_grad;
 
-        M_adj += err * M_grads;
-        V_adj += err * V_grads;
+        V_grads *= lambda;
+        V_grads += V_grad;
     }
 
     input_vector input;

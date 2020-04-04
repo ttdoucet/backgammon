@@ -108,8 +108,9 @@ public:
 
     void presentBoard(const board& b) override
     {
-        float desired = neural.equity(b);
         assert( !b.d1() && !b.d2() );
+
+        float desired = neural.equity(b);
 
         if (started)
         {
@@ -124,8 +125,6 @@ public:
     {
         if (started)
         {
-//          std::cout << "finalEquity: V_adj magnitude: " << neural.V_adj.magnitude() << "\n";
-//          std::cout << "finalEquity: M_adj magnitude: " << neural.M_adj.magnitude() << "\n";
             neural.reconsider(previous - e);
             neural.update_model();
         }

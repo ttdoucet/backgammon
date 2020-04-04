@@ -39,6 +39,7 @@ inline int score(const board& b, color_t color)
         winner = opponentOf(color);
         equity = -1;
     }
+
     const color_t loser = opponentOf(winner);
     bool gammon = (b.checkersOnPoint(loser, 0) == 0);
     bool backgammon = (gammon && b.highestChecker(loser) > 18);
@@ -91,8 +92,8 @@ public:
 
     void setupGame()
     {
-        b.clearBoard();
         // Set up the checkers.
+        b.clearBoard();
         both(24, 2);
         both(13, 5);
         both(8, 3);
