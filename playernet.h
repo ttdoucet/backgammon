@@ -17,7 +17,8 @@ public:
     NeuralNetPlayer(string player, string netname)
         : Player(player)
     {
-        readFile(neural, netname);
+        if (netname != "random")
+            readFile(neural, netname);
     }
 
     void chooseMove(const board& b, moves& choice)

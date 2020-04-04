@@ -7,7 +7,6 @@
 
 class RNG_die
 {
-
 public:
     RNG_die(unsigned seed = -1)
         : dice{1, 6},

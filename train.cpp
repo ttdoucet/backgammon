@@ -13,8 +13,7 @@ using namespace std;
 class cmdopts : public cmdline
 {
 public:
-    int games = 1000;
-    bool verbose = false;
+    int games = 100000;
     int every = 0;
     uint64_t user_seed = -1;
     string whitenet = "white.w";
@@ -26,8 +25,8 @@ public:
     {
         setopt('n', "--games",   games,       "number of games.");
 
-        setopt('w', "--white",   whitenet,    "Filename for white network, default white.w");
-        setopt('b', "--black",   blacknet,    "Filename for black network, default black.w");
+        setopt('w', "--white",   whitenet,    "Filename for white network or random, default white.w");
+//      setopt('b', "--black",   blacknet,    "Filename for black network, default black.w");
 
         setopt('a', "--alpha",   alpha,       "Learning rate.");
         setopt('l', "--lambda",  lambda,      "Temporal discount.");
@@ -52,8 +51,9 @@ static void report(int numGames, double whitePoints)
             cout << ss.str();
 }
 
-static void trainingSession(Learner& whitePlayer, NeuralNetPlayer& blackPlayer)
+static void train_single(Learner& whitePlayer)
 {
+    NeuralNetPlayer blackPlayer = static_cast<NeuralNetPlayer>(whitePlayer);
     Game game(whitePlayer, blackPlayer);
 
     int numGames;
@@ -64,7 +64,7 @@ static void trainingSession(Learner& whitePlayer, NeuralNetPlayer& blackPlayer)
         double white_eq = game.playGame();
         whitePoints += white_eq;
 
-        blackPlayer = (NeuralNetPlayer) whitePlayer;
+        blackPlayer = static_cast<NeuralNetPlayer>(whitePlayer);
 
         if (opts.every && !(numGames % opts.every))
         {
@@ -85,18 +85,11 @@ int main(int argc, char *argv[])
 {
     opts.parse(argc, argv);
 
-    cout << "white: " << opts.whitenet << endl;
-    cout << "black: " << opts.blacknet  << endl;
+    cout << "train: " << opts.whitenet << endl;
 
-    Learner         whitePlayer("white", opts.whitenet, opts.alpha, opts.lambda);
-    // Learner         blackPlayer("black", opts.blacknet, opts.alpha, opts.lambda);
-    NeuralNetPlayer blackPlayer("black", opts.blacknet);
-
-    trainingSession(whitePlayer, blackPlayer);
-
-
+    Learner whitePlayer("white", opts.whitenet, opts.alpha, opts.lambda);
+    train_single(whitePlayer);
     whitePlayer.save("white.w");
-//  blackPlayer.save("black.w");
 
     return 0;
 }
