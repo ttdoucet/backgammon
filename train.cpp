@@ -2,6 +2,7 @@
  */
 #include <iostream>
 #include <iomanip>
+#include <fstream>
 
 #include "game.h"
 #include "playernet.h"
@@ -17,7 +18,7 @@ public:
     int every = 0;
     uint64_t user_seed = -1;
     string whitenet = "white.w";
-    string blacknet = "black.w";
+    string output = "";
     float alpha = 0.01f;
     float lambda = 0.85f;
 
@@ -27,6 +28,8 @@ public:
 
         setopt('w', "--white",   whitenet,    "Filename for white network or random, default white.w");
 //      setopt('b', "--black",   blacknet,    "Filename for black network, default black.w");
+        setopt('o', "--output",  output,      "Filename to save after training.");
+
 
         setopt('a', "--alpha",   alpha,       "Learning rate.");
         setopt('l', "--lambda",  lambda,      "Temporal discount.");
@@ -49,6 +52,12 @@ static void report(int numGames, double whitePoints)
                << ")\n";
 
             cout << ss.str();
+}
+
+static bool file_exists(string filename)
+{
+    ifstream f(filename);
+    return f.good();
 }
 
 static void train_single(Learner& whitePlayer)
@@ -85,11 +94,19 @@ int main(int argc, char *argv[])
 {
     opts.parse(argc, argv);
 
+    if (file_exists(opts.output))
+    {
+        cout << "File already exists: " << opts.output << ", skipping.\n";
+        return 0;
+    }
+
     cout << "train: " << opts.whitenet << endl;
 
     Learner whitePlayer("white", opts.whitenet, opts.alpha, opts.lambda);
     train_single(whitePlayer);
-    whitePlayer.save("white.w");
+
+    string outfile = opts.output.length() ? opts.output : opts.whitenet;
+    whitePlayer.save(outfile);
 
     return 0;
 }
