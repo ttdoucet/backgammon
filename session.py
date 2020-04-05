@@ -3,11 +3,12 @@ import sys
 import os
 
 games = 1000000
+every = 1000
 alpha = 0.02
 lambda_ = 0.85
 
 def doit(fromfile, tofile):
-    cmd  = f'./train --alpha {alpha} --lambda {lambda_} --games {games} -w {fromfile} -o {tofile} -e 100'
+    cmd  = f'./train --alpha {alpha} --lambda {lambda_} --games {games} -w {fromfile} -o {tofile} -e {every}'
     print(cmd)
     r = os.system(cmd)
     if r & 0xff:
