@@ -15,12 +15,14 @@ class cmdopts : public cmdline
 public:
     int trials = 1000;
     bool display_moves = false;
+    int every = 0;
     uint64_t user_seed = -1;
 
     cmdopts()
     {
         setopt('n', "--games", trials,        "number of trials.");
         setopt('s', "--seed",  user_seed,     "seed for random-number generator.");
+        setopt('e', "--every",   every,       "Report every n games.");
         setopt('d',            display_moves, "display moves.");
     }
 };
@@ -45,7 +47,7 @@ protected:
     }
 };
 
-void playoffSession(int trials, Player& whitePlayer, Player& blackPlayer, uint64_t seed)
+static void playoffSession(int trials, Player& whitePlayer, Player& blackPlayer, uint64_t seed)
 {
     AnnotatedGame game(whitePlayer, blackPlayer, seed);
 
@@ -57,18 +59,21 @@ void playoffSession(int trials, Player& whitePlayer, Player& blackPlayer, uint64
         double white_eq = game.playGame();
         whitePoints += white_eq;
 
-        std::ostringstream ss;
+        if (opts.every && !(numGames % opts.every))
+        {
+            std::ostringstream ss;
 
-        ss << std::fixed << "Game " << numGames << ": "
-           << std::setprecision(2) << std::setw(5) << white_eq << "... ";
+            ss << std::fixed << "Game " << numGames << ": "
+               << std::setprecision(2) << std::setw(5) << white_eq << "... ";
 
-        ss << "white equity/game = "
-           << std::setprecision(3) << whitePoints/numGames
-           << " (total "
-           << std::setprecision(2) << whitePoints
-           << ")\n";
+            ss << "white equity/game = "
+               << std::setprecision(3) << whitePoints/numGames
+               << " (total "
+               << std::setprecision(2) << whitePoints
+               << ")\n";
 
-        cout << ss.str();
+            cout << ss.str();
+        }
     }
 }
 
