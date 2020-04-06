@@ -15,7 +15,8 @@ def doit(fromfile, tofile):
         sys.exit(1)
 
 
-doit('random', 'white-1.w')
+os.system("./train --games 0 -w random -o random.w");
+doit('random.w', 'white-1.w')
 
 for i in range(1, 20):
     doit(f'white-{i}.w', f'white-{i+1}.w')

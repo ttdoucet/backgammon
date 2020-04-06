@@ -14,8 +14,7 @@ using std::string;
 class NeuralNetPlayer : public Player, public callBack
 {
 public:
-    NeuralNetPlayer(string player, string netname)
-        : Player(player)
+    NeuralNetPlayer(string netname)
     {
         if (netname != "random")
             readFile(neural, netname);
@@ -74,7 +73,6 @@ protected:
 
     float littleE(const board &bd)
     {
-    //  assert(bd.diceInCup());
         if (gameOver(bd))
             return score(bd, bd.onRoll());
 
@@ -93,8 +91,8 @@ protected:
 class Learner : public NeuralNetPlayer
 {
 public:
-    Learner(string player, string netname, float alpha, float lambda)
-        : NeuralNetPlayer(player, netname)
+    Learner(string netname, float alpha, float lambda)
+        : NeuralNetPlayer(netname)
     {
         neural.alpha = alpha;
         neural.lambda = lambda;

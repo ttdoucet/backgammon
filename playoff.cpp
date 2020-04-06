@@ -13,9 +13,9 @@ using namespace std;
 class cmdopts : public cmdline
 {
 public:
-    int trials = 1000;
+    int trials = 10000;
     bool display_moves = false;
-    int every = 0;
+    int every = 100;
     uint64_t user_seed = -1;
 
     cmdopts()
@@ -101,8 +101,8 @@ int main(int argc, char *argv[])
     cout << "white: " << net_name[0] << endl;
     cout << "black: " << net_name[1] << endl;
 
-    NeuralNetPlayer whitePlayer("white", net_name[0]);
-    NeuralNetPlayer blackPlayer("black", net_name[1]);
+    NeuralNetPlayer whitePlayer(net_name[0]);
+    NeuralNetPlayer blackPlayer(net_name[1]);
 
     playoffSession(opts.trials, whitePlayer, blackPlayer, opts.user_seed);
 

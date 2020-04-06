@@ -20,7 +20,7 @@ namespace detail_cmdline
         vector<string> Args;
         vector<string> ExtraArgs;
 
-        void parse(int argc, char *argv[])
+        virtual void parse(int argc, char *argv[])
         {
             for (; argc; --argc, ++argv)
                 Args.push_back(argv[0]);
@@ -77,7 +77,7 @@ namespace detail_cmdline
             flags.push_back(move(e));
         }
 
-        void usage(const string& s=""s)
+        virtual void usage(const string& s=""s, bool terminate=true)
         {
             if (s.length())
                 cerr << s << "\n";
@@ -102,7 +102,8 @@ namespace detail_cmdline
                 cerr << " " << flag->help << "\n";
             }
             cerr << "    " << setw(15) << "  --help" << " Print this message and exit.\n";
-            std::exit(1);
+            if (terminate)
+                std::exit(1);
         }
 
         void set_summary(const string& text)

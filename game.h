@@ -8,10 +8,9 @@
 class Player
 {
 protected:
-    std::string playerName;
 
 public:
-    Player(std::string nameOfPlayer) : playerName(nameOfPlayer) {};
+    Player() {};
     virtual void prepareToPlay() { }
     virtual void presentBoard(const board& b) {}
     virtual void chooseMove(const board& b, moves& choice) = 0;
