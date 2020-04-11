@@ -12,7 +12,7 @@ protected:
 public:
     Player() {};
     virtual void prepareToPlay() { }
-    virtual void presentBoard(const board& b) {}
+    virtual void presentBoard(const board& b, bool me_on_roll) {}
     virtual void chooseMove(const board& b, moves& choice) = 0;
     virtual void finalEquity(float e) { }
     virtual ~Player(){}
@@ -78,7 +78,9 @@ public:
             reportMove(b, m);
             applyMove(b, m);
 
-            playerOnRoll().presentBoard(b);
+            whitePlayer.presentBoard(b, b.onRoll() == white);
+            blackPlayer.presentBoard(b, b.onRoll() == black);
+
             b.setDice( die.roll(), die.roll() );
         }
 

@@ -104,18 +104,21 @@ public:
         started = false;
     }
 
-    void presentBoard(const board& b) override
+    void presentBoard(const board& b, bool me_on_roll) override
     {
         assert( !b.d1() && !b.d2() );
 
-        float desired = neural.equity(b);
+        if (me_on_roll == false)
+            return;
+
+        float equity = neural.equity(b);
 
         if (started)
         {
-            float err = previous - desired;
+            float err = previous - equity;
             neural.reconsider(err);
         }
-        previous = desired;
+        previous = equity;
         started = true;
     }
 
