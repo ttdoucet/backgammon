@@ -7,29 +7,32 @@
  * Intended for relatively small matrices whose sizes are known
  * at compile-time.   Intended to be fast and efficient.
  */ 
-template<int R, int C=1> class matrix
+template<int R, int C=1>
+class matrix
 {
     typedef float Array[R][C];
 
- public:
+public:
+    float *begin() { return Data(); }
+    float *end()   { return &data[R-1][C-1] + 1; }
+
+public:
     constexpr int Rows() const { return R; }
     constexpr int Cols() const { return C; }
 
     // initialize to zeros.
     matrix<R,C>()
     {
-        for (int r = 0; r < Rows(); r++)
-            for (int c = 0; c < Cols(); c++)
-                data[r][c] = 0;
+        for (auto &p : *this)
+            p = 0;
     }
 
     matrix<R,C>(std::initializer_list<float> li)
     {
         assert(li.size() == R * C);
         auto it = li.begin();
-        for (int r = 0; r < Rows(); r++)
-            for (int c = 0; c < Cols(); c++)
-                data[r][c] = *it++;
+        for (auto &p : *this)
+            p = *it++;
     }
 
     float& operator() (int r, int c)
@@ -60,17 +63,15 @@ template<int R, int C=1> class matrix
 
     matrix<R,C>& operator *=(float scale)
     {
-        for (int r = 0; r < Rows(); r++)
-            for (int c = 0; c < Cols(); c++)
-                data[r][c] *= scale;
+        for (auto &p : *this)
+            p *= scale;
         return *this;
     }
 
     matrix<R,C>& operator /=(float scale)
     {
-        for (int r = 0; r < Rows(); r++)
-            for (int c = 0; c < Cols(); c++)
-                data[r][c] /= scale;
+        for (auto &p : *this)
+            p /= scale;
         return *this;
     }
 
@@ -145,18 +146,15 @@ template<int R, int C=1> class matrix
 
     void clear()
     {
-        for (int r = 0; r < Rows(); r++)
-            for (int c = 0; c < Cols(); c++)
-                data[r][c] = 0;
+        for (auto &p : *this)
+            p = 0;
     }
 
     double magnitude()
     {
         double sum = 0;
-        for (int r = 0; r < Rows(); r++)
-            for (int c = 0; c < Cols(); c++)
-                sum += (data[r][c] * data[r][c]);
-
+        for (auto p : *this)
+                sum += p * p;
         return sqrt(sum);
     }
 
@@ -228,5 +226,3 @@ std::ostream& operator<<(std::ostream& s, const matrix<R,C>& m)
     }
     return s;
 }
-
-    
