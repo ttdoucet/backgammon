@@ -13,10 +13,6 @@ class matrix
     typedef float Array[R][C];
 
 public:
-    float *begin() { return Data(); }
-    float *end()   { return &data[R-1][C-1] + 1; }
-
-public:
     constexpr int Rows() const { return R; }
     constexpr int Cols() const { return C; }
 
@@ -159,6 +155,9 @@ public:
     }
 
     float *Data() { return &data[0][0]; }
+    float *begin() { return Data(); }
+    float *end()   { return &data[R-1][C-1] + 1; }
+
     operator float() const;
 
  private:
