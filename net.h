@@ -85,10 +85,10 @@ public:
 
         grad.M = lhs * input.Transpose();
 
-        grad_adj += grads * err;
+        grad_adj += grad_sum * err;
 
-        grads *= lambda;
-        grads += grad;
+        grad_sum *= lambda;
+        grad_sum += grad;
     }
 
     float lambda = 0.85f;    // Temporal discount.
@@ -97,7 +97,7 @@ public:
     void clear_gradients()
     {
         grad_adj.clear();
-        grads.clear();
+        grad_sum.clear();
     }
 
     void update_model()
@@ -126,7 +126,7 @@ private:
 
     /* Sum of gradients with lambda temporal discount.
      */
-    Parameters grads;
+    Parameters grad_sum;
 
     /* Accumulated adjustments to weights.
      */
