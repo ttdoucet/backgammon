@@ -25,10 +25,10 @@ void writeFile(BgNet& n, std::string fn)
 
     for (int i = 0; i < n.n_hidden; i++)
         for (int j = 0; j < n.n_inputs; j++)
-            write_float(ofs, n.M(i, j));
+            write_float(ofs, n.parms.M(i, j));
 
     for (int i = 0; i < n.n_hidden; i++)
-        write_float(ofs, n.V(0, i));
+        write_float(ofs, n.parms.V(0, i));
 
     ofs << "Current seed: " << n.seed << "L\n";            // legacy
     ofs << "Games trained: " << n.games_trained << "L\n";  // legacy
@@ -71,10 +71,10 @@ void readFile(BgNet &n, std::string fn)
 
     for (int i = 0; i < n.n_hidden; i++)
         for (int j = 0; j < n.n_inputs; j++)
-            n.M(i, j) = read_float(ifs);
+            n.parms.M(i, j) = read_float(ifs);
 
     for (int i = 0; i < n.n_hidden; i++)
-        n.V(0, i) = read_float(ifs);
+        n.parms.V(0, i) = read_float(ifs);
 
     has(ifs, "Current seed:");
     char L;

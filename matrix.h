@@ -41,7 +41,7 @@ public:
          return data[r][c];
     }
 
-    matrix<R,C>& operator +=(const matrix<R,C> &rhs)
+    matrix<R,C>& operator+=(const matrix<R,C> &rhs)
     {
         for (int r = 0; r < Rows(); r++)
             for (int c = 0; c < Cols(); c++)
@@ -49,7 +49,7 @@ public:
         return *this;
     }
 
-    matrix<R,C>& operator -=(const matrix<R,C> &rhs)
+    matrix<R,C>& operator-=(const matrix<R,C> &rhs)
     {
         for (int r = 0; r < Rows(); r++)
             for (int c = 0; c < Cols(); c++)
@@ -57,27 +57,27 @@ public:
         return *this;
     }
 
-    matrix<R,C>& operator *=(float scale)
+    matrix<R,C>& operator*=(float scale)
     {
         for (auto &p : *this)
             p *= scale;
         return *this;
     }
 
-    matrix<R,C>& operator /=(float scale)
+    matrix<R,C>& operator/=(float scale)
     {
         for (auto &p : *this)
             p /= scale;
         return *this;
     }
 
-    matrix<R,C> operator *(float scale) const
+    matrix<R,C> operator*(float scale) const
     {
         matrix<R,C> v(*this);
         return (v *= scale);
     }
 
-    matrix<R,C> operator /(float scale) const
+    matrix<R,C> operator/(float scale) const
     {
         matrix<R,C> v(*this);
         return (v /= scale);
@@ -190,7 +190,7 @@ template<int S1, int S2, int S3>
 
 /* Multiplication of a matrix by a scalar.
  */
-template<int R, int C> matrix<R,C> operator *(float scale, const matrix<R,C> rhs)
+template<int R, int C> matrix<R,C> operator*(float scale, const matrix<R,C> rhs)
 {
     matrix<R,C> v(rhs);
     return v *= scale;

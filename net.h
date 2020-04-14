@@ -25,34 +25,12 @@ public:
 protected:
     float feedForward()
     {
-        hidden = M * input;
+        hidden = parms.M * input;
 
         for (int i = 0; i < N_HIDDEN; i++)
             hidden(i, 0) = squash(hidden(i, 0));
 
-        return  out = squash( V * hidden );
-    }
-
-    void backprop(float err)
-    {
-        auto const f = out * (1 - out);
-        auto V_grad = f * hidden.Transpose();
-
-        matrix<N_HIDDEN, 1> lhs = f * V.Transpose();
-
-        for (int i = 0; i < lhs.Rows(); i++)
-            lhs(i, 0) *= ( hidden(i, 0) * (1 - hidden(i, 0)) );
-
-        auto M_grad = lhs * input.Transpose();
-
-        M_adj += err * M_grads;
-        V_adj += err * V_grads;
-
-        M_grads *= lambda;
-        M_grads += M_grad;
-
-        V_grads *= lambda;
-        V_grads += V_grad;
+        return  out = squash( parms.V * hidden );
     }
 
     input_vector input;
@@ -60,25 +38,71 @@ protected:
 public:
     /* Model parameters.
      */
-    W1 M;
-    W2 V;
+    struct Parameters
+    {
+        W1 M;
+        W2 V;
+
+        void clear()
+        {
+            M.clear();
+            V.clear();
+        }
+
+        Parameters& operator+=(const Parameters &rhs)
+        {
+            M += rhs.M;
+            V += rhs.V;
+            return *this;
+        }
+
+        Parameters& operator*=(float scale)
+        {
+            M *= scale;
+            V *= scale;
+            return *this;
+        }
+
+        Parameters operator*(float scale) const
+        {
+            Parameters r(*this);
+            return r *= scale;
+        }
+    };
+    Parameters parms;
+
+    void backprop(float err)
+    {
+        Parameters grad;
+
+        auto const f = out * (1 - out);
+        grad.V = f * hidden.Transpose();
+
+        matrix<N_HIDDEN, 1> lhs = f * parms.V.Transpose();
+
+        for (int i = 0; i < lhs.Rows(); i++)
+            lhs(i, 0) *= ( hidden(i, 0) * (1 - hidden(i, 0)) );
+
+        grad.M = lhs * input.Transpose();
+
+        grad_adj += grad * err;
+
+        grads *= lambda;
+        grads += grad;
+    }
 
     float lambda = 0.85f;    // Temporal discount.
     float alpha = 0.001f;    // Learning rate.
 
     void clear_gradients()
     {
-        M_grads.clear();
-        V_grads.clear();
-
-        M_adj.clear();
-        V_adj.clear();
+        grad_adj.clear();
+        grads.clear();
     }
 
     void update_model()
     {
-        M -= alpha * M_adj;
-        V -= alpha * V_adj;
+        parms += grad_adj * (-alpha);
     }
 
     net()
@@ -86,11 +110,11 @@ public:
         RNG_normal rand1(0, 1.0 / N_INPUTS);
         for (int r = 0; r < N_HIDDEN; r++)
             for (int c = 0; c < N_INPUTS; c++)
-                M(r, c) = rand1.random();
+                parms.M(r, c) = rand1.random();
 
         RNG_normal rand2(0, 1.0 / N_HIDDEN);
         for (int c = 0; c < N_HIDDEN; c++)
-            V(0, c) = rand2.random();
+            parms.V(0, c) = rand2.random();
     }
 
 private:
@@ -102,13 +126,11 @@ private:
 
     /* Sum of gradients with lambda temporal discount.
      */
-    W1 M_grads;
-    W2 V_grads;
+    Parameters grads;
 
     /* Accumulated adjustments to weights.
      */
-    W1 M_adj;
-    W2 V_adj;
+    Parameters grad_adj;
 };
 
 

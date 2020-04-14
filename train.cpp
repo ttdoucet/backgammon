@@ -26,7 +26,7 @@ public:
     string output_white = "";
     string output_black = "";
 
-    float alpha  = 0.01f;
+    float alpha  = 0.02f;
     float lambda = 0.85f;
 
     TrainingOptions()
