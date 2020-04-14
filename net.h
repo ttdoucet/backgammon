@@ -85,7 +85,7 @@ public:
 
         grad.M = lhs * input.Transpose();
 
-        grad_adj += grad * err;
+        grad_adj += grads * err;
 
         grads *= lambda;
         grads += grad;
