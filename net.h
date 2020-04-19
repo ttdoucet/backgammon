@@ -84,6 +84,10 @@ public:
     };
     Parameters parms;
 
+    /* Computes dy/dx, where y is the scalar output
+     * of the net during the last forward calculation,
+     * and x is any learning parameter.
+     */
     void backprop(Parameters& grad)
     {
         auto const f = 2 * MAX_EQUITY * out * (1 - out);
