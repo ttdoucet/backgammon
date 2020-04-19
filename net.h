@@ -97,6 +97,11 @@ public:
         grad.M = lhs * input.Transpose();
     }
 
+    void update_model(const Parameters& adj)
+    {
+        parms += adj;
+    }
+
     net()
     {
         RNG_normal rand1(0, 1.0 / N_INPUTS);
@@ -126,13 +131,6 @@ template<class feature_calc, int N_HIDDEN>
 class BackgammonNet : public net<feature_calc::count, N_HIDDEN>
 {
 public:
-    using Parameters = typename net<feature_calc::count, N_HIDDEN>::Parameters;
-
-    void update_model(const Parameters& adj)
-    {
-        this->parms += adj;
-    }
-
     /* Neural net estimate of the equity for the side on roll.
      */
     float equity(const board &b) noexcept
@@ -154,5 +152,5 @@ using netv3 = BackgammonNet<features_v3<float*>, 30>;
 
 using BgNet = netv3;
 
-void readFile( BgNet& n, std::string fn);
-void writeFile(BgNet& n, std::string fn);
+void readFile(BgNet& n, std::string fn);
+void writeFile(const BgNet& n, std::string fn);

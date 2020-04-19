@@ -7,12 +7,12 @@
 
 using namespace std;
 
-static void write_float(std::ostream& fs, float f)
+static void write_float(ostream& fs, float f)
 {
     fs.write( reinterpret_cast<char *>(&f), sizeof(f) );
 }
 
-void writeFile(BgNet& n, std::string fn)
+void writeFile(const BgNet& n, string fn)
 {
     ofstream ofs{fn};
     if (!ofs)
@@ -53,7 +53,7 @@ static bool has(istream& is, const char *str)
 }
 
 // Read in a neural net from a file.
-void readFile(BgNet &n, std::string fn)
+void readFile(BgNet &n, string fn)
 {
     int hidden = 40, portable = 1;
     int ntype = 0, input = 0;
