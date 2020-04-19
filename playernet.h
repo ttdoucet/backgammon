@@ -88,14 +88,19 @@ protected:
     }
 };
 
+#include <iostream>
+
 class Learner : public NeuralNetPlayer
 {
 public:
-    Learner(string netname, float alpha, float lambda)
+    Learner(string netname, float alpha_, float lambda_)
         : NeuralNetPlayer(netname)
     {
-        alpha = alpha;
-        lambda = lambda;
+        alpha = alpha_;
+        lambda = lambda_;
+
+        std::cout << "Learner: alpha = " << this->alpha << "\n";
+        std::cout << "Learner: lambda = " << this->lambda << "\n";
     }
 
     void prepareToPlay() override
@@ -133,8 +138,8 @@ public:
     }
 
 private:
-    float lambda = 0.85f;    // Temporal discount.
-    float alpha = 0.001f;    // Learning rate.
+    float lambda; // Temporal discount.
+    float alpha;  // Learning rate.
 
     /* Sum of gradients with lambda temporal discount.
      */
@@ -154,8 +159,6 @@ private:
         grad_sum += grad;
     }
 
-private:
     float previous;
     bool started;
 };
-
