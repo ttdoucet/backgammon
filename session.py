@@ -4,7 +4,7 @@ import os
 
 games = 1000000
 every = 1000
-alpha = 0.02
+alpha = 0.02 / 36
 lambda_ = 0.85
 
 def doit(fromfile, tofile):
