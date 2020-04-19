@@ -23,6 +23,18 @@ public:
     typedef matrix<1, N_HIDDEN> W2;
 
 protected:
+    constexpr static int MAX_EQUITY = 3;
+
+    constexpr static float net_to_equity(float p)
+    {
+        return  (2*p - 1) * MAX_EQUITY;
+    }
+
+    constexpr static float delta_equity_to_delta_net(float ediff)
+    {
+        return  ediff / (2 * MAX_EQUITY);
+    }
+
     float feedForward()
     {
         hidden = parms.M * input;
@@ -30,7 +42,8 @@ protected:
         for (int i = 0; i < N_HIDDEN; i++)
             hidden(i, 0) = squash(hidden(i, 0));
 
-        return  out = squash( parms.V * hidden );
+        out = squash( parms.V * hidden );
+        return net_to_equity(out);
     }
 
     input_vector input;
@@ -71,11 +84,10 @@ public:
     };
     Parameters parms;
 
-    void backprop(float err)
+    void backprop(Parameters& grad)
     {
-        Parameters grad;
+        auto const f = 2 * MAX_EQUITY * out * (1 - out);
 
-        auto const f = out * (1 - out);
         grad.V = f * hidden.Transpose();
 
         matrix<N_HIDDEN, 1> lhs = f * parms.V.Transpose();
@@ -84,11 +96,6 @@ public:
             lhs(i, 0) *= ( hidden(i, 0) * (1 - hidden(i, 0)) );
 
         grad.M = lhs * input.Transpose();
-
-        grad_adj += grad_sum * err;
-
-        grad_sum *= lambda;
-        grad_sum += grad;
     }
 
     float lambda = 0.85f;    // Temporal discount.
@@ -117,7 +124,7 @@ public:
             parms.V(0, c) = rand2.random();
     }
 
-private:
+protected:
     /* State activations maintained after 
      * feedForward() for backpropagation.
      */
@@ -142,31 +149,27 @@ private:
 template<class feature_calc, int N_HIDDEN>
 class BackgammonNet : public net<feature_calc::count, N_HIDDEN>
 {
-protected:
-    constexpr static int MAX_EQUITY = 3;
-
-    constexpr static float net_to_equity(float p)
-    {
-        return  (2*p - 1) * MAX_EQUITY;
-    }
-
-    constexpr static float delta_equity_to_delta_net(float ediff)
-    {
-        return  ediff / (2 * MAX_EQUITY);
-    }
 
 public:
+    using Parameters = typename net<feature_calc::count, N_HIDDEN>::Parameters;
+    using net<feature_calc::count, N_HIDDEN>::grad_adj;
+
     /* Neural net estimate of the equity for the side on roll.
      */
     float equity(const board &b) noexcept
     {
         feature_calc{b}.calc(this->input.Data());
-        return net_to_equity( this->feedForward() );
+        return this->feedForward();
     }
 
     void reconsider(float err)
     {
-        this->backprop( delta_equity_to_delta_net(err) );
+        Parameters grad;
+        this->backprop(grad);
+
+        grad_adj += this->grad_sum * err;
+        this->grad_sum *= this->lambda;
+        this->grad_sum += grad;
     }
 
     BackgammonNet()
