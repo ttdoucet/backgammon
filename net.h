@@ -30,11 +30,6 @@ protected:
         return  (2*p - 1) * MAX_EQUITY;
     }
 
-    constexpr static float delta_equity_to_delta_net(float ediff)
-    {
-        return  ediff / (2 * MAX_EQUITY);
-    }
-
     float feedForward()
     {
         hidden = parms.M * input;
@@ -102,7 +97,6 @@ public:
         grad.M = lhs * input.Transpose();
     }
 
-
     net()
     {
         RNG_normal rand1(0, 1.0 / N_INPUTS);
@@ -132,22 +126,12 @@ template<class feature_calc, int N_HIDDEN>
 class BackgammonNet : public net<feature_calc::count, N_HIDDEN>
 {
 public:
-    float lambda = 0.85f;    // Temporal discount.
-    float alpha = 0.001f;    // Learning rate.
-
-    void clear_gradients()
-    {
-        grad_adj.clear();
-        grad_sum.clear();
-    }
-
-    void update_model()
-    {
-        this->parms += grad_adj * (-alpha);
-    }
-
-public:
     using Parameters = typename net<feature_calc::count, N_HIDDEN>::Parameters;
+
+    void update_model(const Parameters& adj)
+    {
+        this->parms += adj;
+    }
 
     /* Neural net estimate of the equity for the side on roll.
      */
@@ -157,16 +141,6 @@ public:
         return this->feedForward();
     }
 
-    void reconsider(float err)
-    {
-        Parameters grad;
-        this->backprop(grad);
-
-        grad_adj += this->grad_sum * err;
-        this->grad_sum *= this->lambda;
-        this->grad_sum += grad;
-    }
-
     BackgammonNet()
     {
         assert( feature_calc::count == this->input.Rows() * this->input.Cols() );
@@ -174,15 +148,6 @@ public:
 
     uint64_t seed = 0;  // legacy
     int64_t games_trained = 0;  // legacy
-
-private:
-    /* Sum of gradients with lambda temporal discount.
-     */
-    Parameters grad_sum;
-
-    /* Accumulated adjustments to weights.
-     */
-    Parameters grad_adj;
 };
 
 using netv3 = BackgammonNet<features_v3<float*>, 30>;

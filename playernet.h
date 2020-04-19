@@ -94,13 +94,14 @@ public:
     Learner(string netname, float alpha, float lambda)
         : NeuralNetPlayer(netname)
     {
-        neural.alpha = alpha;
-        neural.lambda = lambda;
+        alpha = alpha;
+        lambda = lambda;
     }
 
     void prepareToPlay() override
     {
-        neural.clear_gradients();
+        grad_adj.clear();
+        grad_sum.clear();
         started = false;
     }
 
@@ -116,7 +117,7 @@ public:
         if (started)
         {
             float err = previous - equity;
-            neural.reconsider(err);
+            reconsider(err);
         }
         previous = equity;
         started = true;
@@ -126,9 +127,31 @@ public:
     {
         if (started)
         {
-            neural.reconsider(previous - e);
-            neural.update_model();
+            reconsider(previous - e);
+            neural.update_model( grad_adj * (-alpha) );
         }
+    }
+
+private:
+    float lambda = 0.85f;    // Temporal discount.
+    float alpha = 0.001f;    // Learning rate.
+
+    /* Sum of gradients with lambda temporal discount.
+     */
+    BgNet::Parameters grad_sum;
+
+    /* Accumulated adjustments to weights.
+     */
+    BgNet::Parameters grad_adj;
+
+    void reconsider(float err)
+    {
+        BgNet::Parameters grad;
+        neural.backprop(grad);
+
+        grad_adj += grad_sum * err;
+        grad_sum *= lambda;
+        grad_sum += grad;
     }
 
 private:
