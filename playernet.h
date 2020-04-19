@@ -88,8 +88,6 @@ protected:
     }
 };
 
-#include <iostream>
-
 class Learner : public NeuralNetPlayer
 {
 public:
@@ -98,9 +96,6 @@ public:
     {
         alpha = alpha_;
         lambda = lambda_;
-
-        std::cout << "Learner: alpha = " << this->alpha << "\n";
-        std::cout << "Learner: lambda = " << this->lambda << "\n";
     }
 
     void prepareToPlay() override
