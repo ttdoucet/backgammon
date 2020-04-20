@@ -29,15 +29,19 @@ public:
     float alpha  = 0.02f;
     float lambda = 0.85f;
 
+    bool wdual = false;
+    bool bdual = false;
+
     TrainingOptions()
     {
         setopt('n', "--games",   games, "number of games.");
         setopt('e', "--every",   every, "Report every n games.");
 
         setopt('w', "--white-learner", wlearn_fn, "file for white learner");
-        setopt('b', "--black-player",  bplay_fn,  " file for black player");
+        setopt('b', "--black-player",  bplay_fn, " file for black player");
         setopt('B', "--black-learner", blearn_fn, "file for black learner");
-
+        setopt('d', "--white-dual",    wdual,   "  white observes both sides");
+        setopt('D', "--black-dual",    bdual,   "  black observes both sides");
         setopt('o', "--out-white", output_white, "file to save white after training.");
         setopt('O', "--out-black", output_black, "file to save black after training.");
 
@@ -67,6 +71,10 @@ public:
 
         if (output_black.empty() && !blearn_fn.empty())
             output_black = blearn_fn;
+
+        if (bdual && blearn_fn.empty())
+            usage("no black learner specified for dual learning");
+
     }
 
 };
@@ -88,23 +96,32 @@ public:
             return 0;
         }
 
-        Learner whitePlayer(opts.wlearn_fn, opts.alpha, opts.lambda);
+        Learner whitePlayer(opts.wlearn_fn, opts.alpha, opts.lambda, opts.wdual);
 
         if (opts.bplay_fn.empty() && opts.blearn_fn.empty())
         {
-            cout << "self-play: " << opts.wlearn_fn << endl;
+            cout << "self-play: "
+                 << name_for(opts.wlearn_fn, opts.wdual)
+                 << "\n";
             train_selfplay(whitePlayer);
         }
         else if (opts.blearn_fn.empty())
         {
-            cout << "train: " << opts.wlearn_fn << " against fixed " << opts.bplay_fn << "\n";
+            cout << "train: "
+                 << name_for(opts.wlearn_fn, opts.wdual)
+                 << " against fixed " << opts.bplay_fn
+                 << "\n";
             NeuralNetPlayer blackPlayer(opts.bplay_fn);
             train_against(whitePlayer, blackPlayer);
         }
         else
         {
-            cout << "train: " << opts.wlearn_fn << " against learning " << opts.blearn_fn << "\n";
-            Learner blackPlayer(opts.blearn_fn, opts.alpha, opts.lambda);
+            cout << "train: "
+                 << name_for(opts.wlearn_fn, opts.wdual)
+                 << " against learning "
+                 << name_for(opts.blearn_fn, opts.bdual)
+                 << "\n";
+            Learner blackPlayer(opts.blearn_fn, opts.alpha, opts.lambda, opts.bdual);
             train_against(whitePlayer, blackPlayer);
             blackPlayer.save(opts.output_black);
             cout << "black saved: " << opts.output_black << "\n";
@@ -137,6 +154,15 @@ private:
     {
         ifstream f(filename);
         return f.good();
+    }
+
+    string name_for(string fn, bool dual)
+    {
+        ostringstream ss;
+        ss << fn;
+        if (dual)
+            ss << " (dual)";
+        return ss.str();
     }
 
     void train(Learner& whitePlayer,
