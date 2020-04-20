@@ -139,7 +139,10 @@ private:
         return f.good();
     }
 
-    void train(Learner& whitePlayer, NeuralNetPlayer& blackPlayer, bool self_play=true, bool black_learns=false)
+    void train(Learner& whitePlayer,
+               NeuralNetPlayer& blackPlayer,
+               bool self_play = true,
+               bool black_learns = false)
     {
         Game game(whitePlayer, blackPlayer);
 

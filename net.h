@@ -7,8 +7,6 @@
 #include "matrix.h"
 #include "random.h"
 
-#include <iostream>
-
 template<int N_INPUTS, int N_HIDDEN>
 class net
 {

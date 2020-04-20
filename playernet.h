@@ -81,21 +81,21 @@ protected:
 
     static bool isBearingOff(const board &bd)
     {
-        return  bd.checkersOnPoint(white, 0) &&
-            bd.checkersOnPoint(black, 0) &&
-            (bd.highestChecker(white) <= 6) &&
-            (bd.highestChecker(black) <= 6);
+        return  bd.checkersOnPoint(white, 0)  &&
+                bd.checkersOnPoint(black, 0)  &&
+                bd.highestChecker(white) <= 6 &&
+                bd.highestChecker(black) <= 6;
     }
 };
 
 class Learner : public NeuralNetPlayer
 {
 public:
-    Learner(string netname, float alpha_, float lambda_)
+    Learner(string netname, float alpha, float lambda)
         : NeuralNetPlayer(netname)
     {
-        alpha = alpha_;
-        lambda = lambda_;
+        this->alpha = alpha;
+        this->lambda = lambda;
     }
 
     void prepareToPlay() override
