@@ -88,30 +88,26 @@ protected:
     }
 };
 
-class Learner : public NeuralNetPlayer
+
+class TemporalDifference
 {
 public:
-    Learner(string netname, float alpha, float lambda)
-        : NeuralNetPlayer(netname)
+    TemporalDifference(BgNet& neural, float alpha, float lambda)
+        : neural{neural},
+          alpha{alpha},
+          lambda{lambda}
     {
-        this->alpha = alpha;
-        this->lambda = lambda;
     }
 
-    void prepareToPlay() override
+    void start()
     {
         grad_adj.clear();
         grad_sum.clear();
         started = false;
     }
 
-    void presentBoard(const board& b, bool me_on_roll) override
+    void observe(const board& b)
     {
-        assert( !b.d1() && !b.d2() );
-
-        if (me_on_roll == false)
-            return;
-
         float equity = neural.equity(b);
 
         if (started)
@@ -123,7 +119,7 @@ public:
         started = true;
     }
 
-    void finalEquity(float e) override
+    void final(float e)
     {
         if (started)
         {
@@ -133,16 +129,15 @@ public:
     }
 
 private:
+    BgNet& neural;
     float lambda; // Temporal discount.
     float alpha;  // Learning rate.
 
-    /* Sum of gradients with lambda temporal discount.
-     */
     BgNet::Parameters grad_sum;
-
-    /* Accumulated adjustments to weights.
-     */
     BgNet::Parameters grad_adj;
+
+    float previous;
+    bool started;
 
     void reconsider(float err)
     {
@@ -153,7 +148,46 @@ private:
         grad_sum *= lambda;
         grad_sum += grad;
     }
+};
 
-    float previous;
-    bool started;
+class Learner : public NeuralNetPlayer
+{
+public:
+    Learner(string netname, float alpha, float lambda, bool dual=false)
+        : NeuralNetPlayer(netname),
+          our_side(neural, alpha, lambda),
+          opp_side(neural, alpha, lambda),
+          dual{dual}
+
+    {
+    }
+
+    void prepareToPlay() override
+    {
+        our_side.start();
+        if (dual)
+            opp_side.start();
+    }
+
+    void presentBoard(const board& b, bool me_on_roll) override
+    {
+        assert( !b.d1() && !b.d2() );
+
+        if (me_on_roll)
+            our_side.observe(b);
+        else if (dual)
+            opp_side.observe(b);
+    }
+
+    void finalEquity(float e) override
+    {
+        our_side.final(e);
+        if (dual)
+            opp_side.final(-e);
+    }
+
+private:
+    bool dual;
+    TemporalDifference our_side;
+    TemporalDifference opp_side;
 };
