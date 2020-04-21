@@ -64,7 +64,7 @@ static void playoffSession(int trials, Player& whitePlayer, Player& blackPlayer,
             std::ostringstream ss;
 
             ss << std::fixed << "Game " << numGames << ": "
-               << std::setprecision(2) << std::setw(5) << white_eq << "... ";
+               << std::setprecision(2) << std::setw(5) << white_eq << ", ";
 
             ss << "white equity/game = "
                << std::setprecision(3) << whitePoints/numGames
