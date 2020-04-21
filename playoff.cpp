@@ -66,11 +66,11 @@ static void playoffSession(int trials, Player& whitePlayer, Player& blackPlayer,
             ss << std::fixed << "Game " << numGames << ": "
                << std::setprecision(2) << std::setw(5) << white_eq << ", ";
 
-            ss << "white equity/game = "
+            ss << "white equity/game: "
                << std::setprecision(3) << whitePoints/numGames
-               << " (total "
+               << ", total: "
                << std::fixed << std::setprecision(1) << whitePoints
-               << ")\n";
+               << "\n";
 
             cout << ss.str();
         }
