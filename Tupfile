@@ -1,5 +1,5 @@
 # Use version 9 or later.
-cxx = clang++-9
+cxx = clang++
 cppflags = -O3 -ffast-math --std=c++17
 
 !compile = |> $(cxx) $(cppflags) -c %f -o %o |> %B.o
