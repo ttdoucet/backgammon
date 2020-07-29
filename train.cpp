@@ -26,7 +26,7 @@ public:
     string output_white = "";
     string output_black = "";
 
-    float alpha  = 0.02f;
+    float alpha  = 0.02f / 36;
     float lambda = 0.85f;
 
     bool wdual = false;
@@ -45,8 +45,13 @@ public:
         setopt('o', "--out-white", output_white, "file to save white after training.");
         setopt('O', "--out-black", output_black, "file to save black after training.");
 
-        setopt('a', "--alpha",   alpha,       "learning rate.");
-        setopt('l', "--lambda",  lambda,      "temporal discount.");
+        setopt('a', "--alpha",   alpha,
+               "learning rate (default: " + to_string(alpha) + ")"
+              );
+
+        setopt('l', "--lambda",  lambda,
+               "temporal discount (default: " + to_string(lambda) + ")"
+              );
     }
 
     virtual void usage(const string& s=""s, bool terminate=true) override
