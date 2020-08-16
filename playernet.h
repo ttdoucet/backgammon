@@ -20,7 +20,7 @@ public:
             readFile(neural, netname);
     }
 
-    void chooseMove(const board& b, moves& choice)
+    void chooseMove(const board& b, moves& choice) override
     {
         if (isBearingOff(b))
             selectMove(b, choice, &NeuralNetPlayer::bearoffEquity);
@@ -47,7 +47,7 @@ protected:
         return ::bearoffEquity(b);
     }
 
-    int callBackF(const board &b)
+    int callBackF(const board &b) override
     {
         float e = - (this->*equityEstimator)(b);
 
