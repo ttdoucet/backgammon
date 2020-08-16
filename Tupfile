@@ -1,9 +1,12 @@
 # Use version 9 or later.
-cxx = clang++
-cppflags = -O3 -ffast-math --std=c++17
+#cxx = clang++
+#cppflags = -Ofast -ffast-math --std=c++17 -I/usr/include/eigen3 -fno-math-errno -g
+
+cxx = g++
+cppflags = -Ofast -ffast-math --std=c++17 -march=sandybridge -mtune=sandybridge -I/usr/include/eigen3 -fno-math-errno
 
 !compile = |> $(cxx) $(cppflags) -c %f -o %o |> %B.o
-!link = |> $(cxx) $(cppflags) %f -o %o |>
+!link = |> $(cxx) $(cppflags) %f -o %o -static -g |>
 
 # Generate the bearoff database.
 : | ./bearoff/beargen.exe |> ./bearoff/beargen.exe > %o |> bearoff.dat
@@ -23,3 +26,6 @@ common-src = hits.cpp net.cpp move.cpp ttydisp.cpp bdata.cpp bearoff.cpp human.c
 #
 : nnstat.cpp  |> !compile |> %B.o
 : nnstat.o net.o |> !link |> nnstat
+
+: matrix-test.cpp  |> !compile |> %B.o
+: matrix-test.o net.o hits.o |> !link |> matrix-test

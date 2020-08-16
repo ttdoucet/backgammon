@@ -1,4 +1,5 @@
 #pragma once
+#include <cmath>
 #include <cassert>
 #include <initializer_list>
 
@@ -12,7 +13,7 @@ class matrix
 {
     typedef float Array[R][C];
 
-public:
+  public:
     constexpr int Rows() const { return R; }
     constexpr int Cols() const { return C; }
 
@@ -160,7 +161,7 @@ public:
 
     operator float() const;
 
- private:
+  private:
     alignas(16) Array data;
 };
 
@@ -180,9 +181,10 @@ template<int S1, int S2, int S3>
     {
         for (int c = 0; c < result.Cols(); c++)
         {
-            result(r, c) = 0;
+            float res = 0;
             for (int k = 0; k < lhs.Cols(); k++)
-                result(r, c) += ( lhs(r, k) * rhs(k, c) );
+                res += ( lhs(r, k) * rhs(k, c) );
+            result(r, c) = res;
         }
     }
     return result;
