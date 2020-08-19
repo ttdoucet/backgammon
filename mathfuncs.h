@@ -5,6 +5,6 @@
 
 inline float squash(float x)
 {
-    return 1 / (1 + expf(-x));
+    return  1 / (1 + exp(-x));
 }
 

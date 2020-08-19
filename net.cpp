@@ -12,9 +12,26 @@ static void write_float(ostream& fs, float f)
     fs.write( reinterpret_cast<char *>(&f), sizeof(f) );
 }
 
-void writeFile(const BgNet& n, string fn)
+bool writeFile(const BgNet& n, string fn)
 {
-    ofstream ofs{fn};
+    bool quit = false;
+
+    if (n.parms.M.isfinite() == false)
+    {
+        std::cout << "ERROR: M is not finite\n";
+        quit = true;
+    }
+
+    if (n.parms.V.isfinite() == false)
+    {
+        std::cout << "ERROR: V is not finite\n";
+        quit = true;
+    }
+
+    if (quit)
+        return false;
+
+    ofstream ofs(fn, ios::binary);
     if (!ofs)
         throw runtime_error(string("Cannot open file stream ") + fn + " for writing.");
 
@@ -32,6 +49,9 @@ void writeFile(const BgNet& n, string fn)
 
     ofs << "Current seed: " << n.seed << "L\n";            // legacy
     ofs << "Games trained: " << n.games_trained << "L\n";  // legacy
+
+    ofs.close();
+    return ofs.fail() == false;
 }
 
 static float read_float(istream& ifs)
@@ -53,12 +73,13 @@ static bool has(istream& is, const char *str)
 }
 
 // Read in a neural net from a file.
-void readFile(BgNet &n, string fn)
+bool readFile(BgNet &n, string fn)
 {
     int hidden = 40, portable = 1;
     int ntype = 0, input = 0;
 
     ifstream ifs(fn, ios::binary);
+
     if (!ifs)
         throw runtime_error("Cannot open network file: "s + fn);
 
@@ -67,7 +88,12 @@ void readFile(BgNet &n, string fn)
     has(ifs, "net type:"); ifs >> ntype >> ws;
     assert(ntype == 3);
     has(ifs, "hidden nodes:"); ifs >> hidden >> ws;
-    has(ifs, "input nodes:"); ifs >> input >> ws;
+    has(ifs, "input nodes:"); ifs >> input;
+
+    char ch;
+    ifs.get(ch);
+    if (ch != '\n')
+        return false;
 
     for (int i = 0; i < n.n_hidden; i++)
         for (int j = 0; j < n.n_inputs; j++)
@@ -76,8 +102,20 @@ void readFile(BgNet &n, string fn)
     for (int i = 0; i < n.n_hidden; i++)
         n.parms.V(0, i) = read_float(ifs);
 
+    if (ifs.fail())
+        return false;
+
+    if (n.parms.M.isfinite() == false)
+        throw runtime_error("M is not finite.");
+    if (n.parms.V.isfinite() == false)
+        throw runtime_error("V is not finite.");
+
     has(ifs, "Current seed:");
+
     char L;
     ifs >> n.seed >> L >> ws;
     has(ifs, "Games trained:"); ifs >> n.games_trained;
+
+    ifs.close();
+    return ifs.fail() == false;
 }

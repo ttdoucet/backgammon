@@ -16,8 +16,13 @@ class NeuralNetPlayer : public Player, public callBack
 public:
     NeuralNetPlayer(string netname)
     {
+        bool okay = true;
         if (netname != "random")
-            readFile(neural, netname);
+            okay = readFile(neural, netname);
+
+        if (okay == false)
+            throw std::runtime_error(string("Error reading network: ") + netname + "\n");
+
     }
 
     void chooseMove(const board& b, moves& choice) override
@@ -30,7 +35,9 @@ public:
 
     void save(string filename)
     {
-        writeFile(neural, filename);
+        bool okay = writeFile(neural, filename);
+        if (okay == false)
+            throw std::runtime_error(string("Error writing network: ") + filename + "\n");
     }
 
 protected:

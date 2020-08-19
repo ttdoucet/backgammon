@@ -35,7 +35,24 @@ protected:
         for (int i = 0; i < N_HIDDEN; i++)
             hidden(i, 0) = squash(hidden(i, 0));
 
-        out = squash( parms.V * hidden );
+        float x =  parms.V * hidden;
+        out = squash(x);
+
+#if 1
+        if (std::isfinite(out) == false)
+        {
+            std::cout << "WARNING: out is not a finite number:";
+            if (std::isnan(out))
+                std::cout << " nan";
+            if (std::isinf(out))
+                std::cout << " inf";
+            std::cout << ", x = " << x << "\n";
+
+            std::cout << "V: " << parms.V << "\n";
+            std::cout << "hidden: " << hidden << "\n";
+        }
+#endif
+
         return net_to_equity(out);
     }
 
@@ -97,7 +114,25 @@ public:
 
     void update_model(const Parameters& adj)
     {
+#if 0
+        auto M_mag = adj.M.magnitude();
+
+        if (std::isfinite(M_mag) == false)
+        {
+            std::cout << "adj.M: " << adj.M << "\n";
+            std::cout << "adj.V: " << adj.V << "\n";
+        }
+
+        assert( adj.M.isfinite() );
+        assert( adj.V.isfinite() );
+#endif
+
         parms += adj;
+
+#if 0
+        assert( parms.M.isfinite() );
+        assert( parms.V.isfinite() );
+#endif
     }
 
     net()
@@ -150,5 +185,5 @@ using netv3 = BackgammonNet<features_v3<float*>, 30>;
 
 using BgNet = netv3;
 
-void readFile(BgNet& n, std::string fn);
-void writeFile(const BgNet& n, std::string fn);
+bool readFile(BgNet& n, std::string fn);
+bool writeFile(const BgNet& n, std::string fn);

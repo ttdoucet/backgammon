@@ -130,6 +130,15 @@ class matrix
             p = 0;
     }
 
+    bool isfinite() const
+    {
+        for (int r = 0; r < Rows(); r++)
+            for (int c = 0; c < Cols(); c++)
+                if (std::isfinite((*this)(c,r)) == false)
+                    return false;
+        return true;
+    }
+
     double magnitude()
     {
         double sum = 0;
