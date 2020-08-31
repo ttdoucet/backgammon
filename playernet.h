@@ -165,7 +165,6 @@ public:
           our_side(neural, alpha, lambda),
           opp_side(neural, alpha, lambda),
           dual{dual}
-
     {
     }
 
