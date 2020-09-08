@@ -106,17 +106,32 @@ private:
         int numGames;
         double whitePoints = 0.0;
 
+        int sw = 0, sl = 0;  // Single wins & losses
+        int gw = 0, gl = 0;  // Gammons
+        int bw = 0, bl = 0;  // Backgammons
+
         for (numGames = 1; numGames <= trials ; numGames++)
         {
-            double white_eq = game.playGame();
+            auto white_eq = game.playGame();
             whitePoints += white_eq;
+
+            switch (white_eq)
+            {
+                case 1: sw++; break;
+                case 2: gw++; break;
+                case 3: bw++; break;
+
+                case -1: sl++; break;
+                case -2: gl++; break;
+                case -3: bl++; break;
+            }
 
             if (opts.every && !(numGames % opts.every))
             {
                 std::ostringstream ss;
 
                 ss << std::fixed << "Game " << numGames << ": "
-                   << std::setprecision(2) << std::setw(5) << white_eq << ", ";
+                   << std::setprecision(2) << std::setw(2) << white_eq << ", ";
 
                 ss << "white equity/game: "
                    << std::setprecision(3) << whitePoints/numGames
@@ -127,6 +142,18 @@ private:
                 cout << ss.str();
             }
         }
+
+        cerr << opts.white_name;
+        cerr << ", " << opts.black_name;
+        cerr << ", " << trials;
+        cerr << ", " <<  std::setprecision(3) << whitePoints/numGames;
+        cerr << ", " << sw;
+        cerr << ", " << sl;
+        cerr << ", " << gw;
+        cerr << ", " << gl;
+        cerr << ", " << bw;
+        cerr << ", " << bl;
+        cerr << "\n";
     }
 };
 

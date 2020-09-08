@@ -63,7 +63,7 @@ public:
     }
 
     // Returns the equity of white at the end of the game.
-    double playGame()
+    int playGame()
     {
         whitePlayer.prepareToPlay();
         blackPlayer.prepareToPlay();
