@@ -25,6 +25,7 @@ def doit(player, opponent):
 start = 1
 stop = 5
 
+os.system(f'echo \# white black trials equity sw sl gw gl bw bl >>{output_file}')
 for i in range(start, stop+1):
     player = f'white-{i}.w'
     doit(player, opponent)
