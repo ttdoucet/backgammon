@@ -2,22 +2,17 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import os
-import click
 import sys
 
-from scipy.signal import savgol_filter
-
 def smooth(y):
-    yhat = savgol_filter(y, 7, 1)
-    return yhat
-
-
-import re
-def seqno(name):
-    v = re.findall(r'\d+', name)
-    return int(v[0])
+    from scipy.signal import savgol_filter
+    return savgol_filter(y, 7, 1)
 
 def sequence(names):
+    import re
+    def seqno(name):
+        v = re.findall(r'\d+', name)
+        return int(v[0])
     return [seqno(name) for name in names]
 
 fig, ax = plt.subplots()
