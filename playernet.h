@@ -5,9 +5,14 @@
 #include <memory>
 #include <cmath>
 
+#include "equity.h"
+
 #include "game.h"
 #include "net.h"
 #include "bearoff.h"
+
+static_assert(EquityEstimator<netv3>);
+static_assert(EquityEstimator<BgNet>);
 
 using std::string;
 

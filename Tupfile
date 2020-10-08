@@ -3,7 +3,7 @@
 #cppflags = -Ofast -ffast-math --std=c++17 -g
 
 cxx = g++
-cppflags = -Ofast -ffast-math --std=c++17 -march=sandybridge -mtune=sandybridge
+cppflags = -Ofast -ffast-math --std=c++17 -fconcepts -march=sandybridge -mtune=sandybridge
 
 !compile = |> $(cxx) $(cppflags) -c %f -o %o |> %B.o
 !link = |> $(cxx) $(cppflags) %f -o %o -static -g |>
