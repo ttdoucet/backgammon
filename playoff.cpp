@@ -54,6 +54,7 @@ public:
     }
 };
 
+template<EquityEstimator Estimator>
 class PlayoffSession
 {
 public:
@@ -64,8 +65,8 @@ public:
 
     int run()
     {
-        NeuralNetPlayer<BgNet> whitePlayer(opts.white_name);
-        NeuralNetPlayer<BgNet> blackPlayer(opts.black_name);
+        NeuralNetPlayer<Estimator> whitePlayer(opts.white_name);
+        NeuralNetPlayer<Estimator> blackPlayer(opts.black_name);
 
         playoffSession(opts.trials, whitePlayer, blackPlayer, opts.user_seed);
         return 0;
@@ -161,5 +162,5 @@ int main(int argc, char *argv[])
 {
     PlayoffOptions opts;
     opts.parse(argc, argv);
-    return PlayoffSession(opts).run();
+    return PlayoffSession<BgNet>(opts).run();
 }
