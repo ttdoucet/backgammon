@@ -15,7 +15,7 @@ using std::string;
 
 static_assert(EquityEstimator<BgNet>);
 
-template<EquityEstimator Equity>
+template<EquityEstimator Estimator>
 class NeuralNetPlayer : public Player, public callBack
 {
 public:
@@ -49,7 +49,7 @@ protected:
     typedef float (NeuralNetPlayer::* evalFunction)(const board& bd);
     evalFunction equityEstimator;
 
-    Equity neural;
+    Estimator neural;
 
     float bestEquity;
     moves bestMove;
@@ -104,7 +104,6 @@ protected:
  * needs to be parametrized for other EquityEstimators
  * that have the required additional facilities.
  */
-
 
 class TemporalDifference
 {
