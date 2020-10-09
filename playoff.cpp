@@ -64,8 +64,8 @@ public:
 
     int run()
     {
-        NeuralNetPlayer whitePlayer(opts.white_name);
-        NeuralNetPlayer blackPlayer(opts.black_name);        
+        NeuralNetPlayer<BgNet> whitePlayer(opts.white_name);
+        NeuralNetPlayer<BgNet> blackPlayer(opts.black_name);
 
         playoffSession(opts.trials, whitePlayer, blackPlayer, opts.user_seed);
         return 0;

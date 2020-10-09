@@ -116,7 +116,7 @@ public:
                  << name_for(opts.wlearn_fn, opts.wdual)
                  << " against fixed " << opts.bplay_fn
                  << "\n";
-            NeuralNetPlayer blackPlayer(opts.bplay_fn);
+            NeuralNetPlayer<BgNet> blackPlayer(opts.bplay_fn);
             train_against(whitePlayer, blackPlayer);
         }
         else
@@ -171,7 +171,7 @@ private:
     }
 
     void train(Learner& whitePlayer,
-               NeuralNetPlayer& blackPlayer,
+               NeuralNetPlayer<BgNet>& blackPlayer,
                bool self_play = true,
                bool black_learns = false)
     {
@@ -186,7 +186,7 @@ private:
             whitePoints += white_eq;
 
             if (self_play)
-                blackPlayer = static_cast<NeuralNetPlayer>(whitePlayer);
+                blackPlayer = static_cast<NeuralNetPlayer<BgNet> >(whitePlayer);
 
             if (opts.every && !(numGames % opts.every))
             {
@@ -205,11 +205,11 @@ private:
 
     void train_selfplay(Learner& whitePlayer)
     {
-        NeuralNetPlayer blackPlayer = static_cast<NeuralNetPlayer>(whitePlayer);
+        NeuralNetPlayer<BgNet> blackPlayer = static_cast<NeuralNetPlayer<BgNet> >(whitePlayer);
         train(whitePlayer, blackPlayer, true);
     }
 
-    void train_against(Learner& whitePlayer, NeuralNetPlayer& blackPlayer)
+    void train_against(Learner& whitePlayer, NeuralNetPlayer<BgNet>& blackPlayer)
     {
         train(whitePlayer, blackPlayer, false);
     }

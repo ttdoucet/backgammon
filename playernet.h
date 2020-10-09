@@ -11,11 +11,11 @@
 #include "net.h"
 #include "bearoff.h"
 
-static_assert(EquityEstimator<netv3>);
-static_assert(EquityEstimator<BgNet>);
-
 using std::string;
 
+static_assert(EquityEstimator<BgNet>);
+
+template<EquityEstimator Equity>
 class NeuralNetPlayer : public Player, public callBack
 {
 public:
@@ -49,7 +49,7 @@ protected:
     typedef float (NeuralNetPlayer::* evalFunction)(const board& bd);
     evalFunction equityEstimator;
 
-    BgNet neural;
+    Equity neural;
 
     float bestEquity;
     moves bestMove;
@@ -99,6 +99,11 @@ protected:
                 bd.highestChecker(black) <= 6;
     }
 };
+
+/* The learning subsystem still has BgNet wired in, and
+ * needs to be parametrized for other EquityEstimators
+ * that have the required additional facilities.
+ */
 
 
 class TemporalDifference
@@ -162,7 +167,7 @@ private:
     }
 };
 
-class Learner : public NeuralNetPlayer
+class Learner : public NeuralNetPlayer<BgNet>
 {
 public:
     Learner(string netname, float alpha, float lambda, bool dual=false)
