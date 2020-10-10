@@ -211,14 +211,15 @@ template<int R, int C>  matrix<R,C> operator-(const matrix<R,C> &lhs, const matr
 template<int R, int C>
 std::ostream& operator<<(std::ostream& s, const matrix<R,C>& m)
 {
-    std::ios_base::fmtflags f(s.flags());
-    s << std::dec << "{ " << m.Rows() << " " << m.Cols() << "\n";
-    s << std::hexfloat;
+    using namespace std;
+    ios_base::fmtflags f(s.flags());
+
+    s << dec << "{ " << m.Rows() << " " << m.Cols() << "\n" << hexfloat;
     for (int r = 0; r < m.Rows(); r++)
     {
-        s << "  ";
+        s << " ";
         for (int c = 0; c < m.Cols(); c++)
-            s << m(r, c) << " ";
+            s << " " << m(r, c);
         s << "\n";
     }
     s << "}\n";
@@ -227,14 +228,43 @@ std::ostream& operator<<(std::ostream& s, const matrix<R,C>& m)
     return s;
 }
 
-#include <iostream>
-
 template<int R, int C>
 std::istream& operator>>(std::istream& s, const matrix<R,C>& m)
 {
-    std::ios_base::fmtflags f(s.flags());
+    using namespace std;
+    ios_base::fmtflags f(s.flags());
 
-    std::cout << "nyi";
+    try
+    {
+        int rows, cols;
+        string curly;
+
+        s >> dec >> curly >> rows >> cols >> hexfloat;
+
+        if (!s || curly != "{"s )
+            throw("matrix: could not determine geometry");
+
+        if ( rows != m.Rows() || cols != m.Cols() )
+            throw("matrix: geometry mismatch");
+
+        for (int r = 0; r < rows; r++)
+            for (int c = 0; c < cols; c++)
+            {
+                float f = 0;
+//                if (read_hexfloat(s, f) == false)
+//                    throw("nyi");
+                m(r, c) = f;
+            }
+
+        s >> curly;
+        if (!s || curly != "}"s)
+            throw("matrix: expected }");
+    }
+    catch(char *str)
+    {
+        cerr << str << "\n";
+        s.setstate(ios::failbit);
+    }
 
     s.flags(f);
     return s;
