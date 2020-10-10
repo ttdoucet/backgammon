@@ -17,5 +17,7 @@ int main(int argc, char *argv[])
         cout << filename << "  magnitudes, ";
         cout << "V: " <<  neural.parms.V.magnitude() << ", ";
         cout << "M: " << neural.parms.M.magnitude() << "\n";
+
+        cout << "M: " << neural.parms.M;
     }
 }
