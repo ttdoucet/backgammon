@@ -228,8 +228,10 @@ std::ostream& operator<<(std::ostream& s, const matrix<R,C>& m)
     return s;
 }
 
+#include <cstdlib>
+
 template<int R, int C>
-std::istream& operator>>(std::istream& s, const matrix<R,C>& m)
+std::istream& operator>>(std::istream& s, matrix<R,C>& m)
 {
     using namespace std;
     ios_base::fmtflags f(s.flags());
@@ -237,7 +239,7 @@ std::istream& operator>>(std::istream& s, const matrix<R,C>& m)
     try
     {
         int rows, cols;
-        string curly;
+        string curly, fstr;
 
         s >> dec >> curly >> rows >> cols >> hexfloat;
 
@@ -250,17 +252,17 @@ std::istream& operator>>(std::istream& s, const matrix<R,C>& m)
         for (int r = 0; r < rows; r++)
             for (int c = 0; c < cols; c++)
             {
-                float f = 0;
-//                if (read_hexfloat(s, f) == false)
-//                    throw("nyi");
-                m(r, c) = f;
+                s >> fstr;
+                if (!s)
+                    throw("matrix: could not read float");
+                m(r, c) = atof(fstr.c_str());
             }
 
         s >> curly;
         if (!s || curly != "}"s)
             throw("matrix: expected }");
     }
-    catch(char *str)
+    catch(char const* str)
     {
         cerr << str << "\n";
         s.setstate(ios::failbit);
