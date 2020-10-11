@@ -255,7 +255,12 @@ std::istream& operator>>(std::istream& s, matrix<R,C>& m)
                 s >> fstr;
                 if (!s)
                     throw("matrix: could not read float");
-                m(r, c) = atof(fstr.c_str());
+                char *end;
+                float f = strtof(fstr.c_str(), &end);
+                if ( (end - fstr.c_str()) != fstr.length())
+                    throw("matrix: float conversion error");
+                m(r, c) = f;
+
             }
 
         s >> curly;
