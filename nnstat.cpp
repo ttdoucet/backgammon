@@ -18,6 +18,16 @@ int main(int argc, char *argv[])
         cout << "V: " <<  neural.parms.V.magnitude() << ", ";
         cout << "M: " << neural.parms.M.magnitude() << "\n";
 
-        cout << "M: " << neural.parms.M;
+/*
+        cout << neural.parms.M;
+
+        matrix<30, 156> foo;
+        std::cin >> foo;
+
+        if (foo == neural.parms.M)
+            std::cout << "They are equal\n";
+        else
+            std::cout << "They are not equal\n";
+*/
     }
 }
