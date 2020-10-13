@@ -103,11 +103,11 @@ protected:
 };
 
 
-template<TrainableEquityEstimator BgNet>
+template<TrainableEquityEstimator Estimator>
 class TemporalDifference
 {
 public:
-    TemporalDifference(BgNet& neural, float alpha, float lambda)
+    TemporalDifference(Estimator& neural, float alpha, float lambda)
         : neural{neural},
           alpha{alpha},
           lambda{lambda}
@@ -144,19 +144,19 @@ public:
     }
 
 private:
-    BgNet& neural;
+    Estimator& neural;
     float lambda; // Temporal discount.
     float alpha;  // Learning rate.
 
-    typename BgNet::Parameters grad_sum;
-    typename BgNet::Parameters grad_adj;
+    typename Estimator::Parameters grad_sum;
+    typename Estimator::Parameters grad_adj;
 
     float previous;
     bool started;
 
     void reconsider(float err)
     {
-        typename BgNet::Parameters grad;
+        typename Estimator::Parameters grad;
         neural.backprop(grad);
 
         grad_adj += grad_sum * err;
@@ -165,12 +165,12 @@ private:
     }
 };
 
-template<TrainableEquityEstimator BgNet>
-class Learner : public NeuralNetPlayer<BgNet>
+template<TrainableEquityEstimator Estimator>
+class Learner : public NeuralNetPlayer<Estimator>
 {
 public:
     Learner(string netname, float alpha, float lambda, bool dual=false)
-        : NeuralNetPlayer<BgNet>(netname),
+        : NeuralNetPlayer<Estimator>(netname),
           our_side(this->neural, alpha, lambda),
           opp_side(this->neural, alpha, lambda),
           dual{dual}
@@ -203,6 +203,6 @@ public:
 
 private:
     bool dual;
-    TemporalDifference<BgNet> our_side;
-    TemporalDifference<BgNet> opp_side;
+    TemporalDifference<Estimator> our_side;
+    TemporalDifference<Estimator> opp_side;
 };
