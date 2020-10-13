@@ -85,7 +85,7 @@ public:
 };
 
 
-template<typename BgNet>
+template<TrainableEquityEstimator Estimator>
 class TrainingSession
 {
 public:
@@ -102,7 +102,7 @@ public:
             return 0;
         }
 
-        Learner<BgNet> whitePlayer(opts.wlearn_fn, opts.alpha, opts.lambda, opts.wdual);
+        Learner<Estimator> whitePlayer(opts.wlearn_fn, opts.alpha, opts.lambda, opts.wdual);
 
         if (opts.bplay_fn.empty() && opts.blearn_fn.empty())
         {
@@ -117,7 +117,7 @@ public:
                  << name_for(opts.wlearn_fn, opts.wdual)
                  << " against fixed " << opts.bplay_fn
                  << "\n";
-            NeuralNetPlayer<BgNet> blackPlayer(opts.bplay_fn);
+            NeuralNetPlayer<Estimator> blackPlayer(opts.bplay_fn);
             train_against(whitePlayer, blackPlayer);
         }
         else
@@ -127,7 +127,7 @@ public:
                  << " against learning "
                  << name_for(opts.blearn_fn, opts.bdual)
                  << "\n";
-            Learner<BgNet> blackPlayer(opts.blearn_fn, opts.alpha, opts.lambda, opts.bdual);
+            Learner<Estimator> blackPlayer(opts.blearn_fn, opts.alpha, opts.lambda, opts.bdual);
             train_against(whitePlayer, blackPlayer);
             blackPlayer.save(opts.output_black);
             cout << "black saved: " << opts.output_black << "\n";
@@ -171,8 +171,8 @@ private:
         return ss.str();
     }
 
-    void train(Learner<BgNet>& whitePlayer,
-               NeuralNetPlayer<BgNet>& blackPlayer,
+    void train(Learner<Estimator>& whitePlayer,
+               NeuralNetPlayer<Estimator>& blackPlayer,
                bool self_play = true,
                bool black_learns = false)
     {
@@ -187,7 +187,7 @@ private:
             whitePoints += white_eq;
 
             if (self_play)
-                blackPlayer = static_cast<NeuralNetPlayer<BgNet> >(whitePlayer);
+                blackPlayer = static_cast<NeuralNetPlayer<Estimator> >(whitePlayer);
 
             if (opts.every && !(numGames % opts.every))
             {
@@ -204,13 +204,13 @@ private:
         report(numGames, whitePoints);
     }
 
-    void train_selfplay(Learner<BgNet>& whitePlayer)
+    void train_selfplay(Learner<Estimator>& whitePlayer)
     {
-        NeuralNetPlayer<BgNet> blackPlayer = static_cast<NeuralNetPlayer<BgNet> >(whitePlayer);
+        NeuralNetPlayer<Estimator> blackPlayer = static_cast<NeuralNetPlayer<Estimator> >(whitePlayer);
         train(whitePlayer, blackPlayer, true);
     }
 
-    void train_against(Learner<BgNet>& whitePlayer, NeuralNetPlayer<BgNet>& blackPlayer)
+    void train_against(Learner<Estimator>& whitePlayer, NeuralNetPlayer<Estimator>& blackPlayer)
     {
         train(whitePlayer, blackPlayer, false);
     }
@@ -220,5 +220,5 @@ int main(int argc, char *argv[])
 {
     TrainingOptions opts;
     opts.parse(argc, argv);
-    return TrainingSession<BgNet>(opts).run();
+    return TrainingSession<netv3>(opts).run();
 }

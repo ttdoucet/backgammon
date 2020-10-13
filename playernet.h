@@ -13,8 +13,8 @@
 
 using std::string;
 
-static_assert(EquityEstimator<BgNet>);
-static_assert(TrainableEquityEstimator<BgNet>);
+static_assert(EquityEstimator<netv3>);
+static_assert(TrainableEquityEstimator<netv3>);
 
 
 template<EquityEstimator Estimator>

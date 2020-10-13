@@ -183,7 +183,5 @@ public:
 
 using netv3 = BackgammonNet<features_v3<float*>, 30>;
 
-using BgNet = netv3;
-
-bool readFile(BgNet& n, std::string fn);
-bool writeFile(const BgNet& n, std::string fn);
+bool readFile(netv3& n, std::string fn);
+bool writeFile(const netv3& n, std::string fn);

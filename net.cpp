@@ -12,7 +12,7 @@ static void write_float(ostream& fs, float f)
     fs.write( reinterpret_cast<char *>(&f), sizeof(f) );
 }
 
-bool writeFile(const BgNet& n, string fn)
+bool writeFile(const netv3& n, string fn)
 {
     bool quit = false;
 
@@ -73,7 +73,7 @@ static bool has(istream& is, const char *str)
 }
 
 // Read in a neural net from a file.
-bool readFile(BgNet &n, string fn)
+bool readFile(netv3 &n, string fn)
 {
     int hidden = 40, portable = 1;
     int ntype = 0, input = 0;

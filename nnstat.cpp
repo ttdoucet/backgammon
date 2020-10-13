@@ -3,7 +3,7 @@
 
 using namespace std;
 
-BgNet neural;
+netv3 neural;
 
 int main(int argc, char *argv[])
 {

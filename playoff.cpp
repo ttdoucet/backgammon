@@ -162,5 +162,5 @@ int main(int argc, char *argv[])
 {
     PlayoffOptions opts;
     opts.parse(argc, argv);
-    return PlayoffSession<BgNet, BgNet>(opts).run();
+    return PlayoffSession<netv3, netv3>(opts).run();
 }
