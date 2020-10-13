@@ -105,6 +105,7 @@ protected:
  * that have the required additional facilities.
  */
 
+template<typename BgNet>
 class TemporalDifference
 {
 public:
@@ -149,15 +150,15 @@ private:
     float lambda; // Temporal discount.
     float alpha;  // Learning rate.
 
-    BgNet::Parameters grad_sum;
-    BgNet::Parameters grad_adj;
+    typename BgNet::Parameters grad_sum;
+    typename BgNet::Parameters grad_adj;
 
     float previous;
     bool started;
 
     void reconsider(float err)
     {
-        BgNet::Parameters grad;
+        typename BgNet::Parameters grad;
         neural.backprop(grad);
 
         grad_adj += grad_sum * err;
@@ -166,13 +167,14 @@ private:
     }
 };
 
+template<typename BgNet>
 class Learner : public NeuralNetPlayer<BgNet>
 {
 public:
     Learner(string netname, float alpha, float lambda, bool dual=false)
-        : NeuralNetPlayer(netname),
-          our_side(neural, alpha, lambda),
-          opp_side(neural, alpha, lambda),
+        : NeuralNetPlayer<BgNet>(netname),
+          our_side(this->neural, alpha, lambda),
+          opp_side(this->neural, alpha, lambda),
           dual{dual}
     {
     }
@@ -203,6 +205,6 @@ public:
 
 private:
     bool dual;
-    TemporalDifference our_side;
-    TemporalDifference opp_side;
+    TemporalDifference<BgNet> our_side;
+    TemporalDifference<BgNet> opp_side;
 };

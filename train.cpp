@@ -85,6 +85,7 @@ public:
 };
 
 
+template<typename BgNet>
 class TrainingSession
 {
 public:
@@ -101,7 +102,7 @@ public:
             return 0;
         }
 
-        Learner whitePlayer(opts.wlearn_fn, opts.alpha, opts.lambda, opts.wdual);
+        Learner<BgNet> whitePlayer(opts.wlearn_fn, opts.alpha, opts.lambda, opts.wdual);
 
         if (opts.bplay_fn.empty() && opts.blearn_fn.empty())
         {
@@ -126,7 +127,7 @@ public:
                  << " against learning "
                  << name_for(opts.blearn_fn, opts.bdual)
                  << "\n";
-            Learner blackPlayer(opts.blearn_fn, opts.alpha, opts.lambda, opts.bdual);
+            Learner<BgNet> blackPlayer(opts.blearn_fn, opts.alpha, opts.lambda, opts.bdual);
             train_against(whitePlayer, blackPlayer);
             blackPlayer.save(opts.output_black);
             cout << "black saved: " << opts.output_black << "\n";
@@ -170,7 +171,7 @@ private:
         return ss.str();
     }
 
-    void train(Learner& whitePlayer,
+    void train(Learner<BgNet>& whitePlayer,
                NeuralNetPlayer<BgNet>& blackPlayer,
                bool self_play = true,
                bool black_learns = false)
@@ -203,13 +204,13 @@ private:
         report(numGames, whitePoints);
     }
 
-    void train_selfplay(Learner& whitePlayer)
+    void train_selfplay(Learner<BgNet>& whitePlayer)
     {
         NeuralNetPlayer<BgNet> blackPlayer = static_cast<NeuralNetPlayer<BgNet> >(whitePlayer);
         train(whitePlayer, blackPlayer, true);
     }
 
-    void train_against(Learner& whitePlayer, NeuralNetPlayer<BgNet>& blackPlayer)
+    void train_against(Learner<BgNet>& whitePlayer, NeuralNetPlayer<BgNet>& blackPlayer)
     {
         train(whitePlayer, blackPlayer, false);
     }
@@ -219,5 +220,5 @@ int main(int argc, char *argv[])
 {
     TrainingOptions opts;
     opts.parse(argc, argv);
-    return TrainingSession(opts).run();
+    return TrainingSession<BgNet>(opts).run();
 }
