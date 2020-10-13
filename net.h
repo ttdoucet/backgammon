@@ -30,12 +30,12 @@ protected:
 
     float feedForward()
     {
-        hidden = parms.M * input;
+        hidden = params.M * input;
 
         for (int i = 0; i < N_HIDDEN; i++)
             hidden(i, 0) = squash(hidden(i, 0));
 
-        float x =  parms.V * hidden;
+        float x =  params.V * hidden;
         out = squash(x);
 
 #if 1
@@ -48,7 +48,7 @@ protected:
                 std::cout << " inf";
             std::cout << ", x = " << x << "\n";
 
-            std::cout << "V: " << parms.V << "\n";
+            std::cout << "V: " << params.V << "\n";
             std::cout << "hidden: " << hidden << "\n";
         }
 #endif
@@ -92,7 +92,7 @@ public:
             return r *= scale;
         }
     };
-    Parameters parms;
+    Parameters params;
 
     /* Computes dy/dx, where y is the scalar output
      * of the net during the last forward calculation,
@@ -104,7 +104,7 @@ public:
 
         grad.V = f * hidden.Transpose();
 
-        matrix<N_HIDDEN, 1> lhs = f * parms.V.Transpose();
+        matrix<N_HIDDEN, 1> lhs = f * params.V.Transpose();
 
         for (int i = 0; i < lhs.Rows(); i++)
             lhs(i, 0) *= ( hidden(i, 0) * (1 - hidden(i, 0)) );
@@ -127,11 +127,11 @@ public:
         assert( adj.V.isfinite() );
 #endif
 
-        parms += adj;
+        params += adj;
 
 #if 0
-        assert( parms.M.isfinite() );
-        assert( parms.V.isfinite() );
+        assert( params.M.isfinite() );
+        assert( params.V.isfinite() );
 #endif
     }
 
@@ -140,11 +140,11 @@ public:
         RNG_normal rand1(0, 1.0 / N_INPUTS);
         for (int r = 0; r < N_HIDDEN; r++)
             for (int c = 0; c < N_INPUTS; c++)
-                parms.M(r, c) = rand1.random();
+                params.M(r, c) = rand1.random();
 
         RNG_normal rand2(0, 1.0 / N_HIDDEN);
         for (int c = 0; c < N_HIDDEN; c++)
-            parms.V(0, c) = rand2.random();
+            params.V(0, c) = rand2.random();
     }
 
 protected:

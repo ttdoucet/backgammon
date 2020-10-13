@@ -21,8 +21,8 @@ concept bool TrainableEquityEstimator =
         requires EquityEstimator<T>;
 
         typename T::Parameters;
-        {v.parms *= 2.2} -> typename T::Parameters;
-        {v.parms *  2.2} -> typename T::Parameters;
-        {v.parms += v.parms} -> typename T::Parameters;
+        {v.params *= 2.2} -> typename T::Parameters;
+        {v.params *  2.2} -> typename T::Parameters;
+        {v.params += v.params} -> typename T::Parameters;
     };
 

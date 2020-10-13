@@ -15,16 +15,16 @@ int main(int argc, char *argv[])
             std::cout << "Could not read net " << filename << "\n";
 
         cout << filename << "  magnitudes, ";
-        cout << "V: " <<  neural.parms.V.magnitude() << ", ";
-        cout << "M: " << neural.parms.M.magnitude() << "\n";
+        cout << "V: " <<  neural.params.V.magnitude() << ", ";
+        cout << "M: " << neural.params.M.magnitude() << "\n";
 
 /*
-        cout << neural.parms.M;
+        cout << neural.params.M;
 
         matrix<30, 156> foo;
         std::cin >> foo;
 
-        if (foo == neural.parms.M)
+        if (foo == neural.params.M)
             std::cout << "They are equal\n";
         else
             std::cout << "They are not equal\n";

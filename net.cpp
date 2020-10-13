@@ -16,13 +16,13 @@ bool writeFile(const BgNet& n, string fn)
 {
     bool quit = false;
 
-    if (n.parms.M.isfinite() == false)
+    if (n.params.M.isfinite() == false)
     {
         std::cout << "ERROR: M is not finite\n";
         quit = true;
     }
 
-    if (n.parms.V.isfinite() == false)
+    if (n.params.V.isfinite() == false)
     {
         std::cout << "ERROR: V is not finite\n";
         quit = true;
@@ -42,10 +42,10 @@ bool writeFile(const BgNet& n, string fn)
 
     for (int i = 0; i < n.n_hidden; i++)
         for (int j = 0; j < n.n_inputs; j++)
-            write_float(ofs, n.parms.M(i, j));
+            write_float(ofs, n.params.M(i, j));
 
     for (int i = 0; i < n.n_hidden; i++)
-        write_float(ofs, n.parms.V(0, i));
+        write_float(ofs, n.params.V(0, i));
 
     ofs << "Current seed: " << n.seed << "L\n";            // legacy
     ofs << "Games trained: " << n.games_trained << "L\n";  // legacy
@@ -97,17 +97,17 @@ bool readFile(BgNet &n, string fn)
 
     for (int i = 0; i < n.n_hidden; i++)
         for (int j = 0; j < n.n_inputs; j++)
-            n.parms.M(i, j) = read_float(ifs);
+            n.params.M(i, j) = read_float(ifs);
 
     for (int i = 0; i < n.n_hidden; i++)
-        n.parms.V(0, i) = read_float(ifs);
+        n.params.V(0, i) = read_float(ifs);
 
     if (ifs.fail())
         return false;
 
-    if (n.parms.M.isfinite() == false)
+    if (n.params.M.isfinite() == false)
         throw runtime_error("M is not finite.");
-    if (n.parms.V.isfinite() == false)
+    if (n.params.V.isfinite() == false)
         throw runtime_error("V is not finite.");
 
     has(ifs, "Current seed:");
