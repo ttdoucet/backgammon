@@ -14,6 +14,8 @@
 using std::string;
 
 static_assert(EquityEstimator<BgNet>);
+static_assert(TrainableEquityEstimator<BgNet>);
+
 
 template<EquityEstimator Estimator>
 class NeuralNetPlayer : public Player, public callBack
@@ -100,12 +102,8 @@ protected:
     }
 };
 
-/* The learning subsystem still has BgNet wired in, and
- * needs to be parametrized for other EquityEstimators
- * that have the required additional facilities.
- */
 
-template<typename BgNet>
+template<TrainableEquityEstimator BgNet>
 class TemporalDifference
 {
 public:
@@ -167,7 +165,7 @@ private:
     }
 };
 
-template<typename BgNet>
+template<TrainableEquityEstimator BgNet>
 class Learner : public NeuralNetPlayer<BgNet>
 {
 public:

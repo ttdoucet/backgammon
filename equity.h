@@ -13,3 +13,16 @@ concept bool EquityEstimator =
         { readFile(v, filename) } -> bool;
         { writeFile(v, filename) } -> bool;
     };
+
+template<typename T>
+concept bool TrainableEquityEstimator =
+    requires(T v, board b, std::string filename)
+    {
+        requires EquityEstimator<T>;
+
+        typename T::Parameters;
+        {v.parms *= 2.2} -> typename T::Parameters;
+        {v.parms *  2.2} -> typename T::Parameters;
+        {v.parms += v.parms} -> typename T::Parameters;
+    };
+
