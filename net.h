@@ -7,6 +7,13 @@
 #include "matrix.h"
 #include "random.h"
 
+class BgNet
+{
+public:
+    virtual float equity(const board& b) = 0;
+    virtual ~BgNet() = default;
+};
+
 template<int N_INPUTS, int N_HIDDEN>
 class net
 {
@@ -114,25 +121,7 @@ public:
 
     void update_model(const Parameters& adj)
     {
-#if 0
-        auto M_mag = adj.M.magnitude();
-
-        if (std::isfinite(M_mag) == false)
-        {
-            std::cout << "adj.M: " << adj.M << "\n";
-            std::cout << "adj.V: " << adj.V << "\n";
-        }
-
-        assert( adj.M.isfinite() );
-        assert( adj.V.isfinite() );
-#endif
-
         params += adj;
-
-#if 0
-        assert( params.M.isfinite() );
-        assert( params.V.isfinite() );
-#endif
     }
 
     net()
@@ -161,12 +150,13 @@ protected:
 #include "features.h"
 
 template<class feature_calc, int N_HIDDEN>
-class BackgammonNet : public net<feature_calc::count, N_HIDDEN>
+class BackgammonNet :  // public BgNet,
+                       public net<feature_calc::count, N_HIDDEN>
 {
 public:
     /* Neural net estimate of the equity for the side on roll.
      */
-    float equity(const board &b) noexcept
+    float equity(const board &b)
     {
         feature_calc{b}.calc(this->input.Data());
         return this->feedForward();
@@ -176,9 +166,6 @@ public:
     {
         assert( feature_calc::count == this->input.Rows() * this->input.Cols() );
     }
-
-    uint64_t seed = 0;  // legacy
-    int64_t games_trained = 0;  // legacy
 };
 
 using netv3 = BackgammonNet<features_v3<float*>, 30>;

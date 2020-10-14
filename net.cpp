@@ -47,8 +47,10 @@ bool writeFile(const netv3& n, string fn)
     for (int i = 0; i < n.n_hidden; i++)
         write_float(ofs, n.params.V(0, i));
 
-    ofs << "Current seed: " << n.seed << "L\n";            // legacy
-    ofs << "Games trained: " << n.games_trained << "L\n";  // legacy
+    uint64_t seed;
+    ofs << "Current seed: " <<seed << "L\n";            // legacy
+    uint64_t games_trained;
+    ofs << "Games trained: " << games_trained << "L\n";  // legacy
 
     ofs.close();
     return ofs.fail() == false;
@@ -113,8 +115,10 @@ bool readFile(netv3 &n, string fn)
     has(ifs, "Current seed:");
 
     char L;
-    ifs >> n.seed >> L >> ws;
-    has(ifs, "Games trained:"); ifs >> n.games_trained;
+    uint64_t seed = 0; // legacy
+    ifs >> seed >> L >> ws;
+    uint64_t games_trained = 0; // legacy
+    has(ifs, "Games trained:"); ifs >> games_trained;
 
     ifs.close();
     return ifs.fail() == false;

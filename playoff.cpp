@@ -54,6 +54,11 @@ public:
     }
 };
 
+// Kind of bizarre here presently.  For each player, we
+// pass in the type of the player via a template parameter,
+// and the file to initialize it as one of the options passed
+// in.
+
 template<EquityEstimator W_equity, EquityEstimator B_equity>
 class PlayoffSession
 {
