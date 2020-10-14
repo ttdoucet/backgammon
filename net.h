@@ -7,12 +7,14 @@
 #include "matrix.h"
 #include "random.h"
 
+/*
 class BgNet
 {
 public:
     virtual float equity(const board& b) = 0;
     virtual ~BgNet() = default;
 };
+*/
 
 template<int N_INPUTS, int N_HIDDEN>
 class net
