@@ -159,7 +159,7 @@ protected:
 #include "features.h"
 
 template<class feature_calc, int N_HIDDEN>
-class BackgammonNet :  // public BgNet,
+class BackgammonNet :  public BgNet,
                        public net<feature_calc::count, N_HIDDEN>
 {
 public:
