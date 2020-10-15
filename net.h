@@ -160,7 +160,7 @@ public:
      */
     float equity(const board &b)
     {
-        feature_calc{b}.calc(this->input.Data());
+        feature_calc::calc(b, this->input.Data());
         return this->feedForward();
     }
 
