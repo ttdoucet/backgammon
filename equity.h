@@ -10,8 +10,8 @@ concept bool EquityEstimator =
         { v.equity(b) } -> float;
 
         // I think these will become automatically generated.
-        { readFile(v, filename) } -> bool;
-        { writeFile(v, filename) } -> bool;
+//        { readFile(v, filename) } -> bool;
+//        { writeFile(v, filename) } -> bool;
     };
 
 template<typename T>

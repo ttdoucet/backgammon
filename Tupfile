@@ -25,7 +25,7 @@ common-src = hits.cpp net.cpp move.cpp ttydisp.cpp bdata.cpp bearoff.cpp human.c
 # Utility
 #
 : nnstat.cpp  |> !compile |> %B.o
-: nnstat.o net.o |> !link |> nnstat
+: nnstat.o net.o hits.o|> !link |> nnstat
 
 : matrix-test.cpp  |> !compile |> %B.o
 : matrix-test.o net.o hits.o |> !link |> matrix-test

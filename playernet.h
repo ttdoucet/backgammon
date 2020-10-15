@@ -25,7 +25,7 @@ public:
     {
         bool okay = true;
         if (netname != "random")
-            okay = readFile(neural, netname);
+            okay = neural.readFile(netname);
 
         if (okay == false)
             throw std::runtime_error(string("Error reading network: ") + netname + "\n");
@@ -42,7 +42,7 @@ public:
 
     void save(string filename)
     {
-        bool okay = writeFile(neural, filename);
+        bool okay = neural.writeFile(filename);
         if (okay == false)
             throw std::runtime_error(string("Error writing network: ") + filename + "\n");
     }

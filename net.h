@@ -7,14 +7,15 @@
 #include "matrix.h"
 #include "random.h"
 
-/*
 class BgNet
 {
 public:
-    virtual float equity(const board& b) = 0;
+    float equity(const board& b);
+    bool readFile(std::string filename);
+    bool writeFile(std::string filename);
     virtual ~BgNet() = default;
 };
-*/
+
 
 template<int N_INPUTS, int N_HIDDEN>
 class net
@@ -64,6 +65,11 @@ protected:
 
         return net_to_equity(out);
     }
+
+    /* I think we should gather things into Activations like
+     * we did for Parameters, and this would include the input
+     * and the output.
+     */
 
     input_vector input;
 
@@ -121,6 +127,7 @@ public:
         grad.M = lhs * input.Transpose();
     }
 
+// I think this can move to TemporalDifferenceNet.
     void update_model(const Parameters& adj)
     {
         params += adj;
@@ -170,7 +177,79 @@ public:
     }
 };
 
-using netv3 = BackgammonNet<features_v3<float*>, 30>;
+class netv3 : public BackgammonNet<features_v3<float*>, 30>
+{
+public:
+    bool readFile(std::string filename);
+    bool writeFile(std::string filename) const;
+    ~netv3() { }
+};
 
-bool readFile(netv3& n, std::string fn);
-bool writeFile(const netv3& n, std::string fn);
+
+/*************************************/
+
+
+template<class N>
+class TemporalDifferenceNet
+{
+public:
+    using Parameters = typename N::Parameters;
+
+    TemporalDifferenceNet(float alpha, float lambda)
+        : alpha{alpha},
+          lambda{lambda}
+    {
+    }
+
+    void start()
+    {
+        grad_adj.clear();
+        grad_sum.clear();
+        started = false;
+    }
+
+    void observe(const board& b)
+    {
+        float eqty = N::equity(b);
+
+        if (started)
+        {
+            float err = previous - eqty;
+            reconsider(err);
+        }
+        previous = eqty;
+        started = true;
+    }
+
+    void final(float e)
+    {
+        if (started)
+        {
+            reconsider(previous - e);
+            update_model( grad_adj * (-alpha) );
+        }
+    }
+
+private:
+    float lambda; // Temporal discount.
+    float alpha;  // Learning rate.
+
+    Parameters grad_sum;
+    Parameters grad_adj;
+
+    float previous;
+    bool started;
+
+    void reconsider(float err)
+    {
+        Parameters grad;
+        backprop(grad);
+
+        grad_adj += grad_sum * err;
+        grad_sum *= lambda;
+        grad_sum += grad;
+    }
+};
+
+
+typedef TemporalDifferenceNet<netv3> netv3_trainable;

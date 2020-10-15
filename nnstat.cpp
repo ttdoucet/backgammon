@@ -10,7 +10,7 @@ int main(int argc, char *argv[])
     for (int i = 1; i < argc; i++)
     {
         auto filename = argv[i];
-        bool st = readFile(neural, filename);
+        bool st = neural.readFile(filename);
         if (st == false)
             std::cout << "Could not read net " << filename << "\n";
 

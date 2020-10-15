@@ -12,17 +12,17 @@ static void write_float(ostream& fs, float f)
     fs.write( reinterpret_cast<char *>(&f), sizeof(f) );
 }
 
-bool writeFile(const netv3& n, string fn)
+bool netv3::writeFile(string fn) const
 {
     bool quit = false;
 
-    if (n.params.M.isfinite() == false)
+    if ((*this).params.M.isfinite() == false)
     {
         std::cout << "ERROR: M is not finite\n";
         quit = true;
     }
 
-    if (n.params.V.isfinite() == false)
+    if ((*this).params.V.isfinite() == false)
     {
         std::cout << "ERROR: V is not finite\n";
         quit = true;
@@ -37,15 +37,15 @@ bool writeFile(const netv3& n, string fn)
 
     ofs << "portable format: " << 0 << "\n"; // legacy
     ofs << "net type: " << 3 << "\n";        // legacy
-    ofs << "hidden nodes: " << n.n_hidden << "\n";
-    ofs << "input nodes: " << n.n_inputs << "\n";
+    ofs << "hidden nodes: " << (*this).n_hidden << "\n";
+    ofs << "input nodes: " << (*this).n_inputs << "\n";
 
-    for (int i = 0; i < n.n_hidden; i++)
-        for (int j = 0; j < n.n_inputs; j++)
-            write_float(ofs, n.params.M(i, j));
+    for (int i = 0; i < (*this).n_hidden; i++)
+        for (int j = 0; j < (*this).n_inputs; j++)
+            write_float(ofs, (*this).params.M(i, j));
 
-    for (int i = 0; i < n.n_hidden; i++)
-        write_float(ofs, n.params.V(0, i));
+    for (int i = 0; i < (*this).n_hidden; i++)
+        write_float(ofs, (*this).params.V(0, i));
 
     uint64_t seed;
     ofs << "Current seed: " <<seed << "L\n";            // legacy
@@ -75,7 +75,7 @@ static bool has(istream& is, const char *str)
 }
 
 // Read in a neural net from a file.
-bool readFile(netv3 &n, string fn)
+bool netv3::readFile(string fn)
 {
     int hidden = 40, portable = 1;
     int ntype = 0, input = 0;
@@ -97,19 +97,19 @@ bool readFile(netv3 &n, string fn)
     if (ch != '\n')
         return false;
 
-    for (int i = 0; i < n.n_hidden; i++)
-        for (int j = 0; j < n.n_inputs; j++)
-            n.params.M(i, j) = read_float(ifs);
+    for (int i = 0; i < (*this).n_hidden; i++)
+        for (int j = 0; j < (*this).n_inputs; j++)
+            (*this).params.M(i, j) = read_float(ifs);
 
-    for (int i = 0; i < n.n_hidden; i++)
-        n.params.V(0, i) = read_float(ifs);
+    for (int i = 0; i < (*this).n_hidden; i++)
+        (*this).params.V(0, i) = read_float(ifs);
 
     if (ifs.fail())
         return false;
 
-    if (n.params.M.isfinite() == false)
+    if ((*this).params.M.isfinite() == false)
         throw runtime_error("M is not finite.");
-    if (n.params.V.isfinite() == false)
+    if ((*this).params.V.isfinite() == false)
         throw runtime_error("V is not finite.");
 
     has(ifs, "Current seed:");
@@ -123,3 +123,7 @@ bool readFile(netv3 &n, string fn)
     ifs.close();
     return ifs.fail() == false;
 }
+
+/******************************/
+
+netv3_trainable trainable{1e-5, 0.85};
