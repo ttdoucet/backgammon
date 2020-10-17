@@ -3,6 +3,10 @@
 #include <cassert>
 #include <initializer_list>
 
+
+#include <iostream>
+
+
 /* Written by Todd Doucet.
  *
  * Intended for relatively small matrices whose sizes are known
@@ -134,7 +138,7 @@ class matrix
     {
         for (int r = 0; r < Rows(); r++)
             for (int c = 0; c < Cols(); c++)
-                if (std::isfinite((*this)(c,r)) == false)
+                if (std::isfinite((*this)(r,c)) == false)
                     return false;
         return true;
     }
