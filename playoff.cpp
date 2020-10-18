@@ -54,12 +54,6 @@ public:
     }
 };
 
-// Kind of bizarre here presently.  For each player, we
-// pass in the type of the player via a template parameter,
-// and the file to initialize it as one of the options passed
-// in.
-
-template<EquityEstimator W_equity, EquityEstimator B_equity>
 class PlayoffSession
 {
 public:
@@ -70,8 +64,11 @@ public:
 
     int run()
     {
-        NeuralNetPlayer<W_equity> whitePlayer(opts.white_name);
-        NeuralNetPlayer<B_equity> blackPlayer(opts.black_name);
+        netv3 whitenet;
+        netv3 blacknet;
+
+        NeuralNetPlayer whitePlayer(whitenet, opts.white_name);
+        NeuralNetPlayer blackPlayer(blacknet, opts.black_name);
 
         playoffSession(opts.trials, whitePlayer, blackPlayer, opts.user_seed);
         return 0;
@@ -109,14 +106,13 @@ private:
     {
         AnnotatedGame game(whitePlayer, blackPlayer, seed, opts);
 
-        int numGames;
         double whitePoints = 0.0;
 
         int sw = 0, sl = 0;  // Single wins & losses
         int gw = 0, gl = 0;  // Gammons
         int bw = 0, bl = 0;  // Backgammons
 
-        for (numGames = 1; numGames <= trials ; numGames++)
+        for (int numGame = 1; numGame <= trials ; numGame++)
         {
             auto white_eq = game.playGame();
             whitePoints += white_eq;
@@ -132,15 +128,15 @@ private:
                 case -3: bl++; break;
             }
 
-            if (opts.every && !(numGames % opts.every))
+            if (opts.every && !(numGame % opts.every))
             {
                 std::ostringstream ss;
 
-                ss << std::fixed << "Game " << numGames << ": "
+                ss << std::fixed << "Game " << numGame << ": "
                    << std::setprecision(2) << std::setw(2) << white_eq << ", ";
 
                 ss << "white equity/game: "
-                   << std::setprecision(3) << whitePoints/numGames
+                   << std::setprecision(3) << whitePoints/numGame
                    << ", total: "
                    << std::fixed << std::setprecision(1) << whitePoints
                    << "\n";
@@ -152,7 +148,7 @@ private:
         cerr << opts.white_name;
         cerr << ", " << opts.black_name;
         cerr << ", " << trials;
-        cerr << ", " <<  std::setprecision(3) << whitePoints/numGames;
+        cerr << ", " <<  std::setprecision(3) << whitePoints/trials;
         cerr << ", " << sw;
         cerr << ", " << sl;
         cerr << ", " << gw;
@@ -167,5 +163,5 @@ int main(int argc, char *argv[])
 {
     PlayoffOptions opts;
     opts.parse(argc, argv);
-    return PlayoffSession<netv3, netv3>(opts).run();
+    return PlayoffSession(opts).run();
 }

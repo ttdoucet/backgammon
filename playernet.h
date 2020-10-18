@@ -5,23 +5,18 @@
 #include <memory>
 #include <cmath>
 
-#include "equity.h"
-
 #include "game.h"
 #include "net.h"
 #include "bearoff.h"
 
+// This seems improper for a header file
 using std::string;
 
-static_assert(EquityEstimator<netv3>);
-static_assert(TrainableEquityEstimator<netv3>);
-
-
-template<EquityEstimator Estimator>
 class NeuralNetPlayer : public Player, public callBack
 {
 public:
-    NeuralNetPlayer(string netname)
+    NeuralNetPlayer(BgNet& nn, string netname)
+        : neural(nn)
     {
         bool okay = true;
         if (netname != "random")
@@ -51,8 +46,7 @@ protected:
     typedef float (NeuralNetPlayer::* evalFunction)(const board& bd);
     evalFunction equityEstimator;
 
-    Estimator neural;
-
+    BgNet& neural;
     float bestEquity;
     moves bestMove;
 
@@ -102,8 +96,7 @@ protected:
     }
 };
 
-
-template<TrainableEquityEstimator Estimator>
+template<class Estimator>
 class TemporalDifference
 {
 public:
@@ -165,15 +158,29 @@ private:
     }
 };
 
-template<TrainableEquityEstimator Estimator>
-class Learner : public NeuralNetPlayer<Estimator>
+// todo: I think template is okay here, but we need to
+//       properly construct the base class with the
+//       template parameter.  But I am confused, because
+//       the parameter is a type but we need to initialize
+//       the base class with an instance.
+//
+//       Okay, I think we need to construct it with an instance
+//       of a BgNet, and one with the additional features of
+//       a TrainableEquityEstimator.
+
+template<typename Estimator>
+class Learner : public NeuralNetPlayer
 {
+
+    Estimator mine;
+
 public:
-    Learner(string netname, float alpha, float lambda, bool dual=false)
-        : NeuralNetPlayer<Estimator>(netname),
-          our_side(this->neural, alpha, lambda),
-          opp_side(this->neural, alpha, lambda),
-          dual{dual}
+      Learner(Estimator& estimator, string netname, float alpha, float lambda, bool dual=false)
+          : NeuralNetPlayer(estimator, netname),
+            mine{estimator},
+            our_side(mine, alpha, lambda),
+            opp_side(mine, alpha, lambda),
+            dual{dual}
     {
     }
 

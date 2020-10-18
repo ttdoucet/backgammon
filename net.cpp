@@ -123,7 +123,3 @@ bool netv3::readFile(string fn)
     ifs.close();
     return ifs.fail() == false;
 }
-
-/******************************/
-
-netv3_trainable trainable{1e-5, 0.85};

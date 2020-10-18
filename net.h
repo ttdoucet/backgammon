@@ -10,9 +10,9 @@
 class BgNet
 {
 public:
-    float equity(const board& b);
-    bool readFile(std::string filename);
-    bool writeFile(std::string filename);
+    virtual float equity(const board& b) = 0;
+    virtual bool readFile(std::string filename) = 0;
+    virtual bool writeFile(std::string filename) const = 0;
     virtual ~BgNet() = default;
 };
 
@@ -127,7 +127,6 @@ public:
         grad.M = lhs * input.Transpose();
     }
 
-// I think this can move to TemporalDifferenceNet.
     void update_model(const Parameters& adj)
     {
         params += adj;
@@ -184,72 +183,3 @@ public:
     bool writeFile(std::string filename) const;
     ~netv3() { }
 };
-
-
-/*************************************/
-
-
-template<class N>
-class TemporalDifferenceNet
-{
-public:
-    using Parameters = typename N::Parameters;
-
-    TemporalDifferenceNet(float alpha, float lambda)
-        : alpha{alpha},
-          lambda{lambda}
-    {
-    }
-
-    void start()
-    {
-        grad_adj.clear();
-        grad_sum.clear();
-        started = false;
-    }
-
-    void observe(const board& b)
-    {
-        float eqty = N::equity(b);
-
-        if (started)
-        {
-            float err = previous - eqty;
-            reconsider(err);
-        }
-        previous = eqty;
-        started = true;
-    }
-
-    void final(float e)
-    {
-        if (started)
-        {
-            reconsider(previous - e);
-            update_model( grad_adj * (-alpha) );
-        }
-    }
-
-private:
-    float lambda; // Temporal discount.
-    float alpha;  // Learning rate.
-
-    Parameters grad_sum;
-    Parameters grad_adj;
-
-    float previous;
-    bool started;
-
-    void reconsider(float err)
-    {
-        Parameters grad;
-        backprop(grad);
-
-        grad_adj += grad_sum * err;
-        grad_sum *= lambda;
-        grad_sum += grad;
-    }
-};
-
-
-typedef TemporalDifferenceNet<netv3> netv3_trainable;

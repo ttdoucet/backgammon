@@ -85,7 +85,7 @@ public:
 };
 
 
-template<TrainableEquityEstimator Estimator>
+template<typename Estimator>
 class TrainingSession
 {
 public:
@@ -102,7 +102,10 @@ public:
             return 0;
         }
 
-        Learner<Estimator> whitePlayer(opts.wlearn_fn, opts.alpha, opts.lambda, opts.wdual);
+        netv3 whitenet;
+        netv3 blacknet;
+
+        Learner<Estimator> whitePlayer(whitenet, opts.wlearn_fn, opts.alpha, opts.lambda, opts.wdual);
 
         if (opts.bplay_fn.empty() && opts.blearn_fn.empty())
         {
@@ -117,7 +120,7 @@ public:
                  << name_for(opts.wlearn_fn, opts.wdual)
                  << " against fixed " << opts.bplay_fn
                  << "\n";
-            NeuralNetPlayer<Estimator> blackPlayer(opts.bplay_fn);
+            NeuralNetPlayer blackPlayer(blacknet, opts.bplay_fn);
             train_against(whitePlayer, blackPlayer);
         }
         else
@@ -127,7 +130,7 @@ public:
                  << " against learning "
                  << name_for(opts.blearn_fn, opts.bdual)
                  << "\n";
-            Learner<Estimator> blackPlayer(opts.blearn_fn, opts.alpha, opts.lambda, opts.bdual);
+            Learner<Estimator> blackPlayer(blacknet, opts.blearn_fn, opts.alpha, opts.lambda, opts.bdual);
             train_against(whitePlayer, blackPlayer);
             blackPlayer.save(opts.output_black);
             cout << "black saved: " << opts.output_black << "\n";
@@ -171,8 +174,8 @@ private:
         return ss.str();
     }
 
-    void train(Learner<Estimator>& whitePlayer,
-               NeuralNetPlayer<Estimator>& blackPlayer,
+    void train(NeuralNetPlayer& whitePlayer,
+               NeuralNetPlayer& blackPlayer,
                bool self_play = true,
                bool black_learns = false)
     {
@@ -186,8 +189,12 @@ private:
             double white_eq = game.playGame();
             whitePoints += white_eq;
 
+
+            // this is probably trouble, broken without though
+#if 0
             if (self_play)
-                blackPlayer = static_cast<NeuralNetPlayer<Estimator> >(whitePlayer);
+                blackPlayer = static_cast<NeuralNetPlayer>(whitePlayer);
+#endif
 
             if (opts.every && !(numGames % opts.every))
             {
@@ -206,11 +213,17 @@ private:
 
     void train_selfplay(Learner<Estimator>& whitePlayer)
     {
-        NeuralNetPlayer<Estimator> blackPlayer = static_cast<NeuralNetPlayer<Estimator> >(whitePlayer);
+        // this is probably trouble
+#if 1
+        NeuralNetPlayer blackPlayer = static_cast<NeuralNetPlayer>(whitePlayer);
+#else
+        netv3 fff;
+        NeuralNetPlayer blackPlayer(fff, "pretend");
+#endif
         train(whitePlayer, blackPlayer, true);
     }
 
-    void train_against(Learner<Estimator>& whitePlayer, NeuralNetPlayer<Estimator>& blackPlayer)
+    void train_against(NeuralNetPlayer& whitePlayer, NeuralNetPlayer& blackPlayer)
     {
         train(whitePlayer, blackPlayer, false);
     }
@@ -221,4 +234,5 @@ int main(int argc, char *argv[])
     TrainingOptions opts;
     opts.parse(argc, argv);
     return TrainingSession<netv3>(opts).run();
+//    return TrainingSession<BgNet>(opts).run();
 }
