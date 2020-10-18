@@ -172,7 +172,7 @@ template<typename Estimator>
 class Learner : public NeuralNetPlayer
 {
 
-    Estimator mine;
+    Estimator& mine;
 
 public:
       Learner(Estimator& estimator, string netname, float alpha, float lambda, bool dual=false)

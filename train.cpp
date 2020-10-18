@@ -102,8 +102,12 @@ public:
             return 0;
         }
 
+        selfplay(opts);
+
+#if 0
         netv3 whitenet;
         netv3 blacknet;
+
 
         Learner<Estimator> whitePlayer(whitenet, opts.wlearn_fn, opts.alpha, opts.lambda, opts.wdual);
 
@@ -139,7 +143,7 @@ public:
         string outfile = opts.output_white.empty() ? opts.wlearn_fn : opts.output_white;
         whitePlayer.save(outfile);
         cout << "white saved: " << outfile << "\n";
-
+#endif
         return 0;
     }
 
@@ -175,9 +179,7 @@ private:
     }
 
     void train(NeuralNetPlayer& whitePlayer,
-               NeuralNetPlayer& blackPlayer,
-               bool self_play = true,
-               bool black_learns = false)
+               NeuralNetPlayer& blackPlayer)
     {
         Game game(whitePlayer, blackPlayer);
 
@@ -188,13 +190,6 @@ private:
         {
             double white_eq = game.playGame();
             whitePoints += white_eq;
-
-
-            // this is probably trouble, broken without though
-#if 0
-            if (self_play)
-                blackPlayer = static_cast<NeuralNetPlayer>(whitePlayer);
-#endif
 
             if (opts.every && !(numGames % opts.every))
             {
@@ -211,6 +206,22 @@ private:
         report(numGames, whitePoints);
     }
 
+    void selfplay(const TrainingOptions& opts)
+    {
+        netv3 whitenet;
+
+        Learner<netv3> whitePlayer(whitenet, opts.wlearn_fn, opts.alpha, opts.lambda, opts.wdual);
+        NeuralNetPlayer blackPlayer(whitenet, opts.wlearn_fn);  // duplicate read?
+
+        train(whitePlayer, blackPlayer);
+
+        string outfile = opts.output_white.empty() ? opts.wlearn_fn : opts.output_white;
+        whitePlayer.save(outfile);
+        cout << "white saved: " << outfile << "\n";
+    }
+
+
+#if 0
     void train_selfplay(Learner<Estimator>& whitePlayer)
     {
         // this is probably trouble
@@ -227,6 +238,8 @@ private:
     {
         train(whitePlayer, blackPlayer, false);
     }
+#endif
+
 };
 
 int main(int argc, char *argv[])
