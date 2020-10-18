@@ -158,21 +158,13 @@ private:
     }
 };
 
-// todo: I think template is okay here, but we need to
-//       properly construct the base class with the
-//       template parameter.  But I am confused, because
-//       the parameter is a type but we need to initialize
-//       the base class with an instance.
-//
-//       Okay, I think we need to construct it with an instance
-//       of a BgNet, and one with the additional features of
-//       a TrainableEquityEstimator.
-
 template<typename Estimator>
 class Learner : public NeuralNetPlayer
 {
-
     Estimator& mine;
+    TemporalDifference<Estimator> our_side;
+    TemporalDifference<Estimator> opp_side;
+    bool dual;
 
 public:
       Learner(Estimator& estimator, string netname, float alpha, float lambda, bool dual=false)
@@ -207,9 +199,4 @@ public:
         if (dual)
             opp_side.final(-e);
     }
-
-private:
-    bool dual;
-    TemporalDifference<Estimator> our_side;
-    TemporalDifference<Estimator> opp_side;
 };
