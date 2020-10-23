@@ -18,13 +18,8 @@ def schedule(n):
 games = 1000000
 every = 1000
 
-# To 136 million
-# alpha = 0.02 / 36
-# lambda_ = 0.85
-
-# From 137 million
-alpha = 0.02 / 36
-lambda_ = 0.85
+alpha = 0.0
+lambda_ = 1.0
 
 def doit(fromfile, tofile):
     cmd  = f'./train --alpha {alpha} --lambda {lambda_} --games {games} -w {fromfile} -o {tofile}  -d -e {every}'
