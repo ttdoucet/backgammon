@@ -23,7 +23,7 @@ def plot_file(filename):
     playoffs.loc[:, 'millions'] = sequence(playoffs.white.values)
 
     name = os.path.basename(filename)
-    #playoffs.plot(ax=ax, x='millions', y='equity', grid=True, label=name)
+    playoffs.plot(ax=ax, x='millions', y='equity', grid=True, label=name)
     playoffs.plot(ax=ax, x='millions', y='equity-smoothed', grid=True, label=name+' (smoothed)')
 
 
