@@ -3,7 +3,7 @@ import sys
 import os
 
 opponent = '~/src/backgammon/good.w'
-trials = 5000
+trials = 100_000
 playoff_cmd = '~/src/backgammon/playoff'
 
 output_file = 'playoffs.csv'
@@ -23,7 +23,7 @@ def doit(player, opponent):
 
 
 start = 1
-stop = 5
+stop = 100
 
 os.system(f'echo white,black,trials,equity,sw,sl,gw,gl,bw,bl >>{output_file}')
 for i in range(start, stop+1):

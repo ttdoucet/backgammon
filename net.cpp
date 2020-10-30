@@ -123,3 +123,30 @@ bool netv3::readFile(string fn)
     ifs.close();
     return ifs.fail() == false;
 }
+
+/* Factory
+ */
+
+static BgNet *initBgNet(const string name)
+{
+    if (name == "netv3")
+        return new netv3();
+
+    // Support other BgNets here. . .
+
+    return nullptr;
+}
+
+// Presently only supports netv3.
+std::unique_ptr<BgNet> readBgNet(const string filename)
+{
+    BgNet *r;
+
+    if (r = initBgNet(filename))
+        return std::unique_ptr<BgNet>(r);
+
+    cout << "default: must be netv3 file\n";
+    r = new netv3();
+    r->readFile(filename);
+    return std::unique_ptr<BgNet>(r);
+}

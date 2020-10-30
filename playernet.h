@@ -15,16 +15,9 @@ using std::string;
 class NeuralNetPlayer : public Player, public callBack
 {
 public:
-    NeuralNetPlayer(BgNet& nn, string netname)
+    NeuralNetPlayer(BgNet& nn)
         : neural(nn)
     {
-        bool okay = true;
-        if (netname != "random")
-            okay = neural.readFile(netname);
-
-        if (okay == false)
-            throw std::runtime_error(string("Error reading network: ") + netname + "\n");
-
     }
 
     void chooseMove(const board& b, moves& choice) override
@@ -167,8 +160,8 @@ class Learner : public NeuralNetPlayer
     bool dual;
 
 public:
-      Learner(Estimator& estimator, string netname, float alpha, float lambda, bool dual=false)
-          : NeuralNetPlayer(estimator, netname),
+      Learner(Estimator& estimator, float alpha, float lambda, bool dual=false)
+          : NeuralNetPlayer(estimator),
             mine{estimator},
             our_side(mine, alpha, lambda),
             opp_side(mine, alpha, lambda),

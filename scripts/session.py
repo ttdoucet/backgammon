@@ -32,10 +32,12 @@ def doit(fromfile, tofile, alpha=0.0, lambda_=1.0):
         sys.exit(1)
 
 
-os.system("./train --games 0 -w random -o random.w");
-doit('random.w', 'white-1.w')
+os.system("./train --games 0 -w netv3 -o random.w");
 
-for i in range(1, 400):
+alpha, lambda_ = schedule(0)
+doit('random.w', 'white-1.w', alpha, lambda_)
+
+for i in range(1, 64):
     alpha, lambda_ = schedule(i)
     print("i:", i, "alpha: ", alpha, "lambda:", lambda_)
     doit(f'white-{i}.w', f'white-{i+1}.w', alpha, lambda_)

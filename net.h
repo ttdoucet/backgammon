@@ -183,3 +183,9 @@ public:
     bool writeFile(std::string filename) const;
     ~netv3() { }
 };
+
+/* Factory
+ */
+#include <memory>
+
+std::unique_ptr<BgNet> readBgNet(const std::string filename);

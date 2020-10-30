@@ -64,11 +64,11 @@ public:
 
     int run()
     {
-        netv3 whitenet;
-        netv3 blacknet;
+        std::unique_ptr<BgNet> whitenet = readBgNet(opts.white_name);
+        std::unique_ptr<BgNet> blacknet = readBgNet(opts.black_name);
 
-        NeuralNetPlayer whitePlayer(whitenet, opts.white_name);
-        NeuralNetPlayer blackPlayer(blacknet, opts.black_name);
+        NeuralNetPlayer whitePlayer(*whitenet);
+        NeuralNetPlayer blackPlayer(*blacknet);
 
         playoffSession(opts.trials, whitePlayer, blackPlayer, opts.user_seed);
         return 0;

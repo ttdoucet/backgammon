@@ -85,7 +85,6 @@ public:
 };
 
 
-template<typename Estimator>
 class TrainingSession
 {
 public:
@@ -134,7 +133,7 @@ public:
                  << " against learning "
                  << name_for(opts.blearn_fn, opts.bdual)
                  << "\n";
-            Learner<Estimator> blackPlayer(blacknet, opts.blearn_fn, opts.alpha, opts.lambda, opts.bdual);
+            Learner<BgNet> blackPlayer(blacknet, opts.blearn_fn, opts.alpha, opts.lambda, opts.bdual);
             train_against(whitePlayer, blackPlayer);
             blackPlayer.save(opts.output_black);
             cout << "black saved: " << opts.output_black << "\n";
@@ -206,46 +205,33 @@ private:
         report(numGames, whitePoints);
     }
 
+    unique_ptr<NeuralNetPlayer> learner_for(BgNet *nn, const TrainingOptions& opts)
+    {
+        if (auto p = dynamic_cast<netv3*>(nn))
+            return make_unique<Learner<netv3> > (*p, opts.alpha, opts.lambda, opts.wdual);
+
+        // Support additional neural net players here. . .
+
+        throw runtime_error("dynamic cast failed");
+    }
+
     void selfplay(const TrainingOptions& opts)
     {
-        netv3 whitenet;
+        unique_ptr<BgNet> whitenet = readBgNet(opts.wlearn_fn);
+        unique_ptr<NeuralNetPlayer> whitePlayer = learner_for(whitenet.get(), opts);
+        NeuralNetPlayer blackPlayer(*whitenet);
 
-        Learner<netv3> whitePlayer(whitenet, opts.wlearn_fn, opts.alpha, opts.lambda, opts.wdual);
-        NeuralNetPlayer blackPlayer(whitenet, opts.wlearn_fn);  // duplicate read?
-
-        train(whitePlayer, blackPlayer);
+        train(*whitePlayer, blackPlayer);
 
         string outfile = opts.output_white.empty() ? opts.wlearn_fn : opts.output_white;
-        whitePlayer.save(outfile);
+        whitenet->writeFile(outfile);
         cout << "white saved: " << outfile << "\n";
     }
-
-
-#if 0
-    void train_selfplay(Learner<Estimator>& whitePlayer)
-    {
-        // this is probably trouble
-#if 1
-        NeuralNetPlayer blackPlayer = static_cast<NeuralNetPlayer>(whitePlayer);
-#else
-        netv3 fff;
-        NeuralNetPlayer blackPlayer(fff, "pretend");
-#endif
-        train(whitePlayer, blackPlayer, true);
-    }
-
-    void train_against(NeuralNetPlayer& whitePlayer, NeuralNetPlayer& blackPlayer)
-    {
-        train(whitePlayer, blackPlayer, false);
-    }
-#endif
-
 };
 
 int main(int argc, char *argv[])
 {
     TrainingOptions opts;
     opts.parse(argc, argv);
-    return TrainingSession<netv3>(opts).run();
-//    return TrainingSession<BgNet>(opts).run();
+    return TrainingSession{opts}.run();
 }
