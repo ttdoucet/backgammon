@@ -99,7 +99,7 @@ public:
         unique_ptr<NeuralNetPlayer> white_player, black_player;
         
         white_net = readBgNet(opts.wlearn_fn);
-        white_player = learner_for(white_net.get(), opts);
+        white_player = learner_for(*white_net, opts);
 
         if (opts.blearn_fn.empty() == false)
         {
@@ -109,7 +109,7 @@ public:
                  << name_for(opts.blearn_fn, opts.bdual)
                  << "\n";
             black_net = readBgNet(opts.blearn_fn);
-            black_player = learner_for(black_net.get(), opts);
+            black_player = learner_for(*black_net, opts);
         }
         else if (opts.bplay_fn.empty() == false)
         {
@@ -118,14 +118,14 @@ public:
                  << " against fixed " << opts.bplay_fn
                  << "\n";
             black_net = readBgNet(opts.bplay_fn);
-            black_player = player_for(black_net.get());
+            black_player = player_for(*black_net);
         }
         else
         {
             cout << "self-play: "
                  << name_for(opts.wlearn_fn, opts.wdual)
                  << "\n";
-            black_player = player_for(white_net.get());
+            black_player = player_for(*white_net);
         }
 
         train(*white_player, *black_player);
@@ -150,9 +150,9 @@ private:
                 ostringstream ss;
 
                 ss << "white equity/game = "
-                   << std::setprecision(3) << whitePoints/numGames
+                   << setprecision(3) << whitePoints/numGames
                    << " (total "
-                   << std::setprecision(2) << whitePoints
+                   << setprecision(2) << whitePoints
                    << ")\n";
 
                 cout << ss.str();
@@ -183,8 +183,8 @@ private:
             if (opts.every && !(numGames % opts.every))
             {
                 ostringstream ss;
-                ss << std::fixed << "Game: " << numGames << ": "
-                   << std::setprecision(2) << std::setw(5) << white_eq << "... ";
+                ss << fixed << "Game: " << numGames << ": "
+                   << setprecision(2) << setw(5) << white_eq << "... ";
                 cout << ss.str();
 
                 report(numGames, whitePoints);
@@ -195,9 +195,9 @@ private:
         report(numGames, whitePoints);
     }
 
-    unique_ptr<NeuralNetPlayer> learner_for(BgNet *nn, const TrainingOptions& opts)
+    unique_ptr<NeuralNetPlayer> learner_for(BgNet& nn, const TrainingOptions& opts)
     {
-        if (auto p = dynamic_cast<netv3*>(nn))
+        if (auto p = dynamic_cast<netv3*>(&nn))
             return make_unique<Learner<netv3> > (*p, opts.alpha, opts.lambda, opts.wdual);
 
         // Support additional neural net players here. . .
@@ -205,9 +205,9 @@ private:
         throw runtime_error("dynamic cast failed");
     }
 
-    unique_ptr<NeuralNetPlayer> player_for(BgNet *nn)
+    unique_ptr<NeuralNetPlayer> player_for(BgNet& nn)
     {
-      return make_unique<NeuralNetPlayer>(*nn);
+      return make_unique<NeuralNetPlayer>(nn);
     }
 };
 
