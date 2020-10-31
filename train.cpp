@@ -93,57 +93,53 @@ public:
     {
     }
 
-    int run()
+    void run()
     {
-        if (file_exists(opts.output_white))
-        {
-            cout << "File already exists: " << opts.output_white << ", skipping.\n";
-            return 0;
-        }
+        unique_ptr<BgNet> white_net, black_net;
+        unique_ptr<NeuralNetPlayer> white_player, black_player;
+        
+        white_net = readBgNet(opts.wlearn_fn);
+        white_player = learner_for(white_net.get(), opts);
 
-        selfplay(opts);
-
-#if 0
-        netv3 whitenet;
-        netv3 blacknet;
-
-
-        Learner<Estimator> whitePlayer(whitenet, opts.wlearn_fn, opts.alpha, opts.lambda, opts.wdual);
-
-        if (opts.bplay_fn.empty() && opts.blearn_fn.empty())
-        {
-            cout << "self-play: "
-                 << name_for(opts.wlearn_fn, opts.wdual)
-                 << "\n";
-            train_selfplay(whitePlayer);
-        }
-        else if (opts.blearn_fn.empty())
-        {
-            cout << "train: "
-                 << name_for(opts.wlearn_fn, opts.wdual)
-                 << " against fixed " << opts.bplay_fn
-                 << "\n";
-            NeuralNetPlayer blackPlayer(blacknet, opts.bplay_fn);
-            train_against(whitePlayer, blackPlayer);
-        }
-        else
+        if (opts.blearn_fn.empty() == false)
         {
             cout << "train: "
                  << name_for(opts.wlearn_fn, opts.wdual)
                  << " against learning "
                  << name_for(opts.blearn_fn, opts.bdual)
                  << "\n";
-            Learner<BgNet> blackPlayer(blacknet, opts.blearn_fn, opts.alpha, opts.lambda, opts.bdual);
-            train_against(whitePlayer, blackPlayer);
-            blackPlayer.save(opts.output_black);
-            cout << "black saved: " << opts.output_black << "\n";
+            black_net = readBgNet(opts.blearn_fn);
+            black_player = learner_for(black_net.get(), opts);
+        }
+        else if (opts.bplay_fn.empty() == false)
+        {
+            cout << "train: "
+                 << name_for(opts.wlearn_fn, opts.wdual)
+                 << " against fixed " << opts.bplay_fn
+                 << "\n";
+            black_net = readBgNet(opts.bplay_fn);
+            black_player = player_for(black_net.get());
+        }
+        else
+        {
+            cout << "self-play: "
+                 << name_for(opts.wlearn_fn, opts.wdual)
+                 << "\n";
+            black_player = player_for(white_net.get());
         }
 
+        train(*white_player, *black_player);
+
         string outfile = opts.output_white.empty() ? opts.wlearn_fn : opts.output_white;
-        whitePlayer.save(outfile);
+        white_net->writeFile(outfile);
         cout << "white saved: " << outfile << "\n";
-#endif
-        return 0;
+
+        if (opts.blearn_fn.empty() == false)
+        {
+            string outfile = opts.output_black.empty() ? opts.blearn_fn : opts.output_black;
+            black_net->writeFile(outfile);
+            cout << "black saved: " << outfile << "\n";
+        }
     }
 
 private:
@@ -160,12 +156,6 @@ private:
                    << ")\n";
 
                 cout << ss.str();
-    }
-
-    static bool file_exists(string filename)
-    {
-        ifstream f(filename);
-        return f.good();
     }
 
     string name_for(string fn, bool dual)
@@ -215,17 +205,9 @@ private:
         throw runtime_error("dynamic cast failed");
     }
 
-    void selfplay(const TrainingOptions& opts)
+    unique_ptr<NeuralNetPlayer> player_for(BgNet *nn)
     {
-        unique_ptr<BgNet> whitenet = readBgNet(opts.wlearn_fn);
-        unique_ptr<NeuralNetPlayer> whitePlayer = learner_for(whitenet.get(), opts);
-        NeuralNetPlayer blackPlayer(*whitenet);
-
-        train(*whitePlayer, blackPlayer);
-
-        string outfile = opts.output_white.empty() ? opts.wlearn_fn : opts.output_white;
-        whitenet->writeFile(outfile);
-        cout << "white saved: " << outfile << "\n";
+      return make_unique<NeuralNetPlayer>(*nn);
     }
 };
 
@@ -233,5 +215,5 @@ int main(int argc, char *argv[])
 {
     TrainingOptions opts;
     opts.parse(argc, argv);
-    return TrainingSession{opts}.run();
+    TrainingSession{opts}.run();
 }
