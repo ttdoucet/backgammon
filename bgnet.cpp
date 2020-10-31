@@ -3,7 +3,7 @@
 #include <stdexcept>
 #include <fstream>
 
-#include "net.h"
+#include "bgnet.h"
 
 using namespace std;
 

@@ -13,7 +13,7 @@ cppflags = -Ofast -ffast-math --std=c++17 -fconcepts -march=sandybridge -mtune=s
 
 # Main executable
 #
-common-src = hits.cpp net.cpp move.cpp ttydisp.cpp bdata.cpp bearoff.cpp human.cpp
+common-src = hits.cpp bgnet.cpp move.cpp ttydisp.cpp bdata.cpp bearoff.cpp human.cpp
 : foreach $(common-src) | bearoff.dat |> !compile |> {common-objs}
 
 : playoff.cpp |> !compile |> playoff.o
@@ -25,7 +25,7 @@ common-src = hits.cpp net.cpp move.cpp ttydisp.cpp bdata.cpp bearoff.cpp human.c
 # Utility
 #
 : nnstat.cpp  |> !compile |> %B.o
-: nnstat.o net.o hits.o|> !link |> nnstat
+: nnstat.o bgnet.o hits.o|> !link |> nnstat
 
 : matrix-test.cpp  |> !compile |> %B.o
-: matrix-test.o net.o hits.o |> !link |> matrix-test
+: matrix-test.o bgnet.o hits.o |> !link |> matrix-test

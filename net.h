@@ -2,20 +2,9 @@
  */
 #pragma once
 
-#include "board.h"
 #include "mathfuncs.h"
 #include "matrix.h"
 #include "random.h"
-
-class BgNet
-{
-public:
-    virtual float equity(const board& b) = 0;
-    virtual bool readFile(std::string filename) = 0;
-    virtual bool writeFile(std::string filename) const = 0;
-    virtual ~BgNet() = default;
-};
-
 
 template<int N_INPUTS, int N_HIDDEN>
 class net
@@ -152,40 +141,3 @@ protected:
     float out;
 };
 
-/* Backgammon-specific class derivations.
- */
-
-#include "features.h"
-
-template<class feature_calc, int N_HIDDEN>
-class BackgammonNet :  public BgNet,
-                       public net<feature_calc::count, N_HIDDEN>
-{
-public:
-    /* Neural net estimate of the equity for the side on roll.
-     */
-    float equity(const board &b)
-    {
-        feature_calc::calc(b, this->input.Data());
-        return this->feedForward();
-    }
-
-    BackgammonNet()
-    {
-        assert( feature_calc::count == this->input.Rows() * this->input.Cols() );
-    }
-};
-
-class netv3 : public BackgammonNet<features_v3<float*>, 30>
-{
-public:
-    bool readFile(std::string filename);
-    bool writeFile(std::string filename) const;
-    ~netv3() { }
-};
-
-/* Factory
- */
-#include <memory>
-
-std::unique_ptr<BgNet> readBgNet(const std::string filename);

@@ -6,10 +6,9 @@
 #include <cmath>
 
 #include "game.h"
-#include "net.h"
+#include "bgnet.h"
 #include "bearoff.h"
 
-// This seems improper for a header file
 using std::string;
 
 class NeuralNetPlayer : public Player, public callBack

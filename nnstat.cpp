@@ -1,4 +1,4 @@
-#include "net.h"
+#include "bgnet.h"
 #include <iostream>
 
 using namespace std;
