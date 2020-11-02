@@ -43,7 +43,7 @@ public:
         ifs >> name >> this->params.M >> this->params.V;
         return ifs.fail() == false;
     }
-    
+
     bool writeFile(std::string filename) const
     {
         std::ofstream ofs(filename);
@@ -70,6 +70,14 @@ class Fc_Sig_H15_I3 : public BackgammonNet<features_v3<float*>, 15>
 public:
     std::string netname() const { return "Fc_Sig_H15_I3"; }
 };
+
+// Fully-connected, sigmoidal activations, 60 hidden units, input features version 3.
+class Fc_Sig_H60_I3 : public BackgammonNet<features_v3<float*>, 60>
+{
+public:
+    std::string netname() const { return "Fc_Sig_H60_I3"; }
+};
+
 
 
 /* Factory

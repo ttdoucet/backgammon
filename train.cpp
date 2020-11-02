@@ -215,6 +215,9 @@ private:
         if (auto p = dynamic_cast<Fc_Sig_H15_I3*>(&nn))
             return make_unique<Learner<Fc_Sig_H15_I3> > (*p, opts.alpha, opts.lambda, opts.wdual);
 
+        if (auto p = dynamic_cast<Fc_Sig_H60_I3*>(&nn))
+            return make_unique<Learner<Fc_Sig_H60_I3> > (*p, opts.alpha, opts.lambda, opts.wdual);
+
         // Support learning in additional neural net players here. . .
 
         throw runtime_error("Network not yet supported: " + nn.netname());
