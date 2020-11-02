@@ -2,59 +2,12 @@
  */
 #include <stdexcept>
 #include <fstream>
+#include <iomanip>
 
 #include "bgnet.h"
 
 using namespace std;
 
-static void write_float(ostream& fs, float f)
-{
-    fs.write( reinterpret_cast<char *>(&f), sizeof(f) );
-}
-
-bool netv3::writeFile(string fn) const
-{
-    bool quit = false;
-
-    if ((*this).params.M.isfinite() == false)
-    {
-        std::cout << "ERROR: M is not finite\n";
-        quit = true;
-    }
-
-    if ((*this).params.V.isfinite() == false)
-    {
-        std::cout << "ERROR: V is not finite\n";
-        quit = true;
-    }
-
-    if (quit)
-        return false;
-
-    ofstream ofs(fn, ios::binary);
-    if (!ofs)
-        throw runtime_error(string("Cannot open file stream ") + fn + " for writing.");
-
-    ofs << "portable format: " << 0 << "\n"; // legacy
-    ofs << "net type: " << 3 << "\n";        // legacy
-    ofs << "hidden nodes: " << (*this).n_hidden << "\n";
-    ofs << "input nodes: " << (*this).n_inputs << "\n";
-
-    for (int i = 0; i < (*this).n_hidden; i++)
-        for (int j = 0; j < (*this).n_inputs; j++)
-            write_float(ofs, (*this).params.M(i, j));
-
-    for (int i = 0; i < (*this).n_hidden; i++)
-        write_float(ofs, (*this).params.V(0, i));
-
-    uint64_t seed;
-    ofs << "Current seed: " <<seed << "L\n";            // legacy
-    uint64_t games_trained;
-    ofs << "Games trained: " << games_trained << "L\n";  // legacy
-
-    ofs.close();
-    return ofs.fail() == false;
-}
 
 static float read_float(istream& ifs)
 {
@@ -74,8 +27,8 @@ static bool has(istream& is, const char *str)
     return *s == 0;
 }
 
-// Read in a neural net from a file.
-bool netv3::readFile(string fn)
+// Legacy format for netv3 parameters.
+bool readFile_legacy(string fn, netv3::Parameters& params)
 {
     int hidden = 40, portable = 1;
     int ntype = 0, input = 0;
@@ -97,20 +50,15 @@ bool netv3::readFile(string fn)
     if (ch != '\n')
         return false;
 
-    for (int i = 0; i < (*this).n_hidden; i++)
-        for (int j = 0; j < (*this).n_inputs; j++)
-            (*this).params.M(i, j) = read_float(ifs);
+    for (int i = 0; i < netv3::n_hidden; i++)
+        for (int j = 0; j < netv3::n_inputs; j++)
+            params.M(i, j) = read_float(ifs);
 
-    for (int i = 0; i < (*this).n_hidden; i++)
-        (*this).params.V(0, i) = read_float(ifs);
+    for (int i = 0; i < netv3::n_hidden; i++)
+        params.V(0, i) = read_float(ifs);
 
     if (ifs.fail())
         return false;
-
-    if ((*this).params.M.isfinite() == false)
-        throw runtime_error("M is not finite.");
-    if ((*this).params.V.isfinite() == false)
-        throw runtime_error("V is not finite.");
 
     has(ifs, "Current seed:");
 
@@ -124,29 +72,51 @@ bool netv3::readFile(string fn)
     return ifs.fail() == false;
 }
 
+
 /* Factory
  */
 
-static BgNet *initBgNet(const string name)
+static string net_name(const string filename)
+{
+    const auto max_name_length = 30;
+    ifstream ifs(filename, ios::binary);
+    string name;
+    ifs >> setw(max_name_length) >> name;
+    return name;
+}
+
+static unique_ptr<BgNet> initBgNet(const string name)
 {
     if (name == "netv3")
-        return new netv3();
+        return make_unique<netv3>();
+
+    if (name == "Fc_Sig_H15_I3")
+        return make_unique<Fc_Sig_H15_I3>();
 
     // Support other BgNets here. . .
 
     return nullptr;
 }
 
-// Presently only supports netv3.
 std::unique_ptr<BgNet> readBgNet(const string filename)
 {
-    BgNet *r;
+    if (auto r = initBgNet(filename))
+        return r;
 
-    if (r = initBgNet(filename))
-        return std::unique_ptr<BgNet>(r);
+    string name = net_name(filename);
+    cout << "net id: " << name << "\n";
 
-    cout << "default: must be netv3 file\n";
-    r = new netv3();
-    r->readFile(filename);
-    return std::unique_ptr<BgNet>(r);
+    if (auto r = initBgNet(name))
+    {
+        if (r->readFile(filename))
+            return r;
+        throw runtime_error("Error reading net file: " + filename);
+    }
+
+    cout << "legacy netv3 file: " << filename << "\n";
+    auto r = make_unique<netv3>();
+
+    if (readFile_legacy(filename, r->params) == false)
+        throw runtime_error("Error reading legacy net file: " + filename);
+    return r;
 }

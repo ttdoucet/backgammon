@@ -2,6 +2,8 @@
  */
 #pragma once
 
+#include <fstream>
+#include <iomanip>
 #include <memory>
 
 #include "net.h"
@@ -17,6 +19,7 @@ public:
     virtual float equity(const board& b) = 0;
     virtual bool readFile(std::string filename) = 0;
     virtual bool writeFile(std::string filename) const = 0;
+    virtual std::string netname() const = 0;
     virtual ~BgNet() = default;
 };
 
@@ -33,19 +36,41 @@ public:
         return this->feedForward();
     }
 
+    bool readFile(std::string filename)
+    {
+        std::ifstream ifs(filename);
+        std::string name;
+        ifs >> name >> this->params.M >> this->params.V;
+        return ifs.fail() == false;
+    }
+    
+    bool writeFile(std::string filename) const
+    {
+        std::ofstream ofs(filename);
+        ofs << this->netname() << "\n" << this->params.M << this->params.V;
+        return ofs.fail() == false;
+    }
+
     BackgammonNet()
     {
         assert( feature_calc::count == this->input.Rows() * this->input.Cols() );
     }
 };
 
+// Fully-connected, sigmoidal activations, 30 hidden units, input features version 3.
 class netv3 : public BackgammonNet<features_v3<float*>, 30>
 {
 public:
-    bool readFile(std::string filename);
-    bool writeFile(std::string filename) const;
-    ~netv3() { }
+    std::string netname() const { return "netv3"; }
 };
+
+// Fully-connected, sigmoidal activations, 15 hidden units, input features version 3.
+class Fc_Sig_H15_I3 : public BackgammonNet<features_v3<float*>, 15>
+{
+public:
+    std::string netname() const { return "Fc_Sig_H15_I3"; }
+};
+
 
 /* Factory
  */

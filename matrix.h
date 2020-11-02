@@ -2,10 +2,8 @@
 #include <cmath>
 #include <cassert>
 #include <initializer_list>
-
-
 #include <iostream>
-
+#include <cstdlib>
 
 /* Written by Todd Doucet.
  *
@@ -210,8 +208,6 @@ template<int R, int C>  matrix<R,C> operator-(const matrix<R,C> &lhs, const matr
     return v -= rhs;
 }
 
-#include <iostream>
-
 template<int R, int C>
 std::ostream& operator<<(std::ostream& s, const matrix<R,C>& m)
 {
@@ -231,8 +227,6 @@ std::ostream& operator<<(std::ostream& s, const matrix<R,C>& m)
     s.flags(f);
     return s;
 }
-
-#include <cstdlib>
 
 template<int R, int C>
 std::istream& operator>>(std::istream& s, matrix<R,C>& m)

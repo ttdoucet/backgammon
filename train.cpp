@@ -95,6 +95,12 @@ public:
 
     void run()
     {
+        if (file_exists(opts.output_white))
+        {
+            cout << "File already exists: " << opts.output_white << ", skipping.\n";
+            return;
+        }
+
         unique_ptr<BgNet> white_net, black_net;
         unique_ptr<NeuralNetPlayer> white_player, black_player;
         
@@ -144,6 +150,12 @@ public:
 
 private:
     const TrainingOptions& opts;
+
+    static bool file_exists(string filename)
+    {
+        ifstream f(filename);
+        return f.good();
+    }
 
     static void report(int numGames, double whitePoints)
     {
@@ -200,9 +212,12 @@ private:
         if (auto p = dynamic_cast<netv3*>(&nn))
             return make_unique<Learner<netv3> > (*p, opts.alpha, opts.lambda, opts.wdual);
 
-        // Support additional neural net players here. . .
+        if (auto p = dynamic_cast<Fc_Sig_H15_I3*>(&nn))
+            return make_unique<Learner<Fc_Sig_H15_I3> > (*p, opts.alpha, opts.lambda, opts.wdual);
 
-        throw runtime_error("dynamic cast failed");
+        // Support learning in additional neural net players here. . .
+
+        throw runtime_error("Network not yet supported: " + nn.netname());
     }
 
     unique_ptr<NeuralNetPlayer> player_for(BgNet& nn)
