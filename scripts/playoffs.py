@@ -22,7 +22,7 @@ def doit(player, opponent):
         sys.exit(1)
 
 
-start = 1
+start = 52
 stop = 100
 
 os.system(f'echo white,black,trials,equity,sw,sl,gw,gl,bw,bl >>{output_file}')

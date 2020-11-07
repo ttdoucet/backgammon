@@ -7,7 +7,7 @@
 #include "random.h"
 
 template<int N_INPUTS, int N_HIDDEN>
-class net
+class SigmoidNet
 {
 public:
     constexpr static int n_inputs = N_INPUTS;
@@ -18,6 +18,7 @@ public:
 
     typedef matrix<N_HIDDEN, N_INPUTS> W1;
     typedef matrix<1, N_HIDDEN> W2;
+
 
 protected:
     constexpr static int MAX_EQUITY = 3;
@@ -36,22 +37,6 @@ protected:
 
         float x =  params.V * hidden;
         out = squash(x);
-
-#if 1
-        if (std::isfinite(out) == false)
-        {
-            std::cout << "WARNING: out is not a finite number:";
-            if (std::isnan(out))
-                std::cout << " nan";
-            if (std::isinf(out))
-                std::cout << " inf";
-            std::cout << ", x = " << x << "\n";
-
-            std::cout << "V: " << params.V << "\n";
-            std::cout << "hidden: " << hidden << "\n";
-        }
-#endif
-
         return net_to_equity(out);
     }
 
@@ -121,7 +106,7 @@ public:
         params += adj;
     }
 
-    net()
+    SigmoidNet()
     {
         RNG_normal rand1(0, 1.0 / N_INPUTS);
         for (int r = 0; r < N_HIDDEN; r++)

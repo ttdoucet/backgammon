@@ -82,6 +82,8 @@ static string net_name(const string filename)
     ifstream ifs(filename, ios::binary);
     string name;
     ifs >> setw(max_name_length) >> name;
+    if (name == "portable")
+        name = "legacy-v3";
     return name;
 }
 
