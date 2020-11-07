@@ -9,14 +9,11 @@
 template<int N_INPUTS, int N_HIDDEN>
 class SigmoidNet
 {
-public:
+protected:
+
     typedef matrix<N_INPUTS, 1> input_vector;
     typedef matrix<N_HIDDEN, 1> hidden_vector;
 
-    typedef matrix<N_HIDDEN, N_INPUTS> W1;
-    typedef matrix<1, N_HIDDEN> W2;
-
-protected:
     constexpr static int MAX_EQUITY = 3;
 
     constexpr static float net_to_equity(float p)
@@ -48,6 +45,9 @@ public:
      */
     struct Parameters
     {
+        using W1 = matrix<N_HIDDEN, N_INPUTS>;
+        using W2 = matrix<1, N_HIDDEN>;
+
         W1 M;
         W2 V;
 
@@ -76,8 +76,7 @@ public:
             Parameters r(*this);
             return r *= scale;
         }
-    };
-    Parameters params;
+    } params;
 
     /* Computes dy/dx, where y is the scalar output
      * of the net during the last forward calculation,
