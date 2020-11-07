@@ -10,10 +10,6 @@ template<int N_INPUTS, int N_HIDDEN>
 class SigmoidNet
 {
 protected:
-
-    typedef matrix<N_INPUTS, 1> InputVector;
-    typedef matrix<N_HIDDEN, 1> HiddenVector;
-
     constexpr static int MAX_EQUITY = 3;
 
     constexpr static float net_to_equity(float p)
@@ -71,8 +67,12 @@ public:
         }
     } params;  // maybe P ?
 
+    using InputVector =  matrix<N_INPUTS, 1>;
+
     struct Activations
     {
+        using HiddenVector = matrix<N_HIDDEN, 1>;
+
         InputVector input;
         HiddenVector hidden;
         float out;
