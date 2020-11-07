@@ -50,11 +50,14 @@ bool readFile_legacy(string fn, netv3::Parameters& params)
     if (ch != '\n')
         return false;
 
-    for (int i = 0; i < netv3::n_hidden; i++)
-        for (int j = 0; j < netv3::n_inputs; j++)
+    const int n_hidden = params.M.Rows();
+    const int n_inputs = params.M.Cols();
+
+    for (int i = 0; i < n_hidden; i++)
+        for (int j = 0; j < n_inputs; j++)
             params.M(i, j) = read_float(ifs);
 
-    for (int i = 0; i < netv3::n_hidden; i++)
+    for (int i = 0; i < n_hidden; i++)
         params.V(0, i) = read_float(ifs);
 
     if (ifs.fail())

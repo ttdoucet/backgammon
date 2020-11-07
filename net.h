@@ -10,15 +10,11 @@ template<int N_INPUTS, int N_HIDDEN>
 class SigmoidNet
 {
 public:
-    constexpr static int n_inputs = N_INPUTS;
-    constexpr static int n_hidden = N_HIDDEN;
-
     typedef matrix<N_INPUTS, 1> input_vector;
     typedef matrix<N_HIDDEN, 1> hidden_vector;
 
     typedef matrix<N_HIDDEN, N_INPUTS> W1;
     typedef matrix<1, N_HIDDEN> W2;
-
 
 protected:
     constexpr static int MAX_EQUITY = 3;
