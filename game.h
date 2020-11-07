@@ -107,8 +107,17 @@ public:
             dwhite = die.roll();
             dblack = die.roll();
         }
-        b.setRoller( (dwhite > dblack) ? white : black);
-        b.setDice(dwhite, dblack);
+
+        if (dwhite > dblack)
+        {
+            b.setRoller(white);
+            b.setDice(dwhite, dblack);
+        }
+        else
+        {
+            b.setRoller(black);
+            b.setDice(dblack, dwhite);
+        }
     }
 
 protected:
