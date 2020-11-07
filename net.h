@@ -11,8 +11,8 @@ class SigmoidNet
 {
 protected:
 
-    typedef matrix<N_INPUTS, 1> input_vector;
-    typedef matrix<N_HIDDEN, 1> hidden_vector;
+    typedef matrix<N_INPUTS, 1> InputVector;
+    typedef matrix<N_HIDDEN, 1> HiddenVector;
 
     constexpr static int MAX_EQUITY = 3;
 
@@ -23,22 +23,15 @@ protected:
 
     float feedForward()
     {
-        hidden = params.M * input;
+        A.hidden = params.M * A.input;
 
         for (int i = 0; i < N_HIDDEN; i++)
-            hidden(i, 0) = squash(hidden(i, 0));
+            A.hidden(i, 0) = squash(A.hidden(i, 0));
 
-        float x =  params.V * hidden;
-        out = squash(x);
-        return net_to_equity(out);
+        float x =  params.V * A.hidden;
+        A.out = squash(x);
+        return net_to_equity(A.out);
     }
-
-    /* I think we should gather things into Activations like
-     * we did for Parameters, and this would include the input
-     * and the output.
-     */
-
-    input_vector input;
 
 public:
     /* Model parameters.
@@ -76,7 +69,19 @@ public:
             Parameters r(*this);
             return r *= scale;
         }
-    } params;
+    } params;  // maybe P ?
+
+    struct Activations
+    {
+        InputVector input;
+        HiddenVector hidden;
+        float out;
+    } A;
+
+    InputVector& input()
+    {
+        return A.input;
+    }
 
     /* Computes dy/dx, where y is the scalar output
      * of the net during the last forward calculation,
@@ -84,16 +89,16 @@ public:
      */
     void backprop(Parameters& grad)
     {
-        auto const f = 2 * MAX_EQUITY * out * (1 - out);
+        auto const f = 2 * MAX_EQUITY * A.out * (1 - A.out);
 
-        grad.V = f * hidden.Transpose();
+        grad.V = f * A.hidden.Transpose();
 
         matrix<N_HIDDEN, 1> lhs = f * params.V.Transpose();
 
         for (int i = 0; i < lhs.Rows(); i++)
-            lhs(i, 0) *= ( hidden(i, 0) * (1 - hidden(i, 0)) );
+            lhs(i, 0) *= ( A.hidden(i, 0) * (1 - A.hidden(i, 0)) );
 
-        grad.M = lhs * input.Transpose();
+        grad.M = lhs * A.input.Transpose();
     }
 
     void update_model(const Parameters& adj)
@@ -112,12 +117,5 @@ public:
         for (int c = 0; c < N_HIDDEN; c++)
             params.V(0, c) = rand2.random();
     }
-
-protected:
-    /* State activations maintained after 
-     * feedForward() for backpropagation.
-     */
-    hidden_vector hidden;
-    float out;
 };
 

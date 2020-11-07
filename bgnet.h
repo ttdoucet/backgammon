@@ -32,7 +32,7 @@ public:
      */
     float equity(const board &b)
     {
-        feature_calc::calc(b, this->input.Data());
+        feature_calc::calc(b, this->input().Data());
         return this->feedForward();
     }
 
@@ -53,7 +53,7 @@ public:
 
     BackgammonNet()
     {
-        assert( feature_calc::count == this->input.Rows() * this->input.Cols() );
+        assert( feature_calc::count == this->input().Rows() * this->input().Cols() );
     }
 };
 
