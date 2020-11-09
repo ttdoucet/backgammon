@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
         // This code is a hold-over from simpler times.
 
         // auto neural = dynamic_cast<netv3*>(bgnet.get());
-        auto neural = dynamic_cast<Fc_ReLU_H60_I3*>(bgnet.get());
+        auto neural = dynamic_cast<Fc_Misc_H30_I3*>(bgnet.get());
 
         if (neural == nullptr)
             cout << "Could not read net " << filename << "\n";

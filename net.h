@@ -6,7 +6,43 @@
 #include "matrix.h"
 #include "random.h"
 
-template<int N_INPUTS, int N_HIDDEN>
+template<int FEATURES, int HIDDEN>
+struct TwoLayerParameters
+{
+    using W1 = matrix<HIDDEN, FEATURES>;
+    using W2 = matrix<1, HIDDEN>;
+
+    W1 M;
+    W2 V;
+
+    void clear()
+    {
+        M.clear();
+        V.clear();
+    }
+
+    TwoLayerParameters& operator+=(const TwoLayerParameters &rhs)
+    {
+        M += rhs.M;
+        V += rhs.V;
+        return *this;
+    }
+
+    TwoLayerParameters& operator*=(float scale)
+    {
+        M *= scale;
+        V *= scale;
+        return *this;
+    }
+
+    TwoLayerParameters operator*(float scale) const
+    {
+        TwoLayerParameters r(*this);
+        return r *= scale;
+    }
+};
+
+template<int FEATURES, int HIDDEN>
 class SigmoidNet
 {
 protected:
@@ -19,68 +55,37 @@ protected:
 
     float feedForward()
     {
-        A.hidden = params.M * A.input;
+        act.hidden = params.M * act.input;
 
-        for (int i = 0; i < N_HIDDEN; i++)
-            A.hidden(i, 0) = squash(A.hidden(i, 0));
+        for (int i = 0; i < HIDDEN; i++)
+            act.hidden(i, 0) = squash(act.hidden(i, 0));
 
-        float x =  params.V * A.hidden;
-        A.out = squash(x);
-        return net_to_equity(A.out);
+        float x =  params.V * act.hidden;
+        act.out = squash(x);
+        return net_to_equity(act.out);
     }
 
 public:
+
     /* Model parameters.
      */
-    struct Parameters
-    {
-        using W1 = matrix<N_HIDDEN, N_INPUTS>;
-        using W2 = matrix<1, N_HIDDEN>;
+    using Parameters = TwoLayerParameters<FEATURES, HIDDEN>; 
+    using InputVector =  matrix<FEATURES, 1>;
 
-        W1 M;
-        W2 V;
-
-        void clear()
-        {
-            M.clear();
-            V.clear();
-        }
-
-        Parameters& operator+=(const Parameters &rhs)
-        {
-            M += rhs.M;
-            V += rhs.V;
-            return *this;
-        }
-
-        Parameters& operator*=(float scale)
-        {
-            M *= scale;
-            V *= scale;
-            return *this;
-        }
-
-        Parameters operator*(float scale) const
-        {
-            Parameters r(*this);
-            return r *= scale;
-        }
-    } params;  // maybe P ?
-
-    using InputVector =  matrix<N_INPUTS, 1>;
+    Parameters params;
 
     struct Activations
     {
-        using HiddenVector = matrix<N_HIDDEN, 1>;
+        using HiddenVector = matrix<HIDDEN, 1>;
 
         InputVector input;
         HiddenVector hidden;
         float out;
-    } A;
+    } act;
 
     InputVector& input()
     {
-        return A.input;
+        return act.input;
     }
 
     /* Computes dy/dx, where y is the scalar output
@@ -89,16 +94,16 @@ public:
      */
     void backprop(Parameters& grad)
     {
-        auto const f = 2 * MAX_EQUITY * A.out * (1 - A.out);
+        auto const f = 2 * MAX_EQUITY * squash_bp(act.out);
 
-        grad.V = f * A.hidden.Transpose();
+        grad.V = f * act.hidden.Transpose();
 
-        matrix<N_HIDDEN, 1> lhs = f * params.V.Transpose();
+        matrix<HIDDEN, 1> lhs = f * params.V.Transpose();
 
         for (int i = 0; i < lhs.Rows(); i++)
-            lhs(i, 0) *= ( A.hidden(i, 0) * (1 - A.hidden(i, 0)) );
+            lhs(i, 0) *= squash_bp(act.hidden(i, 0));
 
-        grad.M = lhs * A.input.Transpose();
+        grad.M = lhs * act.input.Transpose();
     }
 
     void update_model(const Parameters& adj)
@@ -108,13 +113,94 @@ public:
 
     SigmoidNet()
     {
-        RNG_normal rand1(0, 1.0 / N_INPUTS);
-        for (int r = 0; r < N_HIDDEN; r++)
-            for (int c = 0; c < N_INPUTS; c++)
+        RNG_normal rand1(0, 1.0 / FEATURES);
+        for (int r = 0; r < HIDDEN; r++)
+            for (int c = 0; c < FEATURES; c++)
                 params.M(r, c) = rand1.random();
 
-        RNG_normal rand2(0, 1.0 / N_HIDDEN);
-        for (int c = 0; c < N_HIDDEN; c++)
+        RNG_normal rand2(0, 1.0 / HIDDEN);
+        for (int c = 0; c < HIDDEN; c++)
+            params.V(0, c) = rand2.random();
+    }
+};
+
+// This net in intended for experiments and investigations,
+// and its specific implementation could change often.  When
+// something is found which is desired to be kept, it can
+// be renamed to something else.  So any network data files
+// saved in this format are subject to being orphaned.
+//
+template<int FEATURES, int HIDDEN>
+class MiscNet
+{
+protected:
+    constexpr static int MAX_EQUITY = 3;
+
+    constexpr static float net_to_equity(float p)
+    {
+        return  p * MAX_EQUITY;
+    }
+
+    float feedForward()
+    {
+        act.hidden = params.M * act.input;
+
+        for (int i = 0; i < HIDDEN; i++)
+            act.hidden(i, 0) = squash_ctr(act.hidden(i, 0));
+
+        float x =  params.V * act.hidden;
+        act.out = squash_ctr(x); 
+        return net_to_equity(act.out);
+    }
+
+public:
+    using Parameters = TwoLayerParameters<FEATURES, HIDDEN>; 
+    using InputVector =  matrix<FEATURES, 1>;
+
+    Parameters params;
+
+    struct Activations
+    {
+        using HiddenVector = matrix<HIDDEN, 1>;
+
+        InputVector input;
+        HiddenVector hidden;
+        float out;
+    } act;
+
+    InputVector& input()
+    {
+        return act.input;
+    }
+
+    void backprop(Parameters& grad)
+    {
+        auto const f = MAX_EQUITY * squash_ctr_bp(act.out);
+
+        grad.V = f * act.hidden.Transpose();
+
+        matrix<HIDDEN, 1> lhs = f * params.V.Transpose();
+
+        for (int i = 0; i < lhs.Rows(); i++)
+            lhs(i, 0) *= squash_ctr_bp(act.hidden(i, 0));
+
+        grad.M = lhs * act.input.Transpose();
+    }
+
+    void update_model(const Parameters& adj)
+    {
+        params += adj;
+    }
+
+    MiscNet()
+    {
+        RNG_normal rand1(0, 1.0 / FEATURES);
+        for (int r = 0; r < HIDDEN; r++)
+            for (int c = 0; c < FEATURES; c++)
+                params.M(r, c) = rand1.random();
+
+        RNG_normal rand2(0, 1.0 / HIDDEN);
+        for (int c = 0; c < HIDDEN; c++)
             params.V(0, c) = rand2.random();
     }
 };

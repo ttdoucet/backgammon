@@ -101,6 +101,12 @@ static unique_ptr<BgNet> initBgNet(const string name)
     if (name == "Fc_Sig_H60_I3")
         return make_unique<Fc_Sig_H60_I3>();
 
+    if (name == "Fc_Misc_H30_I3")
+        return make_unique<Fc_Misc_H30_I3>();
+
+    if (name == "Fc_Sig_H60_I3b")
+        return make_unique<Fc_Sig_H60_I3b>();
+
     // Support other BgNets here. . .
 
     return nullptr;
@@ -112,7 +118,7 @@ std::unique_ptr<BgNet> readBgNet(const string filename)
         return r;
 
     string name = net_name(filename);
-    cout << "net id: " << name << "\n";
+    // cout << "net id: " << name << "\n";
 
     if (auto r = initBgNet(name))
     {

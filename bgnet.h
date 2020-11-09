@@ -58,25 +58,43 @@ public:
 };
 
 // Fully-connected, sigmoidal activations, 30 hidden units, input features version 3.
-class netv3 : public BackgammonNet<features_v3<float*>, 30, SigmoidNet>
+class netv3 : public BackgammonNet<features_v3, 30, SigmoidNet>
 {
 public:
     std::string netname() const { return "netv3"; }
 };
 
 // Fully-connected, sigmoidal activations, 15 hidden units, input features version 3.
-class Fc_Sig_H15_I3 : public BackgammonNet<features_v3<float*>, 15, SigmoidNet>
+class Fc_Sig_H15_I3 : public BackgammonNet<features_v3, 15, SigmoidNet>
 {
 public:
     std::string netname() const { return "Fc_Sig_H15_I3"; }
 };
 
 // Fully-connected, sigmoidal activations, 60 hidden units, input features version 3.
-class Fc_Sig_H60_I3 : public BackgammonNet<features_v3<float*>, 60, SigmoidNet>
+class Fc_Sig_H60_I3 : public BackgammonNet<features_v3, 60, SigmoidNet>
 {
 public:
     std::string netname() const { return "Fc_Sig_H60_I3"; }
 };
+
+// Fully-connected, sigmoidal activations, 60 hidden units, input features version 3b.
+class Fc_Sig_H60_I3b : public BackgammonNet<features_v3b, 60, SigmoidNet>
+{
+public:
+    std::string netname() const { return "Fc_Sig_H60_I3b"; }
+};
+
+
+
+
+// Fully-connected, sigmoidal activations, 60 hidden units, input features version 3.
+class Fc_Misc_H30_I3 : public BackgammonNet<features_v3, 30, MiscNet>
+{
+public:
+    std::string netname() const { return "Fc_Misc_H30_I3"; }
+};
+
 
 
 
