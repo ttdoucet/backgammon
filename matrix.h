@@ -234,42 +234,34 @@ std::istream& operator>>(std::istream& s, matrix<R,C>& m)
     using namespace std;
     ios_base::fmtflags f(s.flags());
 
-    try
-    {
         int rows, cols;
         string curly, fstr;
 
         s >> dec >> curly >> rows >> cols >> hexfloat;
 
         if (!s || curly != "{"s )
-            throw("matrix: could not determine geometry");
+            throw runtime_error("matrix: could not determine geometry");
 
         if ( rows != m.Rows() || cols != m.Cols() )
-            throw("matrix: geometry mismatch");
+            throw runtime_error("matrix: geometry mismatch");
 
         for (int r = 0; r < rows; r++)
             for (int c = 0; c < cols; c++)
             {
                 s >> fstr;
                 if (!s)
-                    throw("matrix: could not read float");
+                    throw runtime_error("matrix: could not read float");
                 char *end;
                 float f = strtof(fstr.c_str(), &end);
                 if ( (end - fstr.c_str()) != fstr.length())
-                    throw("matrix: float conversion error");
+                    throw runtime_error("matrix: float conversion error");
                 m(r, c) = f;
 
             }
 
         s >> curly;
         if (!s || curly != "}"s)
-            throw("matrix: expected }");
-    }
-    catch(char const* str)
-    {
-        cerr << str << "\n";
-        s.setstate(ios::failbit);
-    }
+            throw runtime_error("matrix: expected }");
 
     s.flags(f);
     return s;
