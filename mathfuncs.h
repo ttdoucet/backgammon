@@ -4,86 +4,33 @@
 #include <cmath>
 #include <algorithm>
 
-/* Sigmoidal activation function, specifically the
- * logistic function, forward and backprop versions.
- */
-inline float squash(float x)
+struct logistic
 {
-    return  1 / (1 + exp(-x));
-}
-
-inline float squash_bp(float y)
+    static float fwd(float x) { return  1 / (1 + exp(-x)); }
+    static float bwd(float y) { return y * (1 - y); }
+};
+    
+struct bipolar_sigmoid
 {
-    return y * (1 - y);
-}
-
-/* Logistic function shifted and scaled vertically to be
- * symmetric about zero, and range from -1 to +1,
- * forward and backprop.  Also called the Bipolar Sigmoid.
- */
-inline float squash_ctr(float x)
+    static float fwd(float x) { return 2 * logistic::fwd(x) - 1; }
+    static float bwd(float y) { return 2 * logistic::bwd( (y+1) / 2 ); }
+};
+    
+struct tanh_sigmoid
 {
-    return 2 * squash(x) - 1;
-}
+//  static float fwd(float x) { return 2 * logistic::fwd(2 * x) - 1; }
+    static float fwd(float x) { return tanh(x); }
+    static float bwd(float y) { return 1 - y * y; }
+};
 
-inline float squash_ctr_bp(float y)
+struct reLU
 {
-    auto b = (y+1)/2;
-    return 2 * squash_bp(b);
-}
+    static float fwd(float x) { return std::max(0.0f, x); }
+    static float bwd(float y) { return (y < 0) ? 0 : 1; }
+};
 
-
-/* The tanh activation function is naturally centered
- * about zero.
- */
-inline float squash_tanh(float x)
+struct leaky_reLU
 {
-    // return 2 * squash(2 * x) - 1;
-    return tanh(x);
-}
-
-inline float squash_tanh_bp(float y)
-{
-    return 1 - y * y;
-}
-
-/* Rectified Linear Unit activation function,
- * forward and backprop.
- */
-inline float relu(float x)
-{
-    return std::max(0.0f, x);
-}
-
-inline float relu_bp(float y)
-{
-    return (y < 0) ? 0 : 1;
-}
-
-/* Leaky rectified Linear Unit activation function,
- * forward and backprop.
- */
-inline float leaky_relu(float x)
-{
-    if (x >= 0)
-        return x;
-    else
-        return 0.01 * x;
-}
-
-inline float leaky_relu_bp(float y)
-{
-    return (y < 0) ? 0.01 : 1;
-}
-
-/* For when you want to try linear structures.
- */
-inline float identity_act(float x)
-{
-    return x;
-}
-
-inline float identity_act_bp(float y)
-{
-    return 1;
-}
+    static float fwd(float x) { return (x >= 0) ? x : (0.01 * x); }
+    static float bwd(float y) { return (y < 0) ? 0.01 : 1; }
+};

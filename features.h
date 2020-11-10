@@ -38,7 +38,7 @@ protected:
     {
         int pdiff = b.pipCount(opponentOf(color)) - b.pipCount(color);
 
-        float h = squash(pdiff / 27.0f);
+        float h = logistic::fwd(pdiff / 27.0f);
         *ib++ = h;
         *ib++ = 1.0f - h;
         return ib;
@@ -125,7 +125,7 @@ private:
     {
         int pdiff = b.pipCount(opponentOf(color)) - b.pipCount(color);
 
-        float h = squash(pdiff / 27.0f);
+        float h = logistic::fwd(pdiff / 27.0f);
         *ib++ = h;
         return ib;
     }

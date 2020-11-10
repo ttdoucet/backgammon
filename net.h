@@ -58,10 +58,10 @@ protected:
         act.hidden = params.M * act.input;
 
         for (int i = 0; i < HIDDEN; i++)
-            act.hidden(i, 0) = squash(act.hidden(i, 0));
+            act.hidden(i, 0) = logistic::fwd(act.hidden(i, 0));
 
         float x =  params.V * act.hidden;
-        act.out = squash(x);
+        act.out = logistic::fwd(x);
         return net_to_equity(act.out);
     }
 
@@ -94,14 +94,14 @@ public:
      */
     void backprop(Parameters& grad)
     {
-        auto const f = 2 * MAX_EQUITY * squash_bp(act.out);
+        auto const f = 2 * MAX_EQUITY * logistic::bwd(act.out);
 
         grad.V = f * act.hidden.Transpose();
 
         matrix<HIDDEN, 1> lhs = f * params.V.Transpose();
 
         for (int i = 0; i < lhs.Rows(); i++)
-            lhs(i, 0) *= squash_bp(act.hidden(i, 0));
+            lhs(i, 0) *= logistic::bwd(act.hidden(i, 0));
 
         grad.M = lhs * act.input.Transpose();
     }
@@ -146,10 +146,10 @@ protected:
         act.hidden = params.M * act.input;
 
         for (int i = 0; i < HIDDEN; i++)
-            act.hidden(i, 0) = squash_ctr(act.hidden(i, 0));
+            act.hidden(i, 0) = bipolar_sigmoid::fwd(act.hidden(i, 0));
 
         float x =  params.V * act.hidden;
-        act.out = squash_ctr(x); 
+        act.out = bipolar_sigmoid::fwd(x); 
         return net_to_equity(act.out);
     }
 
@@ -175,14 +175,14 @@ public:
 
     void backprop(Parameters& grad)
     {
-        auto const f = MAX_EQUITY * squash_ctr_bp(act.out);
+        auto const f = MAX_EQUITY * bipolar_sigmoid::bwd(act.out);
 
         grad.V = f * act.hidden.Transpose();
 
         matrix<HIDDEN, 1> lhs = f * params.V.Transpose();
 
         for (int i = 0; i < lhs.Rows(); i++)
-            lhs(i, 0) *= squash_ctr_bp(act.hidden(i, 0));
+            lhs(i, 0) *= bipolar_sigmoid::bwd(act.hidden(i, 0));
 
         grad.M = lhs * act.input.Transpose();
     }
