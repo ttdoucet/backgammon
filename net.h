@@ -6,11 +6,11 @@
 #include "matrix.h"
 #include "random.h"
 
-template<int FEATURES, int HIDDEN>
+template<int Features, int Hidden>
 struct TwoLayerParameters
 {
-    using W1 = matrix<HIDDEN, FEATURES>;
-    using W2 = matrix<1, HIDDEN>;
+    using W1 = matrix<Hidden, Features>;
+    using W2 = matrix<1, Hidden>;
 
     W1 M;
     W2 V;
@@ -42,46 +42,44 @@ struct TwoLayerParameters
     }
 };
 
-template<int FEATURES, int HIDDEN>
-class SigmoidNet
+template<int Features,
+         int Hidden,
+         class Activ1,
+         class Activ2,
+         class Activ3 = affine<1, 0>
+         >
+class FcTwoLayerNet
 {
 protected:
-    constexpr static int MAX_EQUITY = 3;
-
-    constexpr static float net_to_equity(float p)
-    {
-        return  (2*p - 1) * MAX_EQUITY;
-    }
 
     float feedForward()
     {
         act.hidden = params.M * act.input;
 
-        for (int i = 0; i < HIDDEN; i++)
-            act.hidden(i, 0) = logistic::fwd(act.hidden(i, 0));
+        for (int i = 0; i < Hidden; i++)
+            act.hidden(i, 0) = Activ1::fwd(act.hidden(i, 0));
 
         float x =  params.V * act.hidden;
-        act.out = logistic::fwd(x);
-        return net_to_equity(act.out);
+        act.out = Activ2::fwd(x);
+        return Activ3::fwd(act.out);
     }
 
 public:
-
-    /* Model parameters.
-     */
-    using Parameters = TwoLayerParameters<FEATURES, HIDDEN>; 
-    using InputVector =  matrix<FEATURES, 1>;
-
+    using Parameters = TwoLayerParameters<Features, Hidden>; 
     Parameters params;
 
     struct Activations
     {
-        using HiddenVector = matrix<HIDDEN, 1>;
-
+        using InputVector = matrix<Features, 1>;
+        using HiddenVector = matrix<Hidden, 1>;
+        
         InputVector input;
         HiddenVector hidden;
         float out;
     } act;
+
+
+    using InputVector = typename Activations::InputVector;
 
     InputVector& input()
     {
@@ -94,14 +92,14 @@ public:
      */
     void backprop(Parameters& grad)
     {
-        auto const f = 2 * MAX_EQUITY * logistic::bwd(act.out);
+        auto const f = Activ3::bwd(1) * Activ2::bwd(act.out);
 
         grad.V = f * act.hidden.Transpose();
 
-        matrix<HIDDEN, 1> lhs = f * params.V.Transpose();
+        matrix<Hidden, 1> lhs = f * params.V.Transpose();
 
         for (int i = 0; i < lhs.Rows(); i++)
-            lhs(i, 0) *= logistic::bwd(act.hidden(i, 0));
+            lhs(i, 0) *= Activ1::bwd(act.hidden(i, 0));
 
         grad.M = lhs * act.input.Transpose();
     }
@@ -111,97 +109,27 @@ public:
         params += adj;
     }
 
-    SigmoidNet()
+    FcTwoLayerNet()
     {
-        RNG_normal rand1(0, 1.0 / FEATURES);
-        for (int r = 0; r < HIDDEN; r++)
-            for (int c = 0; c < FEATURES; c++)
+        RNG_normal rand1(0, 1.0 / Features);
+        for (int r = 0; r < Hidden; r++)
+            for (int c = 0; c < Features; c++)
                 params.M(r, c) = rand1.random();
 
-        RNG_normal rand2(0, 1.0 / HIDDEN);
-        for (int c = 0; c < HIDDEN; c++)
+        RNG_normal rand2(0, 1.0 / Hidden);
+        for (int c = 0; c < Hidden; c++)
             params.V(0, c) = rand2.random();
     }
 };
 
-// This net in intended for experiments and investigations,
-// and its specific implementation could change often.  When
-// something is found which is desired to be kept, it can
-// be renamed to something else.  So any network data files
-// saved in this format are subject to being orphaned.
-//
-template<int FEATURES, int HIDDEN>
-class MiscNet
-{
-protected:
-    constexpr static int MAX_EQUITY = 3;
+template<int Features, int Hidden>
+class MiscNet : public FcTwoLayerNet<Features, Hidden,
+                                     bipolar_sigmoid,
+                                     bipolar_sigmoid,
+                                     affine<3, 0> > { };
 
-    constexpr static float net_to_equity(float p)
-    {
-        return  p * MAX_EQUITY;
-    }
-
-    float feedForward()
-    {
-        act.hidden = params.M * act.input;
-
-        for (int i = 0; i < HIDDEN; i++)
-            act.hidden(i, 0) = bipolar_sigmoid::fwd(act.hidden(i, 0));
-
-        float x =  params.V * act.hidden;
-        act.out = bipolar_sigmoid::fwd(x); 
-        return net_to_equity(act.out);
-    }
-
-public:
-    using Parameters = TwoLayerParameters<FEATURES, HIDDEN>; 
-    using InputVector =  matrix<FEATURES, 1>;
-
-    Parameters params;
-
-    struct Activations
-    {
-        using HiddenVector = matrix<HIDDEN, 1>;
-
-        InputVector input;
-        HiddenVector hidden;
-        float out;
-    } act;
-
-    InputVector& input()
-    {
-        return act.input;
-    }
-
-    void backprop(Parameters& grad)
-    {
-        auto const f = MAX_EQUITY * bipolar_sigmoid::bwd(act.out);
-
-        grad.V = f * act.hidden.Transpose();
-
-        matrix<HIDDEN, 1> lhs = f * params.V.Transpose();
-
-        for (int i = 0; i < lhs.Rows(); i++)
-            lhs(i, 0) *= bipolar_sigmoid::bwd(act.hidden(i, 0));
-
-        grad.M = lhs * act.input.Transpose();
-    }
-
-    void update_model(const Parameters& adj)
-    {
-        params += adj;
-    }
-
-    MiscNet()
-    {
-        RNG_normal rand1(0, 1.0 / FEATURES);
-        for (int r = 0; r < HIDDEN; r++)
-            for (int c = 0; c < FEATURES; c++)
-                params.M(r, c) = rand1.random();
-
-        RNG_normal rand2(0, 1.0 / HIDDEN);
-        for (int c = 0; c < HIDDEN; c++)
-            params.V(0, c) = rand2.random();
-    }
-};
-
+template<int Features, int Hidden>
+class SigmoidNet : public FcTwoLayerNet<Features, Hidden,
+                                        logistic,
+                                        bipolar_sigmoid,
+                                        affine<3, 0> > { };

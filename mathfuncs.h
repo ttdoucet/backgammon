@@ -34,3 +34,13 @@ struct leaky_reLU
     static float fwd(float x) { return (x >= 0) ? x : (0.01 * x); }
     static float bwd(float y) { return (y < 0) ? 0.01 : 1; }
 };
+
+// C++ limits us to integral template parameters here, unfortunately.  There
+// are awkward workarounds, but so far this suffices.
+template<int scale, int offset>
+struct affine
+{
+    static float fwd(float x) { return scale * x + offset; }
+    static float bwd(float y) { return scale; }
+};
+
