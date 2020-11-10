@@ -17,8 +17,9 @@ inline float squash_bp(float y)
     return y * (1 - y);
 }
 
-/* Logistic function shifted vertically to be
- * symmetric about zero, forward and backprop.
+/* Logistic function shifted and scaled vertically to be
+ * symmetric about zero, and range from -1 to +1,
+ * forward and backprop.  Also called the Bipolar Sigmoid.
  */
 inline float squash_ctr(float x)
 {
@@ -27,7 +28,8 @@ inline float squash_ctr(float x)
 
 inline float squash_ctr_bp(float y)
 {
-    return 2 * squash_bp(y);
+    auto b = (y+1)/2;
+    return 2 * squash_bp(b);
 }
 
 
