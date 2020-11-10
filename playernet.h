@@ -113,7 +113,7 @@ public:
         if (started)
         {
             float err = previous - equity;
-            reconsider(err);
+            backprop(err);
         }
         previous = equity;
         started = true;
@@ -123,7 +123,7 @@ public:
     {
         if (started)
         {
-            reconsider(previous - e);
+            backprop(previous - e);
             neural.update_model( grad_adj * (-alpha) );
         }
     }
@@ -139,10 +139,10 @@ private:
     float previous;
     bool started;
 
-    void reconsider(float err)
+    void backprop(float err)
     {
         typename Estimator::Parameters grad;
-        neural.backprop(grad);
+        neural.gradient(grad);
 
         grad_adj += grad_sum * err;
         grad_sum *= lambda;

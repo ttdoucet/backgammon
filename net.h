@@ -90,13 +90,14 @@ public:
      * of the net during the last forward calculation,
      * and x is any learning parameter.
      */
-    void backprop(Parameters& grad)
+    void gradient(Parameters& grad)
     {
         auto const f = Activ3::bwd(1) * Activ2::bwd(act.out);
 
         grad.V = f * act.hidden.Transpose();
 
-        matrix<Hidden, 1> lhs = f * params.V.Transpose();
+//      matrix<Hidden, 1> lhs = f * params.V.Transpose();
+        auto lhs = f * params.V.Transpose();
 
         for (int i = 0; i < lhs.Rows(); i++)
             lhs(i, 0) *= Activ1::bwd(act.hidden(i, 0));
@@ -122,6 +123,7 @@ public:
     }
 };
 
+// For experimentation--subject to frequent change.
 template<int Features, int Hidden>
 class MiscNet : public FcTwoLayerNet<Features, Hidden,
                                      bipolar_sigmoid,
