@@ -35,8 +35,6 @@ struct leaky_reLU
     static float bwd(float y) { return (y < 0) ? 0.01 : 1; }
 };
 
-// C++ limits us to integral template parameters here, unfortunately.  There
-// are awkward workarounds, but so far this suffices.
 template<int scale, int offset>
 struct affine
 {

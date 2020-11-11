@@ -59,8 +59,7 @@ protected:
         for (int i = 0; i < Hidden; i++)
             act.hidden(i, 0) = Activ1::fwd(act.hidden(i, 0));
 
-        float x =  params.V * act.hidden;
-        act.out = Activ2::fwd(x);
+        act.out = Activ2::fwd( params.V * act.hidden );
         return Activ3::fwd(act.out);
     }
 
@@ -78,7 +77,6 @@ public:
         float out;
     } act;
 
-
     using InputVector = typename Activations::InputVector;
 
     InputVector& input()
@@ -93,10 +91,7 @@ public:
     void gradient(Parameters& grad)
     {
         auto const f = Activ3::bwd(1) * Activ2::bwd(act.out);
-
         grad.V = f * act.hidden.Transpose();
-
-//      matrix<Hidden, 1> lhs = f * params.V.Transpose();
         auto lhs = f * params.V.Transpose();
 
         for (int i = 0; i < lhs.Rows(); i++)
@@ -122,16 +117,3 @@ public:
             params.V(0, c) = rand2.random();
     }
 };
-
-// For experimentation--subject to frequent change.
-template<int Features, int Hidden>
-class MiscNet : public FcTwoLayerNet<Features, Hidden,
-                                     bipolar_sigmoid,
-                                     bipolar_sigmoid,
-                                     affine<3, 0> > { };
-
-template<int Features, int Hidden>
-class SigmoidNet : public FcTwoLayerNet<Features, Hidden,
-                                        logistic,
-                                        bipolar_sigmoid,
-                                        affine<3, 0> > { };
