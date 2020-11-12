@@ -51,13 +51,12 @@ template<int Features,
 class FcTwoLayerNet
 {
 protected:
-
     float feedForward()
     {
         act.hidden = params.M * act.input;
 
-        for (int i = 0; i < Hidden; i++)
-            act.hidden(i, 0) = Activ1::fwd(act.hidden(i, 0));
+        for (auto& elem : act.hidden)
+            elem = Activ1::fwd(elem);
 
         act.out = Activ2::fwd( params.V * act.hidden );
         return Activ3::fwd(act.out);
