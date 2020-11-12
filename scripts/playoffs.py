@@ -2,7 +2,10 @@
 import sys
 import os
 
-opponent = '~/src/backgammon/good.w'
+opponent = '~/src/backgammon/nets/drc.w'
+
+print("opponent: {opponent}")
+
 trials = 100_000
 playoff_cmd = '~/src/backgammon/playoff'
 
@@ -22,8 +25,8 @@ def doit(player, opponent):
         sys.exit(1)
 
 
-start = 52
-stop = 100
+start = 89
+stop = 95
 
 os.system(f'echo white,black,trials,equity,sw,sl,gw,gl,bw,bl >>{output_file}')
 for i in range(start, stop+1):

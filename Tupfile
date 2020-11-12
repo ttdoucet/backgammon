@@ -26,6 +26,3 @@ common-src = hits.cpp bgnet.cpp move.cpp ttydisp.cpp bdata.cpp bearoff.cpp human
 #
 : nnstat.cpp  |> !compile |> %B.o
 : nnstat.o bgnet.o hits.o|> !link |> nnstat
-
-: matrix-test.cpp  |> !compile |> %B.o
-: matrix-test.o bgnet.o hits.o |> !link |> matrix-test
