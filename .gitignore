@@ -3,3 +3,8 @@
 *.bc
 *.ii
 *.s
+*.exe
+.tup
+train
+playoff
+nnstat
