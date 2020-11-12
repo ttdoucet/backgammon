@@ -212,14 +212,8 @@ private:
         if (auto p = dynamic_cast<netv3*>(&nn))
             return make_unique<Learner<netv3> > (*p, opts.alpha, opts.lambda, opts.wdual);
 
-        if (auto p = dynamic_cast<Fc_Sig_H15_I3*>(&nn))
-            return make_unique<Learner<Fc_Sig_H15_I3> > (*p, opts.alpha, opts.lambda, opts.wdual);
-
         if (auto p = dynamic_cast<Fc_Sig_H60_I3*>(&nn))
             return make_unique<Learner<Fc_Sig_H60_I3> > (*p, opts.alpha, opts.lambda, opts.wdual);
-
-        if (auto p = dynamic_cast<Fc_Sig_H60_I3b*>(&nn))
-            return make_unique<Learner<Fc_Sig_H60_I3b> > (*p, opts.alpha, opts.lambda, opts.wdual);
 
         if (auto p = dynamic_cast<Fc_Misc_H30_I3*>(&nn))
             return make_unique<Learner<Fc_Misc_H30_I3> > (*p, opts.alpha, opts.lambda, opts.wdual);
