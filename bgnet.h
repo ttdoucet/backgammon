@@ -85,6 +85,13 @@ public:
     std::string netname() const { return "Fc_Sig_H60_I3"; }
 };
 
+class Fc_Sig_H120_I3 : public BackgammonNet<features_v3, 120, SigmoidNet>
+{
+public:
+    std::string netname() const { return "Fc_Sig_H120_I3"; }
+};
+
+
 // For experimentation.
 class Fc_Misc_H30_I3 : public BackgammonNet<features_v3, 30, MiscNet>
 {
