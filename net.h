@@ -40,6 +40,18 @@ struct TwoLayerParameters
         TwoLayerParameters r(*this);
         return r *= scale;
     }
+
+    TwoLayerParameters()
+    {
+        RNG_normal rand1(0, 1.0 / Features);
+        for (int r = 0; r < Hidden; r++)
+            for (int c = 0; c < Features; c++)
+                M(r, c) = rand1.random();
+
+        RNG_normal rand2(0, 1.0 / Hidden);
+        for (int c = 0; c < Hidden; c++)
+            V(0, c) = rand2.random();
+    }
 };
 
 template<int Features,
@@ -102,17 +114,5 @@ public:
     void update_model(const Parameters& adj)
     {
         params += adj;
-    }
-
-    FcTwoLayerNet()
-    {
-        RNG_normal rand1(0, 1.0 / Features);
-        for (int r = 0; r < Hidden; r++)
-            for (int c = 0; c < Features; c++)
-                params.M(r, c) = rand1.random();
-
-        RNG_normal rand2(0, 1.0 / Hidden);
-        for (int c = 0; c < Hidden; c++)
-            params.V(0, c) = rand2.random();
     }
 };
