@@ -160,15 +160,15 @@ class matrix
 };
 
 // Conversion to float only for 1-by-1 matrix.
-template<>  inline matrix<1, 1>::operator float() const
+template<> inline matrix<1, 1>::operator float() const
 {
   return data[0][0];
 }
 
 /* Multiplication of two matrices.
  */
-template<int S1, int S2, int S3>
-   matrix<S1,S3> operator *(const matrix<S1, S2> &lhs, const matrix<S2, S3> &rhs)
+template<int S1, int S2, int S3> inline
+matrix<S1,S3> operator *(const matrix<S1, S2> &lhs, const matrix<S2, S3> &rhs)
 {
     matrix<S1,S3> result;
     for (int r = 0; r < result.Rows(); r++)
@@ -186,7 +186,8 @@ template<int S1, int S2, int S3>
 
 /* Multiplication of a matrix by a scalar.
  */
-template<int R, int C> matrix<R,C> operator*(float scale, const matrix<R,C> rhs)
+template<int R, int C> inline
+matrix<R,C> operator*(float scale, const matrix<R,C> rhs)
 {
     matrix<R,C> v(rhs);
     return v *= scale;
@@ -194,7 +195,8 @@ template<int R, int C> matrix<R,C> operator*(float scale, const matrix<R,C> rhs)
 
 /* Addition of two matrices.
  */
-template<int R, int C>  matrix<R,C> operator+(const matrix<R,C> &lhs, const matrix<R,C> &rhs)
+template<int R, int C> inline
+matrix<R,C> operator+(const matrix<R,C> &lhs, const matrix<R,C> &rhs)
 {
     matrix<R,C> v(lhs);
     return v += rhs;
@@ -202,7 +204,8 @@ template<int R, int C>  matrix<R,C> operator+(const matrix<R,C> &lhs, const matr
 
 /* Subtraction of matrices.
  */
-template<int R, int C>  matrix<R,C> operator-(const matrix<R,C> &lhs, const matrix<R,C> &rhs)
+template<int R, int C> inline
+matrix<R,C> operator-(const matrix<R,C> &lhs, const matrix<R,C> &rhs)
 {
     matrix<R,C> v(lhs);
     return v -= rhs;
