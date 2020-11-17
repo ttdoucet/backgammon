@@ -27,6 +27,7 @@ public:
     string output_black = "";
 
     float alpha  = 0.02f / 36;
+    float alpha_end = -1;
     float lambda = 0.85f;
 
     bool wdual = false;
@@ -46,7 +47,11 @@ public:
         setopt('O', "--out-black", output_black, "file to save black after training.");
 
         setopt('a', "--alpha",   alpha,
-               "learning rate (default: " + to_string(alpha) + ")"
+               "learning rate at start (default: " + to_string(alpha) + ")"
+              );
+
+        setopt('A', "--alpha_end",   alpha_end,
+               "learning rate at end (default: alpha)"
               );
 
         setopt('l', "--lambda",  lambda,
@@ -80,10 +85,16 @@ public:
         if (bdual && blearn_fn.empty())
             usage("no black learner specified for dual learning");
 
+        if (alpha_end < 0)
+            alpha_end = alpha;
     }
-
 };
 
+static float interpolate(float start, float end, int i, int count)
+{
+    double cnt = count;
+    return start * std::pow( end / start, i / cnt);
+}
 
 class TrainingSession
 {
@@ -189,6 +200,9 @@ private:
 
         for (numGames = 1; numGames <= opts.games ; numGames++)
         {
+            float alpha = interpolate(opts.alpha, opts.alpha_end, numGames-1, opts.games - 1);
+            // std::cout << "i: " << (numGames-1) << ", alpha: " << alpha << "\n";
+
             double white_eq = game.playGame();
             whitePoints += white_eq;
 

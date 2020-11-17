@@ -23,13 +23,13 @@ struct tanh_sigmoid
     static inline float bwd(float y) { return 1 - y * y; }
 };
 
-struct reLU
+struct ReLU
 {
     static inline float fwd(float x) { return std::max(0.0f, x); }
     static inline float bwd(float y) { return (y < 0) ? 0 : 1; }
 };
 
-struct leaky_reLU
+struct leaky_ReLU
 {
     static inline float fwd(float x) { return (x >= 0) ? x : (0.01 * x); }
     static inline float bwd(float y) { return (y < 0) ? 0.01 : 1; }
