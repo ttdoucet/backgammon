@@ -29,6 +29,7 @@ public:
     float alpha  = 0.02f / 36;
     float alpha_end = -1;
     float lambda = 0.85f;
+    double decay = 1.0;
 
     bool wdual = false;
     bool bdual = false;
@@ -87,14 +88,11 @@ public:
 
         if (alpha_end < 0)
             alpha_end = alpha;
+
+        if (games > 1)
+            decay = std::pow( alpha_end / alpha , 1.0 / (games - 1) );
     }
 };
-
-static float interpolate(float start, float end, int i, int count)
-{
-    double cnt = count;
-    return start * std::pow( end / start, i / cnt);
-}
 
 class TrainingSession
 {
@@ -200,9 +198,6 @@ private:
 
         for (numGames = 1; numGames <= opts.games ; numGames++)
         {
-            float alpha = interpolate(opts.alpha, opts.alpha_end, numGames-1, opts.games - 1);
-            // std::cout << "i: " << (numGames-1) << ", alpha: " << alpha << "\n";
-
             double white_eq = game.playGame();
             whitePoints += white_eq;
 
@@ -224,16 +219,16 @@ private:
     unique_ptr<NeuralNetPlayer> learner_for(BgNet& nn, const TrainingOptions& opts)
     {
         if (auto p = dynamic_cast<netv3*>(&nn))
-            return make_unique<Learner<netv3> > (*p, opts.alpha, opts.lambda, opts.wdual);
+            return make_unique<Learner<netv3> > (*p, opts.alpha, opts.lambda, opts.wdual, opts.decay);
 
         if (auto p = dynamic_cast<Fc_Sig_H60_I3*>(&nn))
-            return make_unique<Learner<Fc_Sig_H60_I3> > (*p, opts.alpha, opts.lambda, opts.wdual);
+            return make_unique<Learner<Fc_Sig_H60_I3> > (*p, opts.alpha, opts.lambda, opts.wdual, opts.decay);
 
         if (auto p = dynamic_cast<Fc_Sig_H120_I3*>(&nn))
-            return make_unique<Learner<Fc_Sig_H120_I3> > (*p, opts.alpha, opts.lambda, opts.wdual);
+            return make_unique<Learner<Fc_Sig_H120_I3> > (*p, opts.alpha, opts.lambda, opts.wdual, opts.decay);
 
         if (auto p = dynamic_cast<Fc_Misc_H30_I3*>(&nn))
-            return make_unique<Learner<Fc_Misc_H30_I3> > (*p, opts.alpha, opts.lambda, opts.wdual);
+            return make_unique<Learner<Fc_Misc_H30_I3> > (*p, opts.alpha, opts.lambda, opts.wdual, opts.decay);
 
         // Support learning in additional neural net players here. . .
 

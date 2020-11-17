@@ -92,11 +92,13 @@ template<class Estimator>
 class TemporalDifference
 {
 public:
-    TemporalDifference(Estimator& neural, float alpha, float lambda)
+    TemporalDifference(Estimator& neural, float a, float lambda, double decay)
         : neural{neural},
-          alpha{alpha},
-          lambda{lambda}
+          alpha{a},
+          lambda{lambda},
+          decay{decay}
     {
+        alpha /= decay;
     }
 
     void start()
@@ -104,6 +106,7 @@ public:
         grad_adj.clear();
         grad_sum.clear();
         started = false;
+        alpha *= decay;
     }
 
     void observe(const board& b)
@@ -132,6 +135,7 @@ private:
     Estimator& neural;
     float lambda; // Temporal discount.
     float alpha;  // Learning rate.
+    double decay; // Rate to decay learning rate.
 
     typename Estimator::Parameters grad_sum;
     typename Estimator::Parameters grad_adj;
@@ -159,12 +163,12 @@ class Learner : public NeuralNetPlayer
     bool dual;
 
 public:
-      Learner(Estimator& estimator, float alpha, float lambda, bool dual=false)
-          : NeuralNetPlayer(estimator),
-            mine{estimator},
-            our_side(mine, alpha, lambda),
-            opp_side(mine, alpha, lambda),
-            dual{dual}
+    Learner(Estimator& estimator, float alpha, float lambda, bool dual, double decay)
+        : NeuralNetPlayer(estimator),
+          mine{estimator},
+          our_side(mine, alpha, lambda, decay),
+          opp_side(mine, alpha, lambda, decay),
+          dual{dual}
     {
     }
 
