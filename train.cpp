@@ -51,7 +51,7 @@ public:
                "learning rate at start (default: " + to_string(alpha) + ")"
               );
 
-        setopt('A', "--alpha_end",   alpha_end,
+        setopt('A', "--alpha-end",   alpha_end,
                "learning rate at end (default: alpha)"
               );
 
