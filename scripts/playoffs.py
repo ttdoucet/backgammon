@@ -3,16 +3,24 @@ import sys
 import os
 
 opponent = '~/src/backgammon/nets/drc.w'
-
-print("opponent: {opponent}")
-
-trials = 100_000
 playoff_cmd = '~/src/backgammon/playoff'
+trials = 100_000
 
-output_file = 'playoffs.csv'
+def usage():
+    print("playoff CSV-file from [to]")
+    print("")
+    print("  Perform playoffs and append results to CSV file.")
+    print("")
+    print("  The CSV file need not exist initially.")
+    print("")
+    print("  The sequences numbers 'from' and 'to' are numbers, and")
+    print("  the net files to use are derived from those numbers")
+    print("  and the sequence values.")
+    print("")
+    sys.exit(-1)
 
-def doit(player, opponent):
-    cmd = f'{playoff_cmd} -e 1000 -n {trials} {player} {opponent} 2>>{output_file}'
+def playoff(csv, player, opponent):
+    cmd = f'{playoff_cmd} -e 1000 -n {trials} {player} {opponent} 2>>{csv}'
     print(cmd)
     r = os.system(cmd)
 
@@ -25,11 +33,28 @@ def doit(player, opponent):
         sys.exit(1)
 
 
-start = 89
-stop = 95
+def playoffs(csv, bname, start, stop):
+    os.system(f'echo white,black,trials,equity,sw,sl,gw,gl,bw,bl >>{csv}')
+    for i in range(start, stop+1):
+        player = f'{bname}-{i}.w'
+        playoff(csv, player, opponent)
 
-os.system(f'echo white,black,trials,equity,sw,sl,gw,gl,bw,bl >>{output_file}')
-for i in range(start, stop+1):
-    player = f'white-{i}.w'
-    doit(player, opponent)
+
+def main(args):
+    n = len(args)
+    if n < 3 or n > 4:
+        usage()
+
+    csv = args[1]
+    bname = os.path.splitext(csv)[0]
+    start = int(args[2])
+    if n == 4:
+        stop = int(args[3])
+    else:
+        stop = f
+        
+    print("okay", csv, bname, start, stop)
+    playoffs(csv, bname, start, stop)
+
+main(sys.argv)
 
