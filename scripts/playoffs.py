@@ -51,7 +51,7 @@ def main(args):
     if n == 4:
         stop = int(args[3])
     else:
-        stop = f
+        stop = start
         
     print("okay", csv, bname, start, stop)
     playoffs(csv, bname, start, stop)
