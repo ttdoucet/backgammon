@@ -28,6 +28,9 @@ static unique_ptr<BgNet> initBgNet(const string name)
     if (name == "Fc_Sig_H60_I3")
         return make_unique<Fc_Sig_H60_I3>();
 
+    if (name == "Fc_Sig_H90_I3")
+        return make_unique<Fc_Sig_H90_I3>();
+
     if (name == "Fc_Sig_H120_I3")
         return make_unique<Fc_Sig_H120_I3>();
 
