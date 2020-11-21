@@ -53,7 +53,6 @@ def main(args):
     else:
         stop = start
         
-    print("okay", csv, bname, start, stop)
     playoffs(csv, bname, start, stop)
 
 main(sys.argv)
