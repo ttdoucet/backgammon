@@ -5,9 +5,23 @@ import os
 import sys
 import re
 
+class filter():
+    "Exponential moving average filter."
+    def __init__(self, halflife=10):
+        self.a = None
+        self.d = 0 if halflife==0 else 0.5 ** (1/halflife)
+
+    def __call__(self, v):
+        self.a = v if self.a is None else self.d * self.a + (1-self.d) * v
+        return self.a
+
+
+
 def smooth(y):
-    from scipy.signal import savgol_filter
-    return savgol_filter(y, 7, 1)
+    filt = filter(halflife = 3.5)
+    return [filt(v) for v in y]
+#    from scipy.signal import savgol_filter
+#    return savgol_filter(y, 7, 1)
 
 def sequence(names):
     def seqno(name):
@@ -25,7 +39,7 @@ def plot_file(filename):
     playoffs.loc[:, 'equity-smoothed'] = smooth(playoffs.equity.values)
     playoffs.loc[:, 'millions'] = sequence(playoffs['white'].values)
 
-    playoffs.plot(ax=ax, x='millions', y='equity', grid=True, label=name)
+    #playoffs.plot(ax=ax, x='millions', y='equity', grid=True, label=name)
     playoffs.plot(ax=ax, x='millions', y='equity-smoothed', grid=True, label=name+' (smoothed)')
 
 
