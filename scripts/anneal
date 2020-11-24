@@ -35,7 +35,7 @@ def anneal_schedule(a_start, a_stop, rounds, frm=0, lambda_=0.85, basename='whit
                f'-d -e {every} ' \
                f'-w {fromfile} -o {tofile}'
 
-        print( cmd)
+        print(cmd)
         alpha = alpha * decay
 
 
@@ -47,9 +47,10 @@ def initialize_net(net_type, basename='white'):
 
 
 bname = 'h60-a'
-a_start = 0.001
-a_stop = a_start / 50
-rounds = 100
+a_start = 2e-5
+a_stop =  2e-5
+rounds = 200
 
-initialize_net('Fc_Sig_H60_I3', basename=bname);
-anneal_schedule(a_start, a_stop, rounds, basename=bname)
+#initialize_net('Fc_Sig_H60_I3', basename=bname);
+#initialize_net('Fc_Sig_H90_I3', basename=bname);
+anneal_schedule(a_start, a_stop, rounds, basename=bname, frm=100)

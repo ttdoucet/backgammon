@@ -15,10 +15,10 @@ class filter():
         self.a = v if self.a is None else self.d * self.a + (1-self.d) * v
         return self.a
 
-
-
 def smooth(y):
-    filt = filter(halflife = 3.5)
+    filt_p = filter(halflife = 12)
+    filt = filter(halflife = 6)
+    # return [filt(v) - filt_p(v) for v in y]
     return [filt(v) for v in y]
 #    from scipy.signal import savgol_filter
 #    return savgol_filter(y, 7, 1)

@@ -34,7 +34,9 @@ def playoff(csv, player, opponent):
 
 
 def playoffs(csv, bname, start, stop):
-    os.system(f'echo white,black,trials,equity,sw,sl,gw,gl,bw,bl >>{csv}')
+    if os.path.isfile(csv) == False:
+        os.system(f'echo white,black,trials,equity,sw,sl,gw,gl,bw,bl >>{csv}')
+
     for i in range(start, stop+1):
         player = f'{bname}-{i}.w'
         playoff(csv, player, opponent)
