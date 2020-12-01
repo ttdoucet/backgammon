@@ -45,6 +45,7 @@ def plot_file(filename):
     #playoffs.plot(ax=ax, x='millions', y='equity', grid=True, label=name)
     playoffs.plot(ax=ax, x='millions', y='equity-smoothed', grid=True, label=name+' (smoothed)')
     ax.yaxis.set_major_locator(ticker.MultipleLocator(tick_spacing))
+    ax.legend(loc='lower right')
 
     fig.tight_layout()
 
