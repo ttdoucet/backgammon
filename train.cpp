@@ -230,6 +230,9 @@ private:
         if (auto p = dynamic_cast<Fc_Sig_H120_I3*>(&nn))
             return make_unique<Learner<Fc_Sig_H120_I3> > (*p, opts.alpha, opts.lambda, opts.wdual, opts.decay);
 
+        if (auto p = dynamic_cast<Fc_Sig_H1024_I3*>(&nn))
+            return make_unique<Learner<Fc_Sig_H1024_I3> > (*p, opts.alpha, opts.lambda, opts.wdual, opts.decay);
+
         if (auto p = dynamic_cast<Fc_Misc_H30_I3*>(&nn))
             return make_unique<Learner<Fc_Misc_H30_I3> > (*p, opts.alpha, opts.lambda, opts.wdual, opts.decay);
 
