@@ -19,6 +19,7 @@ class filter():
 def smooth(y):
     from scipy.signal import savgol_filter
     return savgol_filter(y, 7, 1)
+
     # filt_p = filter(halflife = 12)
     # filt = filter(halflife = 6)
     # return [filt(v) - filt_p(v) for v in y]
@@ -34,6 +35,7 @@ def sequence(names):
 fig, ax = plt.subplots()
 tick_spacing = 0.01
 
+
 def plot_file(filename):
     bname = os.path.basename(filename)
     name = os.path.splitext(bname)[0]
@@ -42,7 +44,7 @@ def plot_file(filename):
     playoffs.loc[:, 'equity-smoothed'] = smooth(playoffs.equity.values)
     playoffs.loc[:, 'millions'] = sequence(playoffs['white'].values)
 
-    #playoffs.plot(ax=ax, x='millions', y='equity', grid=True, label=name)
+    playoffs.plot(ax=ax, x='millions', y='equity', grid=True, label=name, alpha=0.25)
     playoffs.plot(ax=ax, x='millions', y='equity-smoothed', grid=True, label=name+' (smoothed)')
     ax.yaxis.set_major_locator(ticker.MultipleLocator(tick_spacing))
     ax.legend(loc='lower right')
