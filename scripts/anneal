@@ -7,7 +7,7 @@ games_per_round = 1_000_000
 def file_for(basename, number):
     return f'{basename}-{number}.w'
 
-def anneal_schedule(a_start, a_stop, rounds, frm=0, lambda_=0.85, basename='white'):
+def anneal_schedule(a_start, a_stop, rounds, frm=0, lambda_=0.85, basename='white', opponent=None):
 
     games = games_per_round * rounds
     decay = (a_stop / a_start) ** (1 / rounds)
@@ -19,6 +19,10 @@ def anneal_schedule(a_start, a_stop, rounds, frm=0, lambda_=0.85, basename='whit
     print("# games per round:", games_per_round)
     print("# rounds:", rounds)
     print("# decay per round:", decay)
+    if opponent:
+        print("# opponent: ", opponent)
+    else:
+        print("# opponent:", "self")
     print("#")
 
     every = 1000
@@ -33,7 +37,10 @@ def anneal_schedule(a_start, a_stop, rounds, frm=0, lambda_=0.85, basename='whit
                f'--lambda {lambda_} ' \
                f'--games {games_per_round} ' \
                f'-d -e {every} ' \
-               f'-w {fromfile} -o {tofile}'
+               f'-w {fromfile} -o {tofile}' \
+
+        if opponent is not None:
+            cmd += f' -b {opponent}'
 
         print(cmd)
         alpha = alpha * decay
@@ -46,12 +53,14 @@ def initialize_net(net_type, basename='white'):
     print(cmd);
 
 
-bname = 'h30-400m'
+opponent = '../h30-200m/h30-200m-200.w'
+bname = 'h120-200m--h30'
 a_start = 0.001
-a_stop =  2.5e-6
-rounds = 800
+a_stop = 5e-5 / 20
+rounds = 400
 lmbda = 0.85
 
-#initialize_net('Fc_Sig_H60_I3', basename=bname);
-initialize_net('netv3', basename=bname);
-anneal_schedule(a_start, a_stop, rounds, basename=bname, lambda_=lmbda, frm=0)
+initialize_net('Fc_Sig_H120_I3', basename=bname);
+#initialize_net('netv3', basename=bname);
+anneal_schedule(a_start, a_stop, rounds, basename=bname, lambda_=lmbda, frm=0, opponent=opponent)
+
