@@ -1,11 +1,14 @@
 sysname = $(shell uname -s)
+archname = $(shell uname -m)
 
 CXXFLAGS = -Ofast -ffast-math --std=c++17 -MMD
 LDFLAGS = -L bearoff -lbearoff
 
 ifeq ($(sysname), Linux)
-  CXX = g++-10
-  CXXFLAGS += -march=sandybridge -mtune=sandybridge
+  ifeq ($(archname), x86_64)
+    CXX = g++-10
+    CXXFLAGS += -march=sandybridge -mtune=sandybridge
+  endif
 endif
 
 ifeq ($(sysname), Darwin)
