@@ -7,7 +7,7 @@
 
 #include "game.h"
 #include "bgnet.h"
-#include "bearoff.h"
+#include "bearoff/bearoff.h"
 
 using std::string;
 

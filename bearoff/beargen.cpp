@@ -8,17 +8,13 @@
 #include <cstdint>
 
 #include "move.h"
+#include "beargen.h"
 #include "bearoff.h"
 
 struct bear_off bear_off[bsize];
 
 int p_output;
 int perm_data[10];
-
-// shared between this generator and the main code
-extern int board_to_index(uint32_t b);
-extern double fewerEq(uint32_t b, int n);
-extern uint32_t board_to_32(const board &b, color_t c);
 
 std::string print_bearoffs()
 {

@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cstdint>
 
+#include "beargen.h"
 #include "bearoff.h"
 
 extern struct bear_off bear_off[bsize];

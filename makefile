@@ -1,36 +1,28 @@
 sysname = $(shell uname -s)
 
+CXXFLAGS = -Ofast -ffast-math --std=c++17 -L bearoff
+
 ifeq ($(sysname), Linux)
   CXX = g++-10
-  CXXFLAGS = -Ofast -ffast-math --std=c++17 -march=sandybridge -mtune=sandybridge
+  CXXFLAGS += -march=sandybridge -mtune=sandybridge
 endif
 
 ifeq ($(sysname), Darwin)
   CXX = clang++
-  CXXFLAGS = -Ofast -ffast-math --std=c++17
 endif
 
-all : playoff train
+all : bearoff/libbearoff.a  playoff train
 
-common_src = hits.cpp bgnet.cpp move.cpp ttydisp.cpp bearoff.cpp human.cpp
+common_src = hits.cpp bgnet.cpp move.cpp ttydisp.cpp human.cpp
 
-playoff_src = playoff.cpp $(common_src)
+playoff : playoff.cpp $(common_src)
+	$(CXX) $(CXXFLAGS) $^ -lbearoff -o playoff
 
-playoff : $(playoff_src) bdata.o
-	$(CXX) $(CXXFLAGS) $(playoff_src) bdata.o -o playoff
+train : train.cpp $(common_src)
+	$(CXX) $(CXXFLAGS) $^ -l bearoff -o train
 
-
-train_src = train.cpp $(common_src)
-
-train : $(train_src)
-	$(CXX) $(CXXFLAGS) $(train_src) bdata.o -o train
-
-bearoff/bearoff.dat:
-	$(MAKE) -C bearoff bearoff.dat
-
-bdata.o : bdata.cpp bearoff/bearoff.dat
-	$(CXX) $(CXXFLAGS) -c bdata.cpp
-
+bearoff/libbearoff.a :
+	$(MAKE) -C bearoff libbearoff.a
 
 
 .PHONY : clean distclean

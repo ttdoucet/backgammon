@@ -1,15 +1,4 @@
-/* Written by Todd Doucet.  See file copyright.txt.
+/* Interface to the bearoff library.
  */
-#include "board.h"
-
-struct bear_off
-{
-    unsigned int board;
-    float expectation;
-    float f[15];
-};
-
-constexpr int bsize = 54264;
-extern bear_off bearoff[bsize];
-
+#include "../board.h"
 float bearoffEquity(const board &b);
