@@ -1,5 +1,14 @@
-cpp = g++-10
-cpp_flags = -Ofast -ffast-math --std=c++17 -march=sandybridge -mtune=sandybridge
+sysname = $(shell uname -s)
+
+ifeq ($(sysname), Linux)
+  cpp = g++-10
+  cpp_flags = -Ofast -ffast-math --std=c++17 -march=sandybridge -mtune=sandybridge
+endif
+
+ifeq ($(sysname), Darwin)
+  cpp = clang++
+  cpp_flags = -Ofast -ffast-math --std=c++17
+endif
 
 all : playoff train
 
