@@ -8,7 +8,7 @@ bearoff.dat : beargen
 	./beargen > bearoff.dat
 
 libbearoff.a : bearoff.dat bdata.cpp bearoff.cpp
-	$(CXX) $(CXXFLAGS) -c bearoff.cpp bdata.cpp
+	$(CXX) $(CXXFLAGS) -fPIC -c bearoff.cpp bdata.cpp
 	$(AR) rcs libbearoff.a bdata.o bearoff.o
 
 .PHONY : clean
