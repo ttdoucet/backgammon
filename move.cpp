@@ -3,6 +3,7 @@
 #include <assert.h>
 #include <iomanip>
 #include "move.h"
+#include <sstream>
 
 class LegalPlay
 {

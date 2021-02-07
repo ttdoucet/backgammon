@@ -1,5 +1,8 @@
 /* Written by Todd Doucet.  See file copyright.txt.
  */
+
+#include <sstream>
+#include <string>
 #include <iostream>
 #include <iomanip>
 #include <cstdint>
