@@ -1,4 +1,4 @@
-cpp = g++
+cpp = clang++
 cpp_flags = -Ofast -ffast-math --std=c++17
 
 src = beargen.cpp bearoff.cpp move.cpp

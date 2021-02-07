@@ -1,5 +1,5 @@
-cpp = g++
-cpp_flags = -Ofast -ffast-math --std=c++17
+cpp = g++-10
+cpp_flags = -Ofast -ffast-math --std=c++17 -march=sandybridge -mtune=sandybridge
 
 all : playoff train
 
@@ -21,6 +21,9 @@ bearoff.dat : bearoff/beargen
 
 bdata.o : bdata.cpp bearoff.dat
 	$(cpp) $(cpp_flags) -c bdata.cpp
+
+bearoff/beargen:
+	cd bearoff && make
 
 clean :
 	-rm playoff train
