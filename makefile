@@ -34,8 +34,8 @@ dep = $(all_obj:.o=.d)
 .PHONY : clean distclean
 
 clean :
-	-rm playoff train *.o *.d
+	-@rm playoff train *.o *.d 2>/dev/null || true
 
 distclean :
-	$(MAKE) -C bearoff distclean
-	$(MAKE) clean
+	@$(MAKE) -C bearoff distclean
+	@$(MAKE) clean

@@ -14,8 +14,8 @@ libbearoff.a : bearoff.dat bdata.cpp bearoff.cpp
 .PHONY : clean
 
 clean:
-	-rm beargen bearoff.dat *.o *.a
+	@rm beargen bearoff.dat *.o *.a 2>/dev/null || true
 
 distclean :
-	make clean
+	@make clean
 
