@@ -20,13 +20,13 @@ int board_to_index(uint32_t b)
 */
 double fewerEq(uint32_t b, int n)
 {
-	if (n == 0)
-            return (b == 0x0f);
-        else
-        {
-            int i = board_to_index(b);
-            return bear_off[i].f[n-1];
-	}
+    if (n == 0)
+        return (b == 0x0f);
+    else
+    {
+        int i = board_to_index(b);
+        return bear_off[i].f[n-1];
+    }
 }
 
 /* Return the probability that the bearoff position denoted
@@ -34,9 +34,9 @@ double fewerEq(uint32_t b, int n)
 */
 double greaterEq(uint32_t b, int n)
 {
-	if (n == 0)
-		return 1.0;
-	return 1.0 - fewerEq(b, n - 1);
+    if (n == 0)
+        return 1.0;
+    return 1.0 - fewerEq(b, n - 1);
 }
 
 /* Return the probability that the bearoff position denoted
@@ -44,17 +44,17 @@ double greaterEq(uint32_t b, int n)
 */
 double exact(uint32_t b, int n)
 {
-	if (n == 0)
-            return b == 0x0f;
-	return fewerEq(b, n) - fewerEq(b, n - 1);
+    if (n == 0)
+        return b == 0x0f;
+    return fewerEq(b, n) - fewerEq(b, n - 1);
 }
 
 double bearoffEquity(uint32_t onRoll, uint32_t notOnRoll)
 {
-	double p = 0.0;
-	for (int i = 0; i <= 15; i++)
-		p += (exact(onRoll, i) * greaterEq(notOnRoll, i));
-	return (2.0 * p) - 1.0;
+    double p = 0.0;
+    for (int i = 0; i <= 15; i++)
+        p += (exact(onRoll, i) * greaterEq(notOnRoll, i));
+    return (2.0 * p) - 1.0;
 }
 
 uint32_t board_to_32(const board &b, color_t c)

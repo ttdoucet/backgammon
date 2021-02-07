@@ -1,3 +1,3 @@
 #include "bearoff.h"
 
-#include "bearoff.dat"
+#include "bearoff/bearoff.dat"
