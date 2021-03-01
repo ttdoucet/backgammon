@@ -92,13 +92,18 @@ template<class Estimator>
 class TemporalDifference
 {
 public:
-    TemporalDifference(Estimator& neural, float a, float lambda, double decay)
+    TemporalDifference(Estimator& neural, float a, float lambda, double decay, int batchsize)
         : neural{neural},
           alpha{a},
           lambda{lambda},
-          decay{decay}
+          decay{decay},
+          batchsize{batchsize}
     {
         alpha /= decay;
+
+        if (batchsize != 1)
+            std::cout << "TemporalDifference Warning: batchsize = " << batchsize << " nyi\n";
+
     }
 
     void start()
@@ -136,6 +141,7 @@ private:
     float lambda; // Temporal discount.
     float alpha;  // Learning rate.
     double decay; // Rate to decay learning rate.
+    int batchsize; // number of games per batch
 
     typename Estimator::Parameters grad_sum;
     typename Estimator::Parameters grad_adj;
@@ -163,11 +169,11 @@ class Learner : public NeuralNetPlayer
     bool dual;
 
 public:
-    Learner(Estimator& estimator, float alpha, float lambda, bool dual, double decay)
+    Learner(Estimator& estimator, float alpha, float lambda, bool dual, double decay, int batchsize)
         : NeuralNetPlayer(estimator),
           mine{estimator},
-          our_side(mine, alpha, lambda, decay),
-          opp_side(mine, alpha, lambda, decay),
+          our_side(mine, alpha, lambda, decay, batchsize),
+          opp_side(mine, alpha, lambda, decay, batchsize),
           dual{dual}
     {
     }
