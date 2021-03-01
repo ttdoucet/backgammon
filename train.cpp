@@ -16,6 +16,7 @@ class TrainingOptions : public cmdline
 public:
     // command-line options
     int games = 100000;
+    int batchsize = 1;
     int every = 100;
     uint64_t user_seed = -1;
 
@@ -36,16 +37,18 @@ public:
 
     TrainingOptions()
     {
-        setopt('n', "--games",   games, "number of games.");
-        setopt('e', "--every",   every, "Report every n games.");
+        setopt('n', "--games",   games, "games to play");
+        setopt("--batchsize", batchsize, "games per batch (default: "
+               + to_string(batchsize) + ")\n");
 
         setopt('w', "--white-learner", wlearn_fn, "file for white learner");
         setopt('b', "--black-player",  bplay_fn, " file for black player");
-        setopt('B', "--black-learner", blearn_fn, "file for black learner");
+        setopt('B', "--black-learner", blearn_fn, "file for black learner\n");
         setopt('d', "--white-dual",    wdual,   "  white observes both sides");
-        setopt('D', "--black-dual",    bdual,   "  black observes both sides");
+        setopt('D', "--black-dual",    bdual,   "  black observes both sides\n");
+
         setopt('o', "--out-white", output_white, "file to save white after training.");
-        setopt('O', "--out-black", output_black, "file to save black after training.");
+        setopt('O', "--out-black", output_black, "file to save black after training.\n");
 
         setopt('a', "--alpha",   alpha,
                "learning rate at start (default: " + to_string(alpha) + ")"
@@ -56,8 +59,11 @@ public:
               );
 
         setopt('l', "--lambda",  lambda,
-               "temporal discount (default: " + to_string(lambda) + ")"
+               "temporal discount (default: " + to_string(lambda) + ")\n"
               );
+
+
+        setopt('e', "--every",   every, "Report every n games.");
     }
 
     virtual void usage(const string& s=""s, bool terminate=true) override
