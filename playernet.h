@@ -100,10 +100,8 @@ public:
           batchsize{batchsize}
     {
         alpha /= decay;
-
-        if (batchsize != 1)
-            std::cout << "TemporalDifference Warning: batchsize = " << batchsize << " nyi\n";
-
+        batch_grad.clear();
+        seq = 0;
     }
 
     void start()
@@ -132,7 +130,14 @@ public:
         if (started)
         {
             backprop(previous - e);
-            neural.update_model( grad_adj * (-alpha) );
+
+            batch_grad += grad_adj;
+            if (++seq == batchsize)
+            {
+                neural.update_model(batch_grad * (-alpha));
+                seq = 0;
+                batch_grad.clear();
+            }
         }
     }
 
@@ -145,9 +150,11 @@ private:
 
     typename Estimator::Parameters grad_sum;
     typename Estimator::Parameters grad_adj;
+    typename Estimator::Parameters batch_grad;
 
     float previous;
     bool started;
+    int seq = 0;
 
     void backprop(float err)
     {

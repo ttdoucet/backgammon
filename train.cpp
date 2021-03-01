@@ -38,7 +38,7 @@ public:
     TrainingOptions()
     {
         setopt('n', "--games",   games, "games to play");
-        setopt("--batchsize", batchsize, "games per batch (default: "
+        setopt("--batch-size", batchsize, "games per batch (default: "
                + to_string(batchsize) + ")\n");
 
         setopt('w', "--white-learner", wlearn_fn, "file for white learner");
