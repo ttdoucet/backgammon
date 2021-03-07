@@ -44,7 +44,7 @@ def plot_file(filename):
     playoffs.loc[:, 'equity-smoothed'] = smooth(playoffs.equity.values)
     playoffs.loc[:, 'millions'] = sequence(playoffs['white'].values)
 
-    playoffs.plot(ax=ax, x='millions', y='equity', grid=True, label=name, alpha=0.25)
+    # playoffs.plot(ax=ax, x='millions', y='equity', grid=True, label=name, alpha=0.25)
     playoffs.plot(ax=ax, x='millions', y='equity-smoothed', grid=True, label=name+' (smoothed)')
     ax.yaxis.set_major_locator(ticker.MultipleLocator(tick_spacing))
     ax.legend(loc='lower right')

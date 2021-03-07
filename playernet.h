@@ -92,12 +92,19 @@ template<class Estimator>
 class TemporalDifference
 {
 public:
-    TemporalDifference(Estimator& neural, float a, float lambda, double decay, int batchsize)
+    TemporalDifference(Estimator& neural,
+		       float a,
+		       float lambda,
+		       double decay,
+		       int batchsize,
+	               float momentum=0
+    )
         : neural{neural},
           alpha{a},
           lambda{lambda},
           decay{decay},
-          batchsize{batchsize}
+          batchsize{batchsize},
+	  momentum{momentum}
     {
         alpha /= decay;
         batch_grad.clear();
@@ -131,7 +138,11 @@ public:
         {
             backprop(previous - e);
 
-            batch_grad += grad_adj;
+	    if (momentum == 0)
+		    batch_grad += grad_adj;
+	    else
+		    batch_grad = batch_grad * momentum + grad_adj * (1 - momentum);
+
             if (++seq == batchsize)
             {
                 neural.update_model(batch_grad * (-alpha));
@@ -147,6 +158,7 @@ private:
     float alpha;  // Learning rate.
     double decay; // Rate to decay learning rate.
     int batchsize; // number of games per batch
+    float momentum; // exponential decay factor for gradient
 
     typename Estimator::Parameters grad_sum;
     typename Estimator::Parameters grad_adj;
@@ -176,11 +188,18 @@ class Learner : public NeuralNetPlayer
     bool dual;
 
 public:
-    Learner(Estimator& estimator, float alpha, float lambda, bool dual, double decay, int batchsize)
+    Learner(Estimator& estimator,
+	    float alpha,
+	    float lambda,
+	    bool dual,
+	    double decay,
+	    int batchsize,
+	    float momentum
+     )
         : NeuralNetPlayer(estimator),
           mine{estimator},
-          our_side(mine, alpha, lambda, decay, batchsize),
-          opp_side(mine, alpha, lambda, decay, batchsize),
+          our_side(mine, alpha, lambda, decay, batchsize, momentum),
+          opp_side(mine, alpha, lambda, decay, batchsize, momentum),
           dual{dual}
     {
     }

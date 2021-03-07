@@ -31,6 +31,7 @@ public:
     float alpha_end = -1;
     float lambda = 0.85f;
     double decay = 1.0;
+    float momentum = 0;
 
     bool wdual = false;
     bool bdual = false;
@@ -62,6 +63,9 @@ public:
                "temporal discount (default: " + to_string(lambda) + ")\n"
               );
 
+	setopt('p', "--momentum", momentum,
+               "factor to exponentiallly average gradient (default: " + to_string(momentum) + ")\n"
+              );
 
         setopt('e', "--every",   every, "Report every n games.");
     }
@@ -225,22 +229,22 @@ private:
     unique_ptr<NeuralNetPlayer> learner_for(BgNet& nn, const TrainingOptions& opts)
     {
         if (auto p = dynamic_cast<netv3*>(&nn))
-            return make_unique<Learner<netv3> > (*p, opts.alpha, opts.lambda, opts.wdual, opts.decay, opts.batchsize);
+	    return make_unique<Learner<netv3> > (*p, opts.alpha, opts.lambda, opts.wdual, opts.decay, opts.batchsize, opts.momentum);
 
         if (auto p = dynamic_cast<Fc_Sig_H60_I3*>(&nn))
-            return make_unique<Learner<Fc_Sig_H60_I3> > (*p, opts.alpha, opts.lambda, opts.wdual, opts.decay, opts.batchsize);
+	    return make_unique<Learner<Fc_Sig_H60_I3> > (*p, opts.alpha, opts.lambda, opts.wdual, opts.decay, opts.batchsize, opts.momentum);
 
         if (auto p = dynamic_cast<Fc_Sig_H90_I3*>(&nn))
-            return make_unique<Learner<Fc_Sig_H90_I3> > (*p, opts.alpha, opts.lambda, opts.wdual, opts.decay, opts.batchsize);
+            return make_unique<Learner<Fc_Sig_H90_I3> > (*p, opts.alpha, opts.lambda, opts.wdual, opts.decay, opts.batchsize, opts.momentum);
 
         if (auto p = dynamic_cast<Fc_Sig_H120_I3*>(&nn))
-            return make_unique<Learner<Fc_Sig_H120_I3> > (*p, opts.alpha, opts.lambda, opts.wdual, opts.decay, opts.batchsize);
+            return make_unique<Learner<Fc_Sig_H120_I3> > (*p, opts.alpha, opts.lambda, opts.wdual, opts.decay, opts.batchsize, opts.momentum);
 
         if (auto p = dynamic_cast<Fc_Sig_H1024_I3*>(&nn))
-            return make_unique<Learner<Fc_Sig_H1024_I3> > (*p, opts.alpha, opts.lambda, opts.wdual, opts.decay, opts.batchsize);
+            return make_unique<Learner<Fc_Sig_H1024_I3> > (*p, opts.alpha, opts.lambda, opts.wdual, opts.decay, opts.batchsize, opts.momentum);
 
         if (auto p = dynamic_cast<Fc_Misc_H30_I3*>(&nn))
-            return make_unique<Learner<Fc_Misc_H30_I3> > (*p, opts.alpha, opts.lambda, opts.wdual, opts.decay, opts.batchsize);
+            return make_unique<Learner<Fc_Misc_H30_I3> > (*p, opts.alpha, opts.lambda, opts.wdual, opts.decay, opts.batchsize, opts.momentum);
 
         // Support learning in additional neural net players here. . .
 

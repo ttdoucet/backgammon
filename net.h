@@ -42,6 +42,16 @@ struct TwoLayerParameters
     }
 };
 
+template<int F, int H>
+TwoLayerParameters<F,H> operator+(const TwoLayerParameters<F,H> &lhs,
+				  const TwoLayerParameters<F,H> &rhs)
+{
+    TwoLayerParameters<F,H> v(lhs);
+    return v += rhs;
+}
+
+
+
 template<int Features,
          int Hidden,
          class Activ1,
