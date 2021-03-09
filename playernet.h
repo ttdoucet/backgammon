@@ -141,7 +141,7 @@ public:
 	    if (momentum == 0)
 		    batch_grad += grad_adj;
 	    else
-		    batch_grad = batch_grad * momentum + grad_adj * (1 - momentum);
+		    batch_grad += batch_grad * momentum + grad_adj * (1 - momentum);
 
             if (++seq == batchsize)
             {
