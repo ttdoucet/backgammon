@@ -97,7 +97,7 @@ public:
 		       float lambda,
 		       double decay,
 		       int batchsize,
-	               float momentum=0
+	               float momentum
     )
         : neural{neural},
           alpha{a},
