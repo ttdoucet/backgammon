@@ -10,7 +10,7 @@ template<int Features, int Hidden>
 struct TwoLayerParameters
 {
     using W1 = matrix<Hidden, Features>;
-    using W2 = matrix<1, Hidden>;
+    using W2 = row_vector<Hidden>;
 
     W1 M;
     W2 V;
@@ -50,8 +50,6 @@ TwoLayerParameters<F,H> operator+(const TwoLayerParameters<F,H> &lhs,
     return v += rhs;
 }
 
-
-
 template<int Features,
          int Hidden,
          class Activ1,
@@ -78,8 +76,8 @@ public:
 
     struct Activations
     {
-        using InputVector = matrix<Features, 1>;
-        using HiddenVector = matrix<Hidden, 1>;
+        using InputVector = col_vector<Features>;
+        using HiddenVector = col_vector<Hidden>;
         
         InputVector input;
         HiddenVector hidden;
@@ -93,9 +91,9 @@ public:
         return act.input;
     }
 
-    /* Computes dy/dx, where y is the scalar output
-     * of the net during the last forward calculation,
-     * and x is any learning parameter.
+    /* Computes dloss/dw, where loss is the scalar loss of the last
+     * forward calculation with respect to the ground truth output,
+     * and w is any learning parameter.
      */
     void gradient(Parameters& grad)
     {
