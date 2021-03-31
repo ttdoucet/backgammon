@@ -10,6 +10,9 @@
 #include "board.h"
 #include "features.h"
 
+#include "netop.h"
+
+
 /* Backgammon-specific class derivations.
  */
 class BgNet

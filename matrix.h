@@ -159,13 +159,11 @@ class matrix
     alignas(16) Array data;
 };
 
-// Column vector
 template<int n>
-using col_vector = matrix<n,1>;
+using vec = matrix<n,1>;
 
-// Row vector
 template<int n>
-using row_vector = matrix<1,n>;
+using rowvec = matrix<1,n>;
 
 
 // Conversion to float only for 1-by-1 matrix.

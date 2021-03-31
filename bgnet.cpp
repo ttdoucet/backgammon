@@ -59,3 +59,32 @@ std::unique_ptr<BgNet> readBgNet(const string filename)
 
     throw runtime_error("Error reading net file: " + filename);
 }
+
+/*
+ *  Temporary code.
+ */
+
+void testingit()
+{
+    struct activs
+    {
+        vec<100> x;
+        vec<200> y;
+    };
+
+    struct params
+    {
+        matrix<200, 100> M;
+    };
+
+    activs activ;
+    params param, grad;
+
+    Linear<100,200> mapping{activ.x, activ.y, param.M, grad.M};
+
+// I guess template argument deduction also works.
+//   Linear mapping{activ.x, activ.y, param.M, grad.M};
+
+    mapping.fwd();
+    mapping.bwd();
+}

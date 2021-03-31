@@ -10,7 +10,7 @@ template<int Features, int Hidden>
 struct TwoLayerParameters
 {
     using W1 = matrix<Hidden, Features>;
-    using W2 = row_vector<Hidden>;
+    using W2 = rowvec<Hidden>;
 
     W1 M;
     W2 V;
@@ -76,8 +76,8 @@ public:
 
     struct Activations
     {
-        using InputVector = col_vector<Features>;
-        using HiddenVector = col_vector<Hidden>;
+        using InputVector = vec<Features>;
+        using HiddenVector = vec<Hidden>;
         
         InputVector input;
         HiddenVector hidden;
