@@ -68,8 +68,9 @@ void testingit()
 {
     struct activs
     {
-        vec<100> x;
-        vec<200> y;
+        vec<100> input;
+        vec<200> pre_hidden;
+        vec<200> hidden;
     };
 
     struct params
@@ -80,11 +81,12 @@ void testingit()
     activs activ;
     params param, grad;
 
-    Linear<100,200> mapping{activ.x, activ.y, param.M, grad.M};
+    auto Layer_1 = Linear{activ.input, activ.pre_hidden, param.M, grad.M};
+    auto Layer_2 = Termwise<logistic>(activ.pre_hidden, activ.hidden);
 
-// I guess template argument deduction also works.
-//   Linear mapping{activ.x, activ.y, param.M, grad.M};
+    Layer_1.fwd();
+    Layer_2.fwd();
 
-    mapping.fwd();
-    mapping.bwd();
+    Layer_2.bwd();
+    Layer_1.bwd();
 }
