@@ -71,22 +71,31 @@ void testingit()
         vec<100> input;
         vec<200> pre_hidden;
         vec<200> hidden;
+        vec<1>   pre_output;
+        vec<1>   output;
     };
 
     struct params
     {
         matrix<200, 100> M;
+        matrix<1, 200> V;
     };
 
     activs activ;
     params param, grad;
 
-    auto Layer_1 = Linear{activ.input, activ.pre_hidden, param.M, grad.M};
-    auto Layer_2 = Termwise<logistic>(activ.pre_hidden, activ.hidden);
+    auto Op_1 = Linear(activ.input, activ.pre_hidden, param.M, grad.M);
+    auto Op_2 = Termwise<logistic>(activ.pre_hidden, activ.hidden);
+    auto Op_3 = Linear(activ.hidden, activ.pre_output, param.V, grad.V);
+    auto Op_4 = Termwise<logistic>(activ.pre_output, activ.output);
 
-    Layer_1.fwd();
-    Layer_2.fwd();
+    Op_1.fwd();
+    Op_2.fwd();
+    Op_3.fwd();
+    Op_4.fwd();
 
-    Layer_2.bwd();
-    Layer_1.bwd();
+    Op_4.bwd();
+    Op_3.bwd();
+    Op_2.bwd();
+    Op_1.bwd();
 }
