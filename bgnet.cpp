@@ -91,15 +91,20 @@ void testingit()
     auto Op_4 = Termwise<bipolar_sigmoid>(act.linear_2, act.hidden_2);
     auto Op_5 = Termwise<affine<3,0>>(act.hidden_2, act.output);
 
+    // Forward propagation.
     Op_1.fwd();
     Op_2.fwd();
     Op_3.fwd();
     Op_4.fwd();
     Op_5.fwd();
+    // Then act.output is the output.
 
+    // Back propagation.
+    act.output(0,0) = 1; // or alpha
     Op_5.bwd();
     Op_4.bwd();
     Op_3.bwd();
     Op_2.bwd();
     Op_1.bwd();
+    // Then grad has the gradient.
 }
