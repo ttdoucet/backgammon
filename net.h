@@ -91,9 +91,10 @@ public:
         return act.input;
     }
 
-    /* Computes dloss/dw, where loss is the scalar loss of the last
-     * forward calculation with respect to the ground truth output,
-     * and w is any learning parameter.
+
+    /* Computes dy/dw, where y is the scalar output of the net
+     * from the last forward calculation, and w is any learnable
+     * parameter.
      */
     void gradient(Parameters& grad)
     {
