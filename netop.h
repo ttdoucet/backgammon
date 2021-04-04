@@ -23,22 +23,16 @@ public:
     vec<xydim>& x;
     vec<xydim>& y;
 
-// can be simplified now
     void fwd()
     {
-        auto src = x.begin();
-        auto dst = y.begin();
-        while ( src < x.end() )
-            *dst++ = Activ::fwd(*src++);
+        for (int r = 0; r < x.Rows(); r++)
+            y(r, 0) = x(r,0);
     }
 
-// can be simplified now
     void bwd()
     {
-        auto src = y.begin();
-        auto dst = x.begin();
-        while ( src < y.end() )
-            *dst++ = Activ::bwd(*src++);
+        for (int r = 0; r < x.Rows(); r++)
+            x(r, 0) = y(r,0);
     }
 
     void bwd_param()

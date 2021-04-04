@@ -105,6 +105,6 @@ void testingit()
     Op_4.bwd();
     Op_3.bwd();
     Op_2.bwd();
-    Op_1.bwd();
+    Op_1.bwd_param();
     // Then grad has the gradient.
 }
