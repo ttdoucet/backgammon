@@ -16,13 +16,14 @@ public:
 
 
 
-template<class Activ, int xdim, int ydim>
+template<class Activ, int xydim>
   class Termwise_t : public netop
 {
 public:
-    matrix<xdim, ydim>& x;
-    matrix<xdim, ydim>& y;
+    vec<xydim>& x;
+    vec<xydim>& y;
 
+// can be simplified now
     void fwd()
     {
         auto src = x.begin();
@@ -31,6 +32,7 @@ public:
             *dst++ = Activ::fwd(*src++);
     }
 
+// can be simplified now
     void bwd()
     {
         auto src = y.begin();
@@ -44,16 +46,16 @@ public:
         // no parameters
     }
 
-    Termwise_t(matrix<xdim, ydim>& x, matrix<xdim, ydim>& y)
+    Termwise_t(vec<xydim>& x, vec<xydim>& y)
         : x{x}, y{y}
      {
      }
 };
 
-template<class Activ, int xdim, int ydim>
-auto Termwise(matrix<xdim, ydim>& x, matrix<xdim, ydim>& y)
+template<class Activ, int xydim>
+auto Termwise(vec<xydim>& x, vec<xydim>& y)
 {
-    return Termwise_t<Activ, xdim, ydim>(x, y);
+    return Termwise_t<Activ, xydim>(x, y);
 }
 
 
