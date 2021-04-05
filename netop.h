@@ -17,24 +17,22 @@ public:
 };
 
 
-
-template<class Activ, int xydim>
+template<class Activ, int len>
   class Termwise_t : public netop
 {
 public:
-    vec<xydim>& x;
-    vec<xydim>& y;
+    vec<len>& v;
 
     void fwd()
     {
-        for (int r = 0; r < x.Rows(); r++)
-            y(r, 0) = Activ::fwd(x(r, 0));
+        for (int r = 0; r < v.Rows(); r++)
+            v(r, 0) = Activ::fwd(v(r, 0));
     }
 
     void bwd()
     {
-        for (int r = 0; r < x.Rows(); r++)
-            x(r, 0) = Activ::bwd(y(r, 0));
+        for (int r = 0; r < v.Rows(); r++)
+            v(r, 0) = Activ::bwd(v(r, 0));
     }
 
     void bwd_param()
@@ -42,19 +40,17 @@ public:
         // no parameters
     }
 
-    Termwise_t(vec<xydim>& x, vec<xydim>& y)
-        : x{x}, y{y}
+    Termwise_t(vec<len>& v)
+        : v{v}
      {
      }
 };
 
-template<class Activ, int xydim>
-auto Termwise(vec<xydim>& x, vec<xydim>& y)
+template<class Activ, int len>
+auto Termwise(vec<len>& v)
 {
-    return Termwise_t<Activ, xydim>(x, y);
+    return Termwise_t<Activ, len>(v);
 }
-
-
 
 
 template<int xdim, int ydim>

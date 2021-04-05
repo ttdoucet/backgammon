@@ -69,10 +69,7 @@ void testingit()
     struct activs
     {
         vec<100> input;
-        vec<200> linear_1; //pre_hidden;
-        vec<200> hidden_1;
-        vec<1>   linear_2;
-        vec<1>   hidden_2;
+        vec<200> hidden;
         vec<1>   output;
     };
 
@@ -85,11 +82,11 @@ void testingit()
     activs act;
     params param, grad;
 
-    auto Op_1 = Linear(act.input, act.linear_1, param.M, grad.M);
-    auto Op_2 = Termwise<logistic>(act.linear_1, act.hidden_1);
-    auto Op_3 = Linear(act.hidden_1, act.linear_2, param.V, grad.V);
-    auto Op_4 = Termwise<bipolar_sigmoid>(act.linear_2, act.hidden_2);
-    auto Op_5 = Termwise<affine<3,0>>(act.hidden_2, act.output);
+    auto Op_1 = Linear(act.input, act.hidden, param.M, grad.M);
+    auto Op_2 = Termwise<logistic>(act.hidden);
+    auto Op_3 = Linear(act.hidden, act.output, param.V, grad.V);
+    auto Op_4 = Termwise<bipolar_sigmoid>(act.output);
+    auto Op_5 = Termwise<affine<3,0>>(act.output);
 
     // Forward propagation.
     Op_1.fwd();
