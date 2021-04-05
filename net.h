@@ -59,7 +59,7 @@ template<int Features,
 class FcTwoLayerNet
 {
 protected:
-    float feedForward()
+    float feedForward_old()
     {
         act.hidden = params.M * act.input;
 
@@ -68,6 +68,16 @@ protected:
 
         act.out = Activ2::fwd( params.V * act.hidden );
         return Activ3::fwd(act.out);
+    }
+
+    float feedForward_new()
+    {
+        assert(false);
+    }
+
+    float feedForward()
+    {
+        return feedForward_old();
     }
 
 public:

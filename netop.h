@@ -5,6 +5,8 @@
 #include "mathfuncs.h"
 #include "matrix.h"
 
+#include <cassert>
+
 class netop
 {
 public:
@@ -26,13 +28,13 @@ public:
     void fwd()
     {
         for (int r = 0; r < x.Rows(); r++)
-            y(r, 0) = x(r,0);
+            y(r, 0) = Activ::fwd(x(r, 0));
     }
 
     void bwd()
     {
         for (int r = 0; r < x.Rows(); r++)
-            x(r, 0) = y(r,0);
+            x(r, 0) = Activ::bwd(y(r, 0));
     }
 
     void bwd_param()
@@ -81,12 +83,13 @@ public:
     void bwd()
     {
         bwd_param();
-        // nyi
+        assert(false);   // nyi
+
     }
 
     void bwd_param()
     {
-        // nyi
+        assert(false); // nyi
     }
 
 };
