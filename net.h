@@ -6,6 +6,8 @@
 #include "matrix.h"
 #include "random.h"
 
+#include "netop.h"
+
 template<int Features, int Hidden>
 struct TwoLayerParameters
 {
@@ -59,39 +61,38 @@ template<int Features,
 class FcTwoLayerNet
 {
 protected:
-    float feedForward_old()
-    {
-        act.hidden = params.M * act.input;
 
-        for (auto& elem : act.hidden)
-            elem = Activ1::fwd(elem);
-
-        act.out = Activ2::fwd( params.V * act.hidden );
-        return Activ3::fwd(act.out);
-    }
-
-    float feedForward_new()
-    {
-        assert(false);
-    }
+    Linear<Features, Hidden>        Op_1{act.input, act.hidden, params.M, grad.M};
+    Termwise<logistic, Hidden>    Op_2{act.hidden};
+    Linear<Hidden, 1>               Op_3{act.hidden, act.output, params.V, grad.V};
+    Termwise<bipolar_sigmoid, 1>  Op_4{act.output};
+    Termwise<affine<3,0>, 1>      Op_5{act.output};
 
     float feedForward()
     {
-        return feedForward_old();
+        Op_1.fwd();
+        Op_2.fwd();
+        Op_3.fwd();
+        Op_4.fwd();
+        Op_5.fwd();
+        return act.output;
     }
 
 public:
     using Parameters = TwoLayerParameters<Features, Hidden>; 
     Parameters params;
+    Parameters grad;
 
     struct Activations
     {
         using InputVector = vec<Features>;
         using HiddenVector = vec<Hidden>;
-        
+        using OutputVector = vec<1>;
+
         InputVector input;
         HiddenVector hidden;
-        float out;
+        OutputVector output;
+        float out;  // not used after new backprop is done.
     } act;
 
     using InputVector = typename Activations::InputVector;
@@ -126,12 +127,11 @@ public:
     FcTwoLayerNet()
     {
         RNG_normal rand1(0, 1.0 / Features);
-        for (int r = 0; r < Hidden; r++)
-            for (int c = 0; c < Features; c++)
-                params.M(r, c) = rand1.random();
+        for (auto& m : params.M)
+            m = rand1.random();
 
         RNG_normal rand2(0, 1.0 / Hidden);
-        for (int c = 0; c < Hidden; c++)
-            params.V(0, c) = rand2.random();
+        for (auto& v : params.V)
+            v = rand2.random();
     }
 };

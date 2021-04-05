@@ -18,7 +18,7 @@ public:
 
 
 template<class Activ, int len>
-  class Termwise_t : public netop
+  class Termwise : public netop
 {
 public:
     vec<len>& v;
@@ -40,18 +40,11 @@ public:
         // no parameters
     }
 
-    Termwise_t(vec<len>& v)
+    Termwise(vec<len>& v)
         : v{v}
      {
      }
 };
-
-template<class Activ, int len>
-auto Termwise(vec<len>& v)
-{
-    return Termwise_t<Activ, len>(v);
-}
-
 
 template<int xdim, int ydim>
   class Linear : public netop
