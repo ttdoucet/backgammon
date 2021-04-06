@@ -26,24 +26,18 @@ public:
     void fwd()
     {
         for (int r = 0; r < v.Rows(); r++)
-            v(r, 0) = Activ::fwd(v(r, 0));
+            v(r) = Activ::fwd( v(r) );
     }
 
     void bwd()
     {
         for (int r = 0; r < v.Rows(); r++)
-            v(r, 0) = Activ::bwd(v(r, 0));
+            v(r) = Activ::bwd( v(r) );
     }
 
-    void bwd_param()
-    {
-        // no parameters
-    }
+    void bwd_param() {  /* no parameters */  }
 
-    Termwise(vec<len>& v)
-        : v{v}
-     {
-     }
+    Termwise(vec<len>& v) : v{v} { }
 };
 
 template<int xdim, int ydim>
@@ -73,12 +67,10 @@ public:
     {
         bwd_param();
         assert(false);   // nyi
-
     }
 
     void bwd_param()
     {
         assert(false); // nyi
     }
-
 };

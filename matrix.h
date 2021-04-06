@@ -10,7 +10,7 @@
  * Intended for relatively small matrices whose sizes are known
  * at compile-time.   Intended to be fast and efficient.
  */ 
-template<int R, int C=1>
+template<int R, int C>
 class matrix
 {
     typedef float Array[R][C];
@@ -36,12 +36,37 @@ class matrix
 
     float& operator() (int r, int c)
     {
-         return data[r][c];
+        return data[r][c];
     }
 
     float operator() (int r, int c) const
     {
-         return data[r][c];
+        return data[r][c];
+    }
+
+    template<typename T>
+    struct dependent_false { static constexpr bool value = false; };
+
+    float operator() (int idx) const
+    {
+        if constexpr(C == 1)
+            return (*this)(idx,0);
+        else if constexpr(R == 1)
+            return (*this)(0, idx);
+        else
+            static_assert(dependent_false<matrix<R,C>>::value,
+                          "Single index requires row or column vector.");
+    }
+
+    float& operator() (int idx)
+    {
+        if constexpr(C == 1)
+            return (*this)(idx,0);
+        else if constexpr(R == 1)
+            return (*this)(0, idx);
+        else
+            static_assert(dependent_false<matrix<R,C>>::value,
+                          "Single index requires row or column vector.");
     }
 
     matrix<R,C>& operator+=(const matrix<R,C> &rhs)
@@ -165,11 +190,10 @@ using vec = matrix<n,1>;
 template<int n>
 using rowvec = matrix<1,n>;
 
-
 // Conversion to float only for 1-by-1 matrix.
 template<> inline matrix<1, 1>::operator float() const
 {
-  return data[0][0];
+    return (*this)(0, 0);
 }
 
 /* Multiplication of two matrices.
