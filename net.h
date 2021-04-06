@@ -62,9 +62,9 @@ class FcTwoLayerNet
 {
 protected:
 
-    Linear<Features, Hidden>        Op_1{act.input, act.hidden, params.M, grad.M};
+    Linear<Features, Hidden>      Op_1{act.input, act.hidden, params.M, grad.M};
     Termwise<logistic, Hidden>    Op_2{act.hidden};
-    Linear<Hidden, 1>               Op_3{act.hidden, act.output, params.V, grad.V};
+    Linear<Hidden, 1>             Op_3{act.hidden, act.output, params.V, grad.V};
     Termwise<bipolar_sigmoid, 1>  Op_4{act.output};
     Termwise<affine<3,0>, 1>      Op_5{act.output};
 
