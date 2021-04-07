@@ -66,11 +66,16 @@ public:
     void bwd()
     {
         bwd_param();
-        assert(false);   // nyi
+
+        for (auto r = 0; r < y.Rows(); r++)
+            for (auto c = 0; c < x.Cols(); c++)
+                x(c) += y(r) * M(r, c);
     }
 
     void bwd_param()
     {
-        assert(false); // nyi
+        for (auto r = 0; r < M.Rows(); r++)
+            for (auto c = 0; c < M.Cols(); c++)
+                dl_dM(r, c) += y(r) * x(c);
     }
 };
