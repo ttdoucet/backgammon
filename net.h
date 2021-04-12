@@ -87,7 +87,7 @@ public:
         HiddenVector hidden;
         OutputVector pre_out;
         OutputVector out;
-    } act;
+    } act, back;
 
     using InputVector = typename Activations::InputVector;
 
@@ -105,11 +105,11 @@ public:
         grad.clear();
 
         matrix<1,1> one = { 1 };
-        auto r5 = Op_5.bwd(one);
-        auto r4 = Op_4.bwd(r5);
-        auto r3 = Op_3.bwd(r4);
-        auto r2 = Op_2.bwd(r3);
-        Op_1.bwd_param(r2);
+        back.pre_out = Op_5.bwd(one);
+        back.pre_out = Op_4.bwd(back.pre_out);
+        back.hidden = Op_3.bwd(back.pre_out);
+        back.hidden = Op_2.bwd(back.hidden);
+        Op_1.bwd_param(back.hidden);
         g = grad;
     }
 
