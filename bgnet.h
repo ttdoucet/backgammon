@@ -62,17 +62,7 @@ public:
 constexpr auto MAX_EQUITY = 3;
 
 template<int Features, int Hidden>
-class SigmoidNet : public FcTwoLayerNet<Features, Hidden,
-                                        logistic,
-                                        bipolar_sigmoid,
-                                        affine<MAX_EQUITY, 0> > { };
-
-// For experimentation--subject to frequent change.
-template<int Features, int Hidden>
-class MiscNet : public FcTwoLayerNet<Features, Hidden,
-                                     bipolar_sigmoid,
-                                     bipolar_sigmoid,
-                                     affine<MAX_EQUITY, 0> > { };
+class SigmoidNet : public FcTwoLayerNet<Features, Hidden>{ };
 
 // Fully-connected, sigmoidal activations, 30 hidden units, input features version 3.
 class netv3 : public BackgammonNet<features_v3, 30, SigmoidNet>
@@ -106,16 +96,6 @@ class Fc_Sig_H1024_I3 : public BackgammonNet<features_v3, 1024, SigmoidNet>
 public:
     std::string netname() const { return "Fc_Sig_H1024_I3"; }
 };
-
-
-
-// For experimentation.
-class Fc_Misc_H30_I3 : public BackgammonNet<features_v3, 30, MiscNet>
-{
-public:
-    std::string netname() const { return "Fc_Misc_H30_I3"; }
-};
-
 
 /* Factory
  */
