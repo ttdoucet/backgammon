@@ -69,6 +69,16 @@ class matrix
                           "Single index requires row or column vector.");
     }
 
+    int length() const
+    {
+        if constexpr(C == 1 || R == 1)
+            return std::max(R, C);
+        else
+            static_assert(dependent_false<matrix<R,C>>::value,
+                          "length() requires row or column vector.");
+
+    }
+
     matrix<R,C>& operator+=(const matrix<R,C> &rhs)
     {
         for (int r = 0; r < Rows(); r++)
