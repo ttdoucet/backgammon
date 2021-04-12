@@ -5,52 +5,50 @@
 #include "mathfuncs.h"
 #include "matrix.h"
 
-#include <cassert>
-
-class netop
-{
-public:
-    virtual void fwd() = 0;
-    virtual void bwd() = 0;
-    virtual void bwd_param() = 0;
-    virtual ~netop() = default;
-};
-
-
 template<class Activ, int len>
-  class Termwise : public netop
+class Termwise
 {
+    using vec_t = vec<len>;
 public:
-    vec<len>& v;
+    vec_t& src;
+    vec_t& dst;
 
     void fwd()
     {
-        for (int r = 0; r < v.Rows(); r++)
-            v(r) = Activ::fwd( v(r) );
+        for (int i = 0; i < len; i++)
+            dst(i) = Activ::fwd( src(i) );
     }
 
-    void bwd()
+    vec_t bwd(vec_t& upstream)
     {
-        for (int r = 0; r < v.Rows(); r++)
-            v(r) = Activ::bwd( v(r) );
+        vec_t r;
+
+        for (int i = 0; i < len; i++)
+            r(i) = upstream(i) * Activ::bwd( dst(i) );
+
+        return r;
     }
 
-    void bwd_param() {  /* no parameters */  }
+    void bwd_param(vec_t& upstream) {  /* no parameters */  }
 
-    Termwise(vec<len>& v) : v{v} { }
+    Termwise(vec_t& src, vec_t& dest) : src{src}, dst{dest} { }
 };
 
 template<int xdim, int ydim>
-  class Linear : public netop
+class Linear
 {
-public:
+    using src_t = vec<xdim>;
+    using dst_t = vec<ydim>;
+
     matrix<ydim, xdim>& M;
     matrix<ydim, xdim>& dl_dM;
-    vec<xdim>& x;
-    vec<ydim>& y;
+    src_t& x;
+    dst_t& y;
 
-    Linear(vec<xdim>& x,
-           vec<ydim>& y,
+public:
+
+    Linear(src_t& x,
+           dst_t& y,
            matrix<ydim,xdim>& M,
            matrix<ydim,xdim>& dl_dM
     )
@@ -63,19 +61,23 @@ public:
         y = M * x;
     }
 
-    void bwd()
+    src_t bwd(dst_t& upstream)
     {
-        bwd_param();
+        bwd_param(upstream);
 
-        for (auto r = 0; r < y.Rows(); r++)
-            for (auto c = 0; c < x.Cols(); c++)
-                x(c) += y(r) * M(r, c);
+        src_t ret;
+
+        for (auto r = 0; r < y.length(); r++)
+            for (auto c = 0; c < ret.length(); c++)
+                ret(c) += upstream(r) * M(r, c);
+
+        return ret;
     }
 
-    void bwd_param()
+    void bwd_param(dst_t& upstream)
     {
         for (auto r = 0; r < M.Rows(); r++)
             for (auto c = 0; c < M.Cols(); c++)
-                dl_dM(r, c) += y(r) * x(c);
+                dl_dM(r, c) += upstream(r) * x(c);
     }
 };

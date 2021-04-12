@@ -59,11 +59,6 @@ public:
     }
 };
 
-constexpr auto MAX_EQUITY = 3;
-
-template<int Features, int Hidden>
-class SigmoidNet : public FcTwoLayerNet<Features, Hidden>{ };
-
 // Fully-connected, sigmoidal activations, 30 hidden units, input features version 3.
 class netv3 : public BackgammonNet<features_v3, 30, SigmoidNet>
 {
