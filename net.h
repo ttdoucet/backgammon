@@ -10,11 +10,8 @@
 template<int Features, int Hidden>
 struct TwoLayerParameters
 {
-    using W1 = matrix<Hidden, Features>;
-    using W2 = rowvec<Hidden>;
-
-    W1 M;
-    W2 V;
+    matrix<Hidden, Features> M;
+    rowvec<Hidden> V;
 
     void clear()
     {
@@ -74,8 +71,7 @@ protected:
 
 public:
     using Parameters = TwoLayerParameters<Features, Hidden>; 
-    Parameters params;
-    Parameters grad;
+    Parameters params, grad;
 
     struct Activations
     {
