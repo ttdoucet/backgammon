@@ -10,7 +10,7 @@ class Termwise
 {
     using vec_t = vec<len>;
 public:
-    vec_t& src;
+    const vec_t& src;
     vec_t& dst;
 
     void fwd()
@@ -19,7 +19,7 @@ public:
             dst(i) = Activ::fwd( src(i) );
     }
 
-    vec_t bwd(vec_t& upstream)
+    vec_t bwd(const vec_t& upstream)
     {
         vec_t r;
 
@@ -29,9 +29,9 @@ public:
         return r;
     }
 
-    void bwd_param(vec_t& upstream) {  /* no parameters */  }
+    void bwd_param(const vec_t& upstream) {  /* no parameters */  }
 
-    Termwise(vec_t& src, vec_t& dest) : src{src}, dst{dest} { }
+    Termwise(const vec_t& src, vec_t& dest) : src{src}, dst{dest} { }
 };
 
 template<int xdim, int ydim>
@@ -42,12 +42,12 @@ class Linear
 
     matrix<ydim, xdim>& M;
     matrix<ydim, xdim>& dl_dM;
-    src_t& x;
+    const src_t& x;
     dst_t& y;
 
 public:
 
-    Linear(src_t& x,
+    Linear(const src_t& x,
            dst_t& y,
            matrix<ydim,xdim>& M,
            matrix<ydim,xdim>& dl_dM
@@ -61,7 +61,7 @@ public:
         y = M * x;
     }
 
-    src_t bwd(dst_t& upstream)
+    src_t bwd(const dst_t& upstream)
     {
         bwd_param(upstream);
 
@@ -74,7 +74,7 @@ public:
         return ret;
     }
 
-    void bwd_param(dst_t& upstream)
+    void bwd_param(const dst_t& upstream)
     {
         for (auto r = 0; r < M.Rows(); r++)
             for (auto c = 0; c < M.Cols(); c++)
