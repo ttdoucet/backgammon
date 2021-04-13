@@ -54,6 +54,9 @@ public:
     )
         : x{x}, y{y}, M{M}, dl_dM{dl_dM}
     {
+        RNG_normal rand1(0, 1.0 / M.Cols());
+        for (auto& m : M)
+            m = rand1.random();
     }
 
     void fwd()

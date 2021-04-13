@@ -113,15 +113,4 @@ public:
     {
         params += adj;
     }
-
-    SigmoidNet()
-    {
-        RNG_normal rand1(0, 1.0 / Features);
-        for (auto& m : params.M)
-            m = rand1.random();
-
-        RNG_normal rand2(0, 1.0 / Hidden);
-        for (auto& v : params.V)
-            v = rand2.random();
-    }
 };
