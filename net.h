@@ -51,8 +51,11 @@ TwoLayerParameters<F,H> operator+(const TwoLayerParameters<F,H> &lhs,
 template<int Features, int Hidden>
 class SigmoidNet
 {
-protected:
+public:
+    using Parameters = TwoLayerParameters<Features, Hidden>; 
+    Parameters params, grad;
 
+protected:
     Linear<Features, Hidden>      Op_1{act.input, act.hidden, params.M, grad.M};
     Termwise<logistic, Hidden>    Op_2{act.hidden, act.hidden};
     Linear<Hidden, 1>             Op_3{act.hidden, act.pre_out, params.V, grad.V};
@@ -70,9 +73,6 @@ protected:
     }
 
 public:
-    using Parameters = TwoLayerParameters<Features, Hidden>; 
-    Parameters params, grad;
-
     struct Activations
     {
         using InputVector = vec<Features>;
