@@ -39,7 +39,7 @@ struct Params_Fc_Sig
 
 template<int F, int H>
 Params_Fc_Sig<F,H> operator+(const Params_Fc_Sig<F,H> &lhs,
-				  const Params_Fc_Sig<F,H> &rhs)
+                             const Params_Fc_Sig<F,H> &rhs)
 {
     Params_Fc_Sig<F,H> v(lhs);
     return v += rhs;

@@ -6,7 +6,6 @@
 #include "matrix.h"
 #include "random.h"
 
-
 /*
  * An activation function f computes y = f(x) with f.fwd(x), and computes
  * the local derivative at x, dy/dx, with f.bwd(y).
@@ -50,7 +49,6 @@ struct affine
     static inline float bwd(float y) { return scale; }
 };
 
-
 /*
  * The netops are nodes in a computational graph which support
  * forward and back propagation.
@@ -60,6 +58,7 @@ template<class Activ, int len>
 class Termwise
 {
     using vec_t = vec<len>;
+
 public:
     const vec_t& src;
     vec_t& dst;
@@ -97,7 +96,6 @@ class Linear
     dst_t& y;
 
 public:
-
     Linear(const src_t& x,
            dst_t& y,
            matrix<ydim,xdim>& M,

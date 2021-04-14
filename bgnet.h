@@ -22,9 +22,9 @@ public:
     virtual ~BgNet() = default;
 };
 
-template<class feature_calc, int N_HIDDEN, template<int, int> class Net>
+template<class feature_calc, int Hidden, template<int, int> class Net>
 class BackgammonNet :  public BgNet,
-                       public Net<feature_calc::count, N_HIDDEN>
+                       public Net<feature_calc::count, Hidden>
 {
 public:
     /* Neural net estimate of the equity for the side on roll.
@@ -62,7 +62,6 @@ struct netv3 : public BackgammonNet<features_v3, 30, Fc_Sig>
     std::string netname() const { return "netv3"; }
 };
 
-// Fully-connected, sigmoidal activations, 60 hidden units, input features version 3.
 struct Fc_Sig_H60_I3 : public BackgammonNet<features_v3, 60, Fc_Sig>
 {
     std::string netname() const { return "Fc_Sig_H60_I3"; }
@@ -72,7 +71,6 @@ struct Fc_Sig_H90_I3 : public BackgammonNet<features_v3, 90, Fc_Sig>
 {
     std::string netname() const { return "Fc_Sig_H90_I3"; }
 };
-
 
 struct Fc_Sig_H120_I3 : public BackgammonNet<features_v3, 120, Fc_Sig>
 {
@@ -84,7 +82,6 @@ struct Fc_Sig_H1024_I3 : public BackgammonNet<features_v3, 1024, Fc_Sig>
     std::string netname() const { return "Fc_Sig_H1024_I3"; }
 };
 
-/* Factory
- */
+/* Factory */
 std::unique_ptr<BgNet> readBgNet(const std::string filename);
 
