@@ -6,7 +6,6 @@
 
 #include "board.h"
 #include "hits.h"
-#include "mathfuncs.h"
 
 class features_v3
 {

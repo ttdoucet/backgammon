@@ -69,7 +69,7 @@ class matrix
                           "Single index requires row or column vector.");
     }
 
-    int length() const
+    constexpr int length() const
     {
         if constexpr(C == 1 || R == 1)
             return std::max(R, C);

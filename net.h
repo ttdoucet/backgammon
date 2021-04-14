@@ -2,9 +2,6 @@
  */
 #pragma once
 
-#include "mathfuncs.h"
-#include "matrix.h"
-#include "random.h"
 #include "netop.h"
 
 template<int Features, int Hidden>
