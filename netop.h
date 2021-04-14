@@ -6,10 +6,10 @@
 #include "matrix.h"
 #include "random.h"
 
+
 /*
- *  The activation functions support forward propagation, and all
- *  compute the local derivative when given the last forward value
- *  returned.
+ * An activation function f computes y = f(x) with f.fwd(x), and computes
+ * the local derivative at x, dy/dx, with f.bwd(y).
  */
 
 struct logistic
