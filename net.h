@@ -5,7 +5,7 @@
 #include "netop.h"
 
 template<int Features, int Hidden>
-struct TwoLayerParameters
+struct SigmoidNetParams
 {
     matrix<Hidden, Features> M;
     rowvec<Hidden> V;
@@ -16,32 +16,32 @@ struct TwoLayerParameters
         V.clear();
     }
 
-    TwoLayerParameters& operator+=(const TwoLayerParameters &rhs)
+    SigmoidNetParams& operator+=(const SigmoidNetParams &rhs)
     {
         M += rhs.M;
         V += rhs.V;
         return *this;
     }
 
-    TwoLayerParameters& operator*=(float scale)
+    SigmoidNetParams& operator*=(float scale)
     {
         M *= scale;
         V *= scale;
         return *this;
     }
 
-    TwoLayerParameters operator*(float scale) const
+    SigmoidNetParams operator*(float scale) const
     {
-        TwoLayerParameters r(*this);
+        SigmoidNetParams r(*this);
         return r *= scale;
     }
 };
 
 template<int F, int H>
-TwoLayerParameters<F,H> operator+(const TwoLayerParameters<F,H> &lhs,
-				  const TwoLayerParameters<F,H> &rhs)
+SigmoidNetParams<F,H> operator+(const SigmoidNetParams<F,H> &lhs,
+				  const SigmoidNetParams<F,H> &rhs)
 {
-    TwoLayerParameters<F,H> v(lhs);
+    SigmoidNetParams<F,H> v(lhs);
     return v += rhs;
 }
 
@@ -49,7 +49,7 @@ template<int Features, int Hidden>
 class SigmoidNet
 {
 public:
-    using Parameters = TwoLayerParameters<Features, Hidden>; 
+    using Parameters = SigmoidNetParams<Features, Hidden>; 
     Parameters params, grad;
 
     struct Activations
