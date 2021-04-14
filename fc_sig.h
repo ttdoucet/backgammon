@@ -5,7 +5,7 @@
 #include "netop.h"
 
 template<int Features, int Hidden>
-struct SigmoidNetParams
+struct Params_Fc_Sig
 {
     matrix<Hidden, Features> M;
     rowvec<Hidden> V;
@@ -16,40 +16,41 @@ struct SigmoidNetParams
         V.clear();
     }
 
-    SigmoidNetParams& operator+=(const SigmoidNetParams &rhs)
+    Params_Fc_Sig& operator+=(const Params_Fc_Sig &rhs)
     {
         M += rhs.M;
         V += rhs.V;
         return *this;
     }
 
-    SigmoidNetParams& operator*=(float scale)
+    Params_Fc_Sig& operator*=(float scale)
     {
         M *= scale;
         V *= scale;
         return *this;
     }
 
-    SigmoidNetParams operator*(float scale) const
+    Params_Fc_Sig operator*(float scale) const
     {
-        SigmoidNetParams r(*this);
+        Params_Fc_Sig r(*this);
         return r *= scale;
     }
 };
 
 template<int F, int H>
-SigmoidNetParams<F,H> operator+(const SigmoidNetParams<F,H> &lhs,
-				  const SigmoidNetParams<F,H> &rhs)
+Params_Fc_Sig<F,H> operator+(const Params_Fc_Sig<F,H> &lhs,
+				  const Params_Fc_Sig<F,H> &rhs)
 {
-    SigmoidNetParams<F,H> v(lhs);
+    Params_Fc_Sig<F,H> v(lhs);
     return v += rhs;
 }
 
+  // Fully-connected two-layer network with sigmoidal activations
 template<int Features, int Hidden>
-class SigmoidNet
+class Fc_Sig
 {
 public:
-    using Parameters = SigmoidNetParams<Features, Hidden>; 
+    using Parameters = Params_Fc_Sig<Features, Hidden>; 
     Parameters params, grad;
 
     struct Activations

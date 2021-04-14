@@ -6,7 +6,7 @@
 #include <iomanip>
 #include <memory>
 
-#include "net.h"
+#include "fc_sig.h"
 #include "board.h"
 #include "features.h"
 
@@ -57,29 +57,29 @@ public:
 };
 
 // Fully-connected, sigmoidal activations, 30 hidden units, input features version 3.
-struct netv3 : public BackgammonNet<features_v3, 30, SigmoidNet>
+struct netv3 : public BackgammonNet<features_v3, 30, Fc_Sig>
 {
     std::string netname() const { return "netv3"; }
 };
 
 // Fully-connected, sigmoidal activations, 60 hidden units, input features version 3.
-struct Fc_Sig_H60_I3 : public BackgammonNet<features_v3, 60, SigmoidNet>
+struct Fc_Sig_H60_I3 : public BackgammonNet<features_v3, 60, Fc_Sig>
 {
     std::string netname() const { return "Fc_Sig_H60_I3"; }
 };
 
-struct Fc_Sig_H90_I3 : public BackgammonNet<features_v3, 90, SigmoidNet>
+struct Fc_Sig_H90_I3 : public BackgammonNet<features_v3, 90, Fc_Sig>
 {
     std::string netname() const { return "Fc_Sig_H90_I3"; }
 };
 
 
-struct Fc_Sig_H120_I3 : public BackgammonNet<features_v3, 120, SigmoidNet>
+struct Fc_Sig_H120_I3 : public BackgammonNet<features_v3, 120, Fc_Sig>
 {
     std::string netname() const { return "Fc_Sig_H120_I3"; }
 };
 
-struct Fc_Sig_H1024_I3 : public BackgammonNet<features_v3, 1024, SigmoidNet>
+struct Fc_Sig_H1024_I3 : public BackgammonNet<features_v3, 1024, Fc_Sig>
 {
     std::string netname() const { return "Fc_Sig_H1024_I3"; }
 };
