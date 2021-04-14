@@ -2,6 +2,7 @@
  */
 #pragma once
 
+#include <tuple>
 #include "netop.h"
 
 template<int Features, int Hidden>
@@ -12,21 +13,36 @@ struct Params_Fc_Sig
 
     void clear()
     {
+#if 0
         M.clear();
         V.clear();
+#else
+        std::get<0>(params).clear(); // M
+        std::get<1>(params).clear(); // V
+#endif
     }
 
     Params_Fc_Sig& operator+=(const Params_Fc_Sig &rhs)
     {
+#if 0
         M += rhs.M;
         V += rhs.V;
+#else
+        std::get<0>(params) += std::get<0>(rhs.params);  // M
+        std::get<1>(params) += std::get<1>(rhs.params);  // V
+#endif
         return *this;
     }
 
     Params_Fc_Sig& operator*=(float scale)
     {
+#if 0
         M *= scale;
         V *= scale;
+#else
+        std::get<0>(params) *= scale;  // M
+        std::get<1>(params) *= scale;  // V
+#endif
         return *this;
     }
 
@@ -35,6 +51,10 @@ struct Params_Fc_Sig
         Params_Fc_Sig r(*this);
         return r *= scale;
     }
+
+    // This is gross.
+    decltype(std::tie(M, V)) params = std::tie(M, V);
+
 };
 
 template<int F, int H>
