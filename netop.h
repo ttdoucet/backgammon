@@ -7,7 +7,9 @@
 #include "random.h"
 
 /*
- *  Activation functions.
+ *  The activation functions support forward propagation, and all
+ *  compute the local derivative when given the last forward value
+ *  returned.
  */
 
 struct logistic
@@ -50,7 +52,8 @@ struct affine
 
 
 /*
- *  Netops
+ * The netops are nodes in a computational graph which support
+ * forward and back propagation.
  */
 
 template<class Activ, int len>
@@ -67,17 +70,17 @@ public:
             dst(i) = Activ::fwd( src(i) );
     }
 
-    vec_t bwd(const vec_t& upstream)
+    vec_t bwd(const vec_t& upstream_d)
     {
         vec_t r;
 
         for (int i = 0; i < len; i++)
-            r(i) = upstream(i) * Activ::bwd( dst(i) );
+            r(i) = upstream_d(i) * Activ::bwd( dst(i) );
 
         return r;
     }
 
-    void bwd_param(const vec_t& upstream) {  /* no parameters */  }
+    void bwd_param(const vec_t& upstream_d) {  /* no parameters */  }
 
     Termwise(const vec_t& src, vec_t& dest) : src{src}, dst{dest} { }
 };
@@ -89,7 +92,7 @@ class Linear
     using dst_t = vec<ydim>;
 
     matrix<ydim, xdim>& M;
-    matrix<ydim, xdim>& dl_dM;
+    matrix<ydim, xdim>& grad_M;
     const src_t& x;
     dst_t& y;
 
@@ -98,9 +101,9 @@ public:
     Linear(const src_t& x,
            dst_t& y,
            matrix<ydim,xdim>& M,
-           matrix<ydim,xdim>& dl_dM
+           matrix<ydim,xdim>& grad_M
     )
-        : x{x}, y{y}, M{M}, dl_dM{dl_dM}
+        : x{x}, y{y}, M{M}, grad_M{grad_M}
     {
         RNG_normal rand(0, 1.0 / M.Cols());
         for (auto& m : M)
@@ -112,23 +115,23 @@ public:
         y = M * x;
     }
 
-    src_t bwd(const dst_t& upstream)
+    src_t bwd(const dst_t& upstream_d)
     {
-        bwd_param(upstream);
+        bwd_param(upstream_d);
 
         src_t ret;
 
         for (auto r = 0; r < y.length(); r++)
             for (auto c = 0; c < ret.length(); c++)
-                ret(c) += upstream(r) * M(r, c);
+                ret(c) += upstream_d(r) * M(r, c);
 
         return ret;
     }
 
-    void bwd_param(const dst_t& upstream)
+    void bwd_param(const dst_t& upstream_d)
     {
         for (auto r = 0; r < M.Rows(); r++)
             for (auto c = 0; c < M.Cols(); c++)
-                dl_dM(r, c) += upstream(r) * x(c);
+                grad_M(r, c) += upstream_d(r) * x(c);
     }
 };
