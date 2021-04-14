@@ -1,3 +1,4 @@
+
 #pragma once
 #include <cmath>
 #include <cassert>
@@ -147,20 +148,6 @@ class matrix
         return !(*this == rhs);
     } 
 
-    /*
-     * This constructs and returns an appropriate matrix,
-     * copying the data as necessary.  But in practice
-     * the copy is often optimized away.
-     */
-    matrix<C,R> Transpose() const
-    {
-        matrix<C,R> dest;
-        for (int r = 0; r < Rows(); r++)
-            for (int c = 0; c < Cols(); c++)
-                dest(c,r) = data[r][c];
-        return dest;
-    }
-
     void clear()
     {
         for (auto &p : *this)
@@ -200,7 +187,8 @@ using vec = matrix<n,1>;
 template<int n>
 using rowvec = matrix<1,n>;
 
-// Conversion to float only for 1-by-1 matrix.
+/* Conversion to float only for 1-by-1 matrix.
+ */
 template<> inline matrix<1, 1>::operator float() const
 {
     return (*this)(0, 0);

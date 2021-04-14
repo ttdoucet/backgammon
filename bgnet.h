@@ -15,10 +15,12 @@
 class BgNet
 {
 public:
+    using string = std::string;
+
     virtual float equity(const board& b) = 0;
-    virtual bool readFile(std::string filename) = 0;
-    virtual bool writeFile(std::string filename) const = 0;
-    virtual std::string netname() const = 0;
+    virtual bool readFile(string filename) = 0;
+    virtual bool writeFile(string filename) const = 0;
+    virtual string netname() const = 0;
     virtual ~BgNet() = default;
 };
 
@@ -35,15 +37,15 @@ public:
         return this->feedForward();
     }
 
-    bool readFile(std::string filename)
+    bool readFile(string filename)
     {
         std::ifstream ifs(filename);
-        std::string name;
+        string name;
         ifs >> name >> this->params.M >> this->params.V;
         return ifs.fail() == false;
     }
 
-    bool writeFile(std::string filename) const
+    bool writeFile(string filename) const
     {
         std::ofstream ofs(filename);
         ofs << this->netname() << "\n" << this->params.M << this->params.V;
@@ -56,30 +58,30 @@ public:
     }
 };
 
-// Fully-connected, sigmoidal activations, 30 hidden units, input features version 3.
+/* Fully-connected, sigmoidal activations, 30 hidden units, input features version 3. */
 struct netv3 : public BackgammonNet<features_v3, 30, Fc_Sig>
 {
-    std::string netname() const { return "netv3"; }
+    string netname() const { return "netv3"; }
 };
 
 struct Fc_Sig_H60_I3 : public BackgammonNet<features_v3, 60, Fc_Sig>
 {
-    std::string netname() const { return "Fc_Sig_H60_I3"; }
+    string netname() const { return "Fc_Sig_H60_I3"; }
 };
 
 struct Fc_Sig_H90_I3 : public BackgammonNet<features_v3, 90, Fc_Sig>
 {
-    std::string netname() const { return "Fc_Sig_H90_I3"; }
+    string netname() const { return "Fc_Sig_H90_I3"; }
 };
 
 struct Fc_Sig_H120_I3 : public BackgammonNet<features_v3, 120, Fc_Sig>
 {
-    std::string netname() const { return "Fc_Sig_H120_I3"; }
+    string netname() const { return "Fc_Sig_H120_I3"; }
 };
 
 struct Fc_Sig_H1024_I3 : public BackgammonNet<features_v3, 1024, Fc_Sig>
 {
-    std::string netname() const { return "Fc_Sig_H1024_I3"; }
+    string netname() const { return "Fc_Sig_H1024_I3"; }
 };
 
 /* Factory */
