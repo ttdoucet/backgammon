@@ -79,11 +79,6 @@ struct Fc_Sig_H120_I3 : public BackgammonNet<features_v3, 120, Fc_Sig>
     string netname() const { return "Fc_Sig_H120_I3"; }
 };
 
-struct Fc_Sig_H1024_I3 : public BackgammonNet<features_v3, 1024, Fc_Sig>
-{
-    string netname() const { return "Fc_Sig_H1024_I3"; }
-};
-
 /* Factory */
 std::unique_ptr<BgNet> readBgNet(const std::string filename);
 
