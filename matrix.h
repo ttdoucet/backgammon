@@ -175,7 +175,7 @@ class matrix
     float *begin() { return Data(); }
     float *end()   { return &data[R-1][C-1] + 1; }
 
-    operator float() const;
+    explicit operator float() const;
 
   private:
     alignas(16) Array data;

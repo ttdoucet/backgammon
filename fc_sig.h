@@ -11,6 +11,20 @@ struct Params_Fc_Sig
     matrix<Hidden, Features> M;
     rowvec<Hidden> V;
 
+    // This is gross.
+    decltype(std::tie(M, V)) params = std::tie(M, V);
+
+    Params_Fc_Sig(const Params_Fc_Sig& p)
+        : M{p.M}, V{p.V}, params{std::tie(M, V)}
+    {
+    }
+
+    Params_Fc_Sig()
+        : params{std::tie(M, V)}
+    {
+    }
+
+
     void clear()
     {
 #if 0
@@ -51,9 +65,6 @@ struct Params_Fc_Sig
         Params_Fc_Sig r(*this);
         return r *= scale;
     }
-
-    // This is gross.
-    decltype(std::tie(M, V)) params = std::tie(M, V);
 
 };
 
@@ -128,6 +139,6 @@ protected:
         Op_3.fwd();
         Op_4.fwd();
         Op_5.fwd();
-        return act.out;
+        return float(act.out);
     }
 };
