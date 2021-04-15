@@ -108,6 +108,6 @@ protected:
         Op_3.fwd();
         Op_4.fwd();
         Op_5.fwd();
-        return act.out;
+        return float(act.out);
     }
 };
