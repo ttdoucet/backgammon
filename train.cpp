@@ -17,7 +17,7 @@ public:
     // command-line options
     int games = 100000;
     int batchsize = 1;
-    int every = 100;
+    int every = 1000;
     uint64_t user_seed = -1;
 
     string wlearn_fn = "white.w";

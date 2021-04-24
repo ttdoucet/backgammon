@@ -15,7 +15,7 @@ class PlayoffOptions : public cmdline
 public:
     int trials = 10000;
     bool display_moves = false;
-    int every = 100;
+    int every = 1000;
     uint64_t user_seed = -1;
 
     // derived
