@@ -172,6 +172,18 @@ class matrix
     }
 
     float *Data() { return &data[0][0]; }
+
+    const float *RowData(int r) const
+    {
+        return &data[r][0];
+    }
+
+    const float *ColData() const
+    {
+        static_assert(C == 1);
+        return &data[0][0];
+    }
+
     float *begin() { return Data(); }
     float *end()   { return &data[R-1][C-1] + 1; }
 
@@ -196,6 +208,7 @@ template<> inline matrix<1, 1>::operator float() const
 
 /* Multiplication of two matrices.
  */
+#if 0
 template<int S1, int S2, int S3> inline
 matrix<S1,S3> operator *(const matrix<S1, S2> &lhs, const matrix<S2, S3> &rhs)
 {
@@ -212,6 +225,30 @@ matrix<S1,S3> operator *(const matrix<S1, S2> &lhs, const matrix<S2, S3> &rhs)
     }
     return result;
 }
+
+#else
+
+
+#include <numeric>
+
+template<int S1, int S2> inline
+vec<S1> operator *(const matrix<S1, S2> &lhs, const vec<S2> &rhs)
+{
+    vec<S1> result;
+
+    for (int r = 0; r < result.Rows(); r++)
+    {
+        auto lp = lhs.RowData(r);
+        result(r) = std::inner_product(lp,
+                                       lp + lhs.Cols(),
+                                       rhs.ColData(),
+                                       0.0f
+                                       );
+    }
+    return result;
+}
+
+#endif
 
 /* Multiplication of a matrix by a scalar.
  */
