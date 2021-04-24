@@ -240,11 +240,12 @@ vec<S1> operator *(const matrix<S1, S2> &lhs, const vec<S2> &rhs)
 
     vec<S1> result;
     for (int r = 0; r < result.Rows(); r++, lp+=n)
-        result(r) = std::inner_product(lp, lp + n, rp,0.0f);
+        result(r) = std::inner_product(lp, lp + n, rp, 0.0f);
     return result;
 }
 
 #endif
+
 
 /* Multiplication of a matrix by a scalar.
  */
