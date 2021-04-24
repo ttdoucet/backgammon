@@ -208,10 +208,13 @@ template<> inline matrix<1, 1>::operator float() const
 
 /* Multiplication of two matrices.
  */
-#if 0
+
 template<int S1, int S2, int S3> inline
 matrix<S1,S3> operator *(const matrix<S1, S2> &lhs, const matrix<S2, S3> &rhs)
 {
+    // Ensure that a specialization, below, is used instead.
+    static_assert(rhs.Cols() != 1);
+
     matrix<S1,S3> result;
     for (int r = 0; r < result.Rows(); r++)
     {
@@ -225,9 +228,6 @@ matrix<S1,S3> operator *(const matrix<S1, S2> &lhs, const matrix<S2, S3> &rhs)
     }
     return result;
 }
-#endif
-
-#if 1
 
 #include <numeric>
 
@@ -243,8 +243,6 @@ vec<S1> operator *(const matrix<S1, S2> &lhs, const vec<S2> &rhs)
         result(r) = std::inner_product(lp, lp + n, rp, 0.0f);
     return result;
 }
-
-#endif
 
 
 /* Multiplication of a matrix by a scalar.
