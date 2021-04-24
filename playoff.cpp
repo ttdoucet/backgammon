@@ -26,7 +26,7 @@ public:
     {
         setopt('n', "--games", trials,        "number of trials.");
         setopt('s', "--seed",  user_seed,     "seed for random-number generator.");
-        setopt('e', "--every",   every,       "Report every n games.");
+        setopt('e', "--every", every,         "Report every n games.");
         setopt('d',            display_moves, "display moves.");
     }
 
