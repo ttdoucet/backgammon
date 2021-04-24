@@ -225,26 +225,22 @@ matrix<S1,S3> operator *(const matrix<S1, S2> &lhs, const matrix<S2, S3> &rhs)
     }
     return result;
 }
+#endif
 
-#else
-
+#if 1
 
 #include <numeric>
 
 template<int S1, int S2> inline
 vec<S1> operator *(const matrix<S1, S2> &lhs, const vec<S2> &rhs)
 {
-    vec<S1> result;
+    const float *rp = rhs.ColData();
+    const float *lp = lhs.RowData(0);
+    const auto n = lhs.Cols();
 
-    for (int r = 0; r < result.Rows(); r++)
-    {
-        auto lp = lhs.RowData(r);
-        result(r) = std::inner_product(lp,
-                                       lp + lhs.Cols(),
-                                       rhs.ColData(),
-                                       0.0f
-                                       );
-    }
+    vec<S1> result;
+    for (int r = 0; r < result.Rows(); r++, lp+=n)
+        result(r) = std::inner_product(lp, lp + n, rp,0.0f);
     return result;
 }
 
