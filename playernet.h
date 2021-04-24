@@ -30,8 +30,10 @@ public:
     void save(string filename)
     {
         bool okay = neural.writeFile(filename);
-        if (okay == false)
-            throw std::runtime_error(string("Error writing network: ") + filename + "\n");
+        if (okay == false){
+//          throw std::runtime_error(string("Error writing network: ") + filename + "\n");
+            assert(false);
+        }
     }
 
 protected:

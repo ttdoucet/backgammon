@@ -266,34 +266,40 @@ std::istream& operator>>(std::istream& s, matrix<R,C>& m)
     using namespace std;
     ios_base::fmtflags f(s.flags());
 
-        int rows, cols;
-        string curly, fstr;
+    int rows, cols;
+    string curly, fstr;
 
-        s >> dec >> curly >> rows >> cols >> hexfloat;
+    s >> dec >> curly >> rows >> cols >> hexfloat;
 
-        if (!s || curly != "{"s )
-            throw runtime_error("matrix: could not determine geometry");
+    auto  error_out = [](const string s)
+                      {
+                          std::cerr << s << "\n";
+                          // throw runtime_error(s);
+                          assert(false);
+                      };
 
-        if ( rows != m.Rows() || cols != m.Cols() )
-            throw runtime_error("matrix: geometry mismatch");
+    if (!s || curly != "{"s )
+        error_out("matrix: could not determine geometry");
 
-        for (int r = 0; r < rows; r++)
-            for (int c = 0; c < cols; c++)
-            {
-                s >> fstr;
-                if (!s)
-                    throw runtime_error("matrix: could not read float");
-                char *end;
-                float f = strtof(fstr.c_str(), &end);
-                if ( (end - fstr.c_str()) != fstr.length())
-                    throw runtime_error("matrix: float conversion error");
-                m(r, c) = f;
+    if ( rows != m.Rows() || cols != m.Cols() )
+        error_out("matrix: geometry mismatch");
 
-            }
+    for (int r = 0; r < rows; r++)
+        for (int c = 0; c < cols; c++)
+        {
+            s >> fstr;
+            if (!s)
+                error_out("matrix: could not read float");
+            char *end;
+            float f = strtof(fstr.c_str(), &end);
+            if ( (end - fstr.c_str()) != fstr.length())
+                error_out("matrix: float conversion error");
+            m(r, c) = f;
+        }
 
-        s >> curly;
-        if (!s || curly != "}"s)
-            throw runtime_error("matrix: expected }");
+    s >> curly;
+    if (!s || curly != "}"s)
+        error_out("matrix: expected }");
 
     s.flags(f);
     return s;

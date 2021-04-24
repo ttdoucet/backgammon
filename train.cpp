@@ -242,7 +242,8 @@ private:
 
         // Support learning in additional neural net players here. . .
 
-        throw runtime_error("Network not yet supported: " + nn.netname());
+//      throw runtime_error("Network not yet supported: " + nn.netname());
+        assert(false);
     }
 
     unique_ptr<NeuralNetPlayer> player_for(BgNet& nn)

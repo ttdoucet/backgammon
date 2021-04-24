@@ -25,7 +25,7 @@ namespace detail_cmdline
             for (; argc; --argc, ++argv)
                 Args.push_back(argv[0]);
 
-            try
+//          try
             {
                 for (const string& s : Args)
                 {
@@ -47,13 +47,15 @@ namespace detail_cmdline
                     }
                 }
 
-                if (need.empty() == false)
-                    throw runtime_error("Missing parameter value"s);
+                if (need.empty() == false){
+                    // throw runtime_error("Missing parameter value"s);
+                    assert(false);
+                }
             }
-            catch(exception& e)
-            {
-                usage(e.what());
-            }
+//          catch(exception& e)
+//          {
+//              usage(e.what());
+//          }
         }
 
         template<typename T>
@@ -117,7 +119,8 @@ namespace detail_cmdline
             for (size_t i = 0; i < flags.size(); ++i)
                 if (flags[i]->flag == ch)
                     return i;
-            throw runtime_error("Unknown switch: -"s + ch);
+//          throw runtime_error("Unknown switch: -"s + ch);
+            assert(false);
         }
 
         int find_opt(const string& longform)
@@ -127,7 +130,8 @@ namespace detail_cmdline
                     return i;
             if (longform == "--help")
                 usage();
-            throw runtime_error("Unknown switch: "s + longform);
+            // throw runtime_error("Unknown switch: "s + longform);
+            assert(false);
         }
 
         template<typename T>
@@ -168,8 +172,10 @@ namespace detail_cmdline
             {
                 stringstream ss{s};
                 ss >> val;
-                if (ss.fail() || !ss.eof())
-                    throw runtime_error("unexpected value: '"s + s + "'"s);
+                if (ss.fail() || !ss.eof()){
+//                    throw runtime_error("unexpected value: '"s + s + "'"s);
+                    assert(false);
+                }
             }
         };
 

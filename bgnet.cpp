@@ -50,5 +50,6 @@ std::unique_ptr<BgNet> readBgNet(const string filename)
         if (r->readFile(filename))
             return r;
 
-    throw runtime_error("Error reading net file: " + filename);
+//    throw runtime_error("Error reading net file: " + filename);
+    assert(false);
 }
