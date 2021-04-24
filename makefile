@@ -1,7 +1,7 @@
 sysname = $(shell uname -s)
 archname = $(shell uname -m)
 
-CXXFLAGS = -Ofast -ffast-math --std=c++17 -MMD # -fno-exceptions
+CXXFLAGS = -Ofast -ffast-math --std=c++17 -MMD  -fno-exceptions
 LDFLAGS = -L bearoff -lbearoff
 
 ifeq ($(sysname), Linux)
