@@ -82,16 +82,16 @@ class matrix
 
     matrix<R,C>& operator+=(const matrix<R,C> &rhs)
     {
-        for (int r = 0; r < Rows(); r++)
-            for (int c = 0; c < Cols(); c++)
+        for (int r = 0; r < R; r++)
+            for (int c = 0; c < C; c++)
                 data[r][c] += rhs(r,c);
         return *this;
     }
 
     matrix<R,C>& operator-=(const matrix<R,C> &rhs)
     {
-        for (int r = 0; r < Rows(); r++)
-            for (int c = 0; c < Cols(); c++)
+        for (int r = 0; r < R; r++)
+            for (int c = 0; c < C; c++)
                 data[r][c] -= rhs(r,c);
         return *this;
     }
@@ -136,8 +136,8 @@ class matrix
 
     bool operator==(const matrix<R,C> &rhs) const
     {
-        for (int r = 0; r < Rows(); r++)
-            for (int c = 0; c < Cols(); c++)
+        for (int r = 0; r < R; r++)
+            for (int c = 0; c < C; c++)
                 if (data[r][c] != rhs(r,c))
                     return false;
         return true;
@@ -156,8 +156,8 @@ class matrix
 
     bool isfinite() const
     {
-        for (int r = 0; r < Rows(); r++)
-            for (int c = 0; c < Cols(); c++)
+        for (int r = 0; r < R; r++)
+            for (int c = 0; c < C; c++)
                 if (std::isfinite((*this)(r,c)) == false)
                     return false;
         return true;
@@ -200,12 +200,12 @@ template<int S1, int S2, int S3> inline
 matrix<S1,S3> operator *(const matrix<S1, S2> &lhs, const matrix<S2, S3> &rhs)
 {
     matrix<S1,S3> result;
-    for (int r = 0; r < result.Rows(); r++)
+    for (int r = 0; r < S1; r++)
     {
-        for (int c = 0; c < result.Cols(); c++)
+        for (int c = 0; c < S3; c++)
         {
             float res = 0;
-            for (int k = 0; k < lhs.Cols(); k++)
+            for (int k = 0; k < S2; k++)
                 res += ( lhs(r, k) * rhs(k, c) );
             result(r, c) = res;
         }
@@ -246,11 +246,11 @@ std::ostream& operator<<(std::ostream& s, const matrix<R,C>& m)
     using namespace std;
     ios_base::fmtflags f(s.flags());
 
-    s << dec << "{ " << m.Rows() << " " << m.Cols() << "\n" << hexfloat;
-    for (int r = 0; r < m.Rows(); r++)
+    s << dec << "{ " << R << " " << C << "\n" << hexfloat;
+    for (int r = 0; r < R; r++)
     {
         s << " ";
-        for (int c = 0; c < m.Cols(); c++)
+        for (int c = 0; c < C; c++)
             s << " " << m(r, c);
         s << "\n";
     }
@@ -274,7 +274,7 @@ std::istream& operator>>(std::istream& s, matrix<R,C>& m)
         if (!s || curly != "{"s )
             throw runtime_error("matrix: could not determine geometry");
 
-        if ( rows != m.Rows() || cols != m.Cols() )
+        if ( rows != R || cols != C )
             throw runtime_error("matrix: geometry mismatch");
 
         for (int r = 0; r < rows; r++)
