@@ -231,11 +231,14 @@ matrix<S1,S3> operator *(const matrix<S1, S2> &lhs, const matrix<S2, S3> &rhs)
 
 #include <numeric>
 
+#if 1
+
 template<int S1, int S2> inline
 vec<S1> operator *(const matrix<S1, S2> &lhs, const vec<S2> &rhs)
 {
     const float *rp = rhs.ColData();
     const float *lp = lhs.RowData(0);
+
     const auto n = lhs.Cols();
 
     vec<S1> result;
@@ -244,6 +247,27 @@ vec<S1> operator *(const matrix<S1, S2> &lhs, const vec<S2> &rhs)
     return result;
 }
 
+#else
+
+template<int S1, int S2> inline
+vec<S1> operator *(const matrix<S1, S2> &lhs, const vec<S2> &rhs)
+{
+    vec<S1> result;
+    float *dst = result.Data();
+    float const *rpstart = rhs.ColData();
+    float const *lp = lhs.RowData(0);
+
+    for(int r = 0; r < S1 ; r++ ){
+        auto rp = rpstart;
+
+        for (int c = 0; c < S2; c++)
+            *dst += (*lp++ * *rp++);
+        dst++;
+    }
+    return result;
+}
+
+#endif
 
 /* Multiplication of a matrix by a scalar.
  */
