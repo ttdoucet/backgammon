@@ -237,21 +237,213 @@ matrix<S1,S3> operator *(const matrix<S1, S2> &lhs, const matrix<S2, S3> &rhs)
 
 #if 1
 
-template<int N, typename Tp, typename R>
-R dot_product(Tp a, Tp b, R init)
+template<typename T>
+T dot_product_156(const T *a, const T *b)
 {
-    R r = 0;
-    R sums[N], *s = sums;;
+    // std::cout << "specialize 156\n";
+    T r = 0;
 
-    for (int i = 0; i < N; i++)
-        s[i] = a[i] * b[i];
-
-    s = sums;
-    for (int i = 0; i < N; i++)
-        r += sums[i];
+    // If this is worthwhile, we can try to get
+    // a template to expand this, perhaps using
+    // a fold expression.
+    //
+    // But this seems correct, yet is much slower,
+    // about 7 times slower, than a loop, on a
+    // Mac Mini M1 arm64.  That is surprising.
+    //
+    // My guess is that clang here cannot figure
+    // out how to vectorize this.  Maybe the r
+    // is a bottleneck and cannot be vectorized?
+    
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
+    r += *a++ * *b++;
 
     return r;
 }
+
+template<int N, typename T>
+T dot_product_gen(const T *a, const T *b)
+{
+    T r = 0;
+    for (int i = 0; i < N; i++)
+        r += *a++ * *b++;
+    return r;
+}
+
+
+template<int N>
+float dot_product(const float *a, const float *b)
+{
+    if constexpr (N == 156)
+        return dot_product_156(a, b);  // this is so stupid
+    else
+        return dot_product_gen<N>(a, b);
+}
+
+/*
+// Fails with duplicate symbol.
+//
+template<>
+float dot_product<156>(const float *a, const float *b)
+{
+    std::cout << "specialization 156\n";
+    return 0;
+}
+*/
 
 template<int S1, int S2> inline
 vec<S1> operator *(const matrix<S1, S2> &lhs, const vec<S2> &rhs)
@@ -261,7 +453,7 @@ vec<S1> operator *(const matrix<S1, S2> &lhs, const vec<S2> &rhs)
 
     vec<S1> result;
     for (int r = 0; r < result.Rows(); r++, lp += S2)
-        result(r) = dot_product<S2>(lp, rp, 0.0f);
+        result(r) = dot_product<S2>(lp, rp);
     return result;
 }
 
