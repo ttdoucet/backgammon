@@ -1,5 +1,4 @@
-/* Written by Todd Doucet.  See file copyright.txt.
- */
+/* Written by Todd Doucet. */
 #include <iostream>
 #include <iomanip>
 

@@ -1,4 +1,4 @@
-All the source files in this directory were written by Todd Doucet, and
+All the source files in this project were written by Todd Doucet, and
 are copyrighted as an unpublished work.
 
 Most of the source files were originally written by me starting in 1993 and

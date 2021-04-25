@@ -1,7 +1,5 @@
-/* Written by Todd Doucet.  See file copyright.txt.
- */
+/* Written by Todd Doucet. */
 #pragma once
-
 #include "netop.h"
 
 template<int Features, int Hidden>
