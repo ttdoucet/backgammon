@@ -241,8 +241,15 @@ template<typename Tp, typename R>
 R dot_product(Tp a, Tp b, int n, R init)
 {
     R r = 0;
-    while (n--)
-        r += (*a++ * *b++);
+    R sums[n], *s = sums;;
+
+    for (int i = 0; i < n; i++)
+        s[i] = a[i] * b[i];
+
+    s = sums;
+    for (int i = 0; i < n; i++)
+        r += sums[i];
+
     return r;
 }
 
