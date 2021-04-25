@@ -209,6 +209,8 @@ template<> inline matrix<1, 1>::operator float() const
 /* Multiplication of two matrices.
  */
 
+#if 0
+
 template<int S1, int S2, int S3> inline
 matrix<S1,S3> operator *(const matrix<S1, S2> &lhs, const matrix<S2, S3> &rhs)
 {
@@ -229,7 +231,37 @@ matrix<S1,S3> operator *(const matrix<S1, S2> &lhs, const matrix<S2, S3> &rhs)
     return result;
 }
 
+#endif
+
 #include <numeric>
+
+#if 1
+
+template<typename Tp, typename R>
+R dot_product(Tp a, Tp b, int n, R init)
+{
+    R r = 0;
+    while (n--)
+        r += (*a++ * *b++);
+    return r;
+}
+
+template<int S1, int S2> inline
+vec<S1> operator *(const matrix<S1, S2> &lhs, const vec<S2> &rhs)
+{
+    const float *rp = rhs.ColData();
+    const float *lp = lhs.RowData(0);
+
+    const auto n = lhs.Cols();
+
+    vec<S1> result;
+    for (int r = 0; r < result.Rows(); r++, lp+=n)
+        result(r) = dot_product(lp, rp, n, 0.0f);
+    return result;
+}
+
+#endif
+
 
 #if 0
 
