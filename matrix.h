@@ -237,17 +237,17 @@ matrix<S1,S3> operator *(const matrix<S1, S2> &lhs, const matrix<S2, S3> &rhs)
 
 #if 1
 
-template<typename Tp, typename R>
-R dot_product(Tp a, Tp b, int n, R init)
+template<int N, typename Tp, typename R>
+R dot_product(Tp a, Tp b, R init)
 {
     R r = 0;
-    R sums[n], *s = sums;;
+    R sums[N], *s = sums;;
 
-    for (int i = 0; i < n; i++)
+    for (int i = 0; i < N; i++)
         s[i] = a[i] * b[i];
 
     s = sums;
-    for (int i = 0; i < n; i++)
+    for (int i = 0; i < N; i++)
         r += sums[i];
 
     return r;
@@ -259,11 +259,9 @@ vec<S1> operator *(const matrix<S1, S2> &lhs, const vec<S2> &rhs)
     const float *rp = rhs.ColData();
     const float *lp = lhs.RowData(0);
 
-    const auto n = lhs.Cols();
-
     vec<S1> result;
-    for (int r = 0; r < result.Rows(); r++, lp+=n)
-        result(r) = dot_product(lp, rp, n, 0.0f);
+    for (int r = 0; r < result.Rows(); r++, lp += S2)
+        result(r) = dot_product<S2>(lp, rp, 0.0f);
     return result;
 }
 
