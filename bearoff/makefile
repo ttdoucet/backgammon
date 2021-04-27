@@ -1,5 +1,5 @@
 CXX = clang++
-CXXFLAGS = -Ofast -ffast-math --std=c++17 -iquote ..
+CXXFLAGS = -Ofast -ffast-math --std=c++17 -iquote .. -iquote ../cmdline
 
 beargen : 
 	$(CXX) $(CXXFLAGS) -iquote .. beargen.cpp bearoff.cpp ../move.cpp -o beargen

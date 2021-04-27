@@ -1,7 +1,7 @@
 sysname = $(shell uname -s)
 archname = $(shell uname -m)
 
-CXXFLAGS = -Ofast -ffast-math --std=c++17 -MMD
+CXXFLAGS = -Ofast -ffast-math --std=c++17 -iquote cmdline -MMD
 LDFLAGS = -L bearoff -lbearoff
 
 ifeq ($(sysname), Linux)
