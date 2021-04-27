@@ -1,3 +1,6 @@
 [submodule "cmdline"]
 	path = cmdline
 	url = https://github.com/ttdoucet/cmdline
+[submodule "matrix"]
+	path = matrix
+	url = https://github.com/ttdoucet/matrix.git
