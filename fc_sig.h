@@ -102,26 +102,53 @@ protected:
 
     float feedForward()
     {
-        timer.start();
-        Op_1.fwd();
-        timer.stop();
-
-        Op_2.fwd();
+        auto time_with = [](auto& timer, auto& op)
+                         {
+                             timer.start();
+                             op.fwd();
+                             timer.stop();
+                         };
+/*      Op_1.fwd();
+        Op_2.fwd();        
         Op_3.fwd();
         Op_4.fwd();
         Op_5.fwd();
+*/
+        time_with(timer1, Op_1);
+        time_with(timer2, Op_2);
+        time_with(timer3, Op_3);
+        time_with(timer4, Op_4);
+        time_with(timer5, Op_5);
+
         return float(act.out);
     }
 
-public: // devel
-    stopwatch timer;
+public: // micro benchmarking
+    stopwatch timer1, timer2, timer3, timer4, timer5;
 
     ~Fc_Sig()
      {
-         auto usec = timer.elapsed_usec();
-         print("Fc_Sig Linear for", Hidden, "elapsed:", usec, "usec");
-         print("  count:", timer.laps());
-         print("   ave:", usec / timer.laps(), "usec");
+         print("Fc_Sig, hidden:", Hidden);
+
+         auto report = [](stopwatch& timer, const std::string& tag)
+                       {
+                           auto usec = timer.elapsed_usec();
+                           print(" ", tag,
+                                 "elapsed:", usec, "usec", "|",
+                                 "count:", timer.laps(),   "|",
+                                  "ave:", usec / timer.laps(), "usec"
+                           );
+                           return usec;
+                       };
+
+         int elapsed = 0;
+         elapsed += report(timer1, "  Linear");
+         elapsed += report(timer2, "logistic");
+         elapsed += report(timer3, "  Linear");
+         elapsed += report(timer4, " bipolar");
+         elapsed += report(timer5, "  affine");
+
+         print("     total elapsed:", elapsed / 1'000'000.0, "sec");
          print("");
      }
 };
