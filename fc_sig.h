@@ -1,6 +1,7 @@
 /* Written by Todd Doucet. */
 #pragma once
 #include "netop.h"
+#include "stopwatch.h"
 
 template<int Features, int Hidden>
 struct Params_Fc_Sig
@@ -101,11 +102,26 @@ protected:
 
     float feedForward()
     {
+        timer.start();
         Op_1.fwd();
+        timer.stop();
+
         Op_2.fwd();
         Op_3.fwd();
         Op_4.fwd();
         Op_5.fwd();
         return float(act.out);
     }
+
+public: // devel
+    stopwatch timer;
+
+    ~Fc_Sig()
+     {
+         auto usec = timer.elapsed_usec();
+         print("Fc_Sig Linear for", Hidden, "elapsed:", usec, "usec");
+         print("  count:", timer.laps());
+         print("   ave:", usec / timer.laps(), "usec");
+         print("");
+     }
 };
