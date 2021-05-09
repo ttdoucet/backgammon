@@ -7,7 +7,7 @@ LDFLAGS = -L bearoff -lbearoff
 ifeq ($(sysname), Linux)
   ifeq ($(archname), x86_64)
     CXX = g++-10  -march=sandybridge
-#   CXX = clang++-10
+   #CXX = clang++-10
   endif
 endif
 

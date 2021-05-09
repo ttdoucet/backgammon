@@ -32,9 +32,7 @@ public:
      */
     float equity(const board &b)
     {
-        timer.start();
         feature_calc::calc(b, this->input().Data());
-        timer.stop();
         return this->feedForward();
     }
 
@@ -42,14 +40,14 @@ public:
     {
         std::ifstream ifs(filename);
         string name;
-        ifs >> name >> this->params.M >> this->params.V;
+        ifs >> name >> this->params;
         return ifs.fail() == false;
     }
 
     bool writeFile(string filename) const
     {
         std::ofstream ofs(filename);
-        ofs << this->netname() << "\n" << this->params.M << this->params.V;
+        ofs << this->netname() << "\n" << this->params;
         return ofs.fail() == false;
     }
 
@@ -57,19 +55,6 @@ public:
     {
         assert( feature_calc::count == this->input().Rows() * this->input().Cols() );
     }
-
-    // micro-benchmarking
-    stopwatch timer;
-
-    ~BackgammonNet()
-    {
-        auto usec = timer.elapsed_usec();
-        print("Feature computation for Hidden:", Hidden,
-              usec, "usecs", "|",
-              "ave:",  usec / timer.laps(), "usecs");
-        print("");
-    }
-
 };
 
 /* Fully-connected, sigmoidal activations, 30 hidden units, input features version 3. */

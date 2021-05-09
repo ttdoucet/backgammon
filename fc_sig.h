@@ -1,48 +1,21 @@
 /* Written by Todd Doucet. */
 #pragma once
 #include "netop.h"
-#include "stopwatch.h"
+#include "algebra.h"
 
 template<int Features, int Hidden>
-struct Params_Fc_Sig
+struct Params_Fc_Sig_b
 {
     matrix<Hidden, Features> M;
     rowvec<Hidden> V;
 
-    void clear()
-    {
-        M.clear();
-        V.clear();
-    }
-
-    Params_Fc_Sig& operator+=(const Params_Fc_Sig &rhs)
-    {
-        M += rhs.M;
-        V += rhs.V;
-        return *this;
-    }
-
-    Params_Fc_Sig& operator*=(float scale)
-    {
-        M *= scale;
-        V *= scale;
-        return *this;
-    }
-
-    Params_Fc_Sig operator*(float scale) const
-    {
-        Params_Fc_Sig r(*this);
-        return r *= scale;
-    }
+    using self = Params_Fc_Sig_b<Features, Hidden>;
+    static constexpr auto members = std::make_tuple(&self::M, &self::V);
 };
 
-template<int F, int H>
-Params_Fc_Sig<F,H> operator+(const Params_Fc_Sig<F,H> &lhs,
-                             const Params_Fc_Sig<F,H> &rhs)
-{
-    Params_Fc_Sig<F,H> v(lhs);
-    return v += rhs;
-}
+template<int Features, int Hidden>
+using Params_Fc_Sig = algebra<Params_Fc_Sig_b<Features, Hidden>>;
+
 
   // Fully-connected two-layer network with sigmoidal activations
 template<int Features, int Hidden>
@@ -102,53 +75,12 @@ protected:
 
     float feedForward()
     {
-        auto time_with = [](auto& timer, auto& op)
-                         {
-                             timer.start();
-                             op.fwd();
-                             timer.stop();
-                         };
-/*      Op_1.fwd();
+        Op_1.fwd();
         Op_2.fwd();        
         Op_3.fwd();
         Op_4.fwd();
         Op_5.fwd();
-*/
-        time_with(timer1, Op_1);
-        time_with(timer2, Op_2);
-        time_with(timer3, Op_3);
-        time_with(timer4, Op_4);
-        time_with(timer5, Op_5);
 
         return float(act.out);
     }
-
-public: // micro benchmarking
-    stopwatch timer1, timer2, timer3, timer4, timer5;
-
-    ~Fc_Sig()
-     {
-         print("Fc_Sig, hidden:", Hidden);
-
-         auto report = [](stopwatch& timer, const std::string& tag)
-                       {
-                           auto usec = timer.elapsed_usec();
-                           print(" ", tag,
-                                 "elapsed:", usec, "usec", "|",
-                                 "count:", timer.laps(),   "|",
-                                  "ave:", usec / timer.laps(), "usec"
-                           );
-                           return usec;
-                       };
-
-         int elapsed = 0;
-         elapsed += report(timer1, "  Linear");
-         elapsed += report(timer2, "logistic");
-         elapsed += report(timer3, "  Linear");
-         elapsed += report(timer4, " bipolar");
-         elapsed += report(timer5, "  affine");
-
-         print("     total elapsed:", elapsed / 1'000'000.0, "sec");
-         print("");
-     }
 };
