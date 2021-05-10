@@ -23,9 +23,9 @@ public:
     virtual ~BgNet() = default;
 };
 
-template<class feature_calc, template<int, int...> class Net, int...Args>
+template<class feature_calc, template<int, int...> class Net, int...args>
 class BackgammonNet :  public BgNet,
-                       public Net<feature_calc::count, Args...>
+                       public Net<feature_calc::count, args...>
 {
 public:
     /* Neural net estimate of the equity for the side on roll.
