@@ -131,3 +131,45 @@ public:
                 grad_M(r, c) += upstream_d(r) * x(c);
     }
 };
+
+template<int xdim, int ydim>
+class Bias
+{
+    using param_t = matrix<ydim, xdim>;
+    using src_t = param_t;
+    using dst_t = param_t;
+
+    param_t& B;
+    param_t& grad_B;
+
+    const src_t& x;
+    dst_t& y;
+
+public:
+    Bias(const src_t& x,
+         dst_t& y,
+         param_t& B,
+         param_t& grad_B
+    )
+        : x{x}, y{y}, B{B}, grad_B{grad_B}
+    {
+        for (auto& b : B)
+            b = 0;
+    }
+
+    void fwd()
+    {
+        y = x + B;
+    }
+
+    src_t bwd(const dst_t& upstream_d)
+    {
+        bwd_param(upstream_d);
+        return upstream_d;
+    }
+
+    void bwd_param(const dst_t& upstream_d)
+    {
+        grad_B += upstream_d;
+    }
+};
