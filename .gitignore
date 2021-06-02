@@ -4,7 +4,11 @@
 *.ii
 *.s
 *.exe
+*.d
 .tup
 train
 playoff
 nnstat
+libbearoff.a
+beargen
+
