@@ -47,6 +47,16 @@ struct affine
     static inline float bwd(float y) { return scale; }
 };
 
+
+// Work around for not being able to have float template parameter.
+struct scale_3_5
+{
+    constexpr static float scale = 3.5;
+
+    static inline float fwd(float x) { return scale * x; }
+    static inline float bwd(float y) { return scale; }
+};
+
 /*
  * The netops are nodes in a computational graph which support
  * forward and back propagation.
