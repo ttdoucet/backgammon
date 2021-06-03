@@ -3,10 +3,8 @@
 #include "netop.h"
 #include "algebra.h"
 
-  /* Fully-connected two-layer network with sigmoidal activations.
-   */
 template<int Features, int Hidden>
-class Fc_Sig
+class ExperimentalModel
 {
     struct Parameters_base
     {
