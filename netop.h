@@ -68,7 +68,7 @@ class Termwise
     using vec_t = vec<len>;
 
 public:
-    const vec_t& src;
+    vec_t const& src;
     vec_t& dst;
 
     void fwd()
@@ -77,7 +77,7 @@ public:
             dst(i) = Activ::fwd( src(i) );
     }
 
-    vec_t bwd(const vec_t& upstream_d)
+    vec_t bwd(vec_t const& upstream_d)
     {
         vec_t r;
 
@@ -87,9 +87,9 @@ public:
         return r;
     }
 
-    void bwd_param(const vec_t& upstream_d) {  /* no parameters */  }
+    void bwd_param(vec_t const& upstream_d) {  /* no parameters */  }
 
-    Termwise(const vec_t& src, vec_t& dest) : src{src}, dst{dest} { }
+    Termwise(vec_t const& src, vec_t& dest) : src{src}, dst{dest} { }
 };
 
 template<int xdim, int ydim>
@@ -100,11 +100,11 @@ class Linear
 
     matrix<ydim, xdim>& M;
     matrix<ydim, xdim>& grad_M;
-    const src_t& x;
+    src_t const& x;
     dst_t& y;
 
 public:
-    Linear(const src_t& x,
+    Linear(src_t const& x,
            dst_t& y,
            matrix<ydim,xdim>& M,
            matrix<ydim,xdim>& grad_M
@@ -121,7 +121,7 @@ public:
         y = M * x;
     }
 
-    src_t bwd(const dst_t& upstream_d)
+    src_t bwd(dst_t const& upstream_d)
     {
         bwd_param(upstream_d);
 
@@ -134,7 +134,7 @@ public:
         return ret;
     }
 
-    void bwd_param(const dst_t& upstream_d)
+    void bwd_param(dst_t const& upstream_d)
     {
         for (auto r = 0; r < M.Rows(); r++)
             for (auto c = 0; c < M.Cols(); c++)
@@ -152,16 +152,20 @@ class Bias
     param_t& B;
     param_t& grad_B;
 
-    const src_t& x;
+    src_t const& x;
     dst_t& y;
 
 public:
-    Bias(const src_t& x,
-         dst_t& y,
-         param_t& B,
-         param_t& grad_B
+    Bias(
+        src_t const& x,
+        dst_t& y,
+        param_t& B,
+        param_t& grad_B
     )
-        : x{x}, y{y}, B{B}, grad_B{grad_B}
+        : x{x},
+          y{y},
+          B{B},
+          grad_B{grad_B}
     {
         for (auto& b : B)
             b = 0;
@@ -172,13 +176,13 @@ public:
         y = x + B;
     }
 
-    src_t bwd(const dst_t& upstream_d)
+    src_t bwd(dst_t const& upstream_d)
     {
         bwd_param(upstream_d);
         return upstream_d;
     }
 
-    void bwd_param(const dst_t& upstream_d)
+    void bwd_param(dst_t const& upstream_d)
     {
         grad_B += upstream_d;
     }

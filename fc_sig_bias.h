@@ -64,7 +64,7 @@ public:
         g = grad;
     }
 
-    void update_model(const Parameters& adj)
+    void update_model(Parameters const& adj)
     {
         params += adj;
     }
