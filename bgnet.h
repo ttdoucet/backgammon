@@ -66,6 +66,13 @@ struct netv3 : public BackgammonNet<features_v3, Fc_Sig, 30>
     string netname() const { return "netv3"; }
 };
 
+// experiment with different input representation.
+struct netv5 : public BackgammonNet<features_v5, Fc_Sig, 30>
+{
+    string netname() const { return "netv5"; }
+};
+
+
 struct Fc_Sig_H60_I3 : public BackgammonNet<features_v3, Fc_Sig, 60>
 {
     string netname() const { return "Fc_Sig_H60_I3"; }

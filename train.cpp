@@ -230,6 +230,11 @@ private:
         if (auto p = dynamic_cast<netv3*>(&nn))
 	    return make_unique<Learner<netv3> > (*p, opts.alpha, opts.lambda, opts.wdual, opts.decay, opts.batchsize, opts.momentum);
 
+        // experimental, in flux
+        if (auto p = dynamic_cast<netv5*>(&nn))
+	    return make_unique<Learner<netv5> > (*p, opts.alpha, opts.lambda, opts.wdual, opts.decay, opts.batchsize, opts.momentum);
+
+
         if (auto p = dynamic_cast<Fc_Sig_H60_I3*>(&nn))
 	    return make_unique<Learner<Fc_Sig_H60_I3> > (*p, opts.alpha, opts.lambda, opts.wdual, opts.decay, opts.batchsize, opts.momentum);
 
@@ -244,8 +249,8 @@ private:
 
         // general-purpose experimental model, not preserved over time
 
-//        if (auto p = dynamic_cast<model*>(&nn))
-//            return make_unique<Learner<model> > (*p, opts.alpha, opts.lambda, opts.wdual, opts.decay, opts.batchsize, opts.momentum);
+        if (auto p = dynamic_cast<Experimental*>(&nn))
+            return make_unique<Learner<Experimental> > (*p, opts.alpha, opts.lambda, opts.wdual, opts.decay, opts.batchsize, opts.momentum);
 
 
         // Support learning in additional neural net players here. . .

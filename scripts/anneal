@@ -67,7 +67,7 @@ def initialize_net(net_type, basename='white'):
     print(cmd);
 
 
-bname = 'k30-50m'
+bname = 'netv5-50m'
 
 batchsize = 1
 opponent = None
@@ -79,6 +79,6 @@ momentum = 0.0
 from_game = 0
 
 
-initialize_net('Fc_Sig_Bias_H30_I3', basename=bname);
+initialize_net('netv5', basename=bname);
 anneal_schedule(a_start, a_stop, rounds, basename=bname, lambda_=lmbda, frm=from_game, opponent=opponent, batchsize=batchsize, momentum=momentum)
 anneal_schedule(a_stop, a_stop/20, rounds, basename=bname, lambda_=lmbda, frm=from_game+rounds, opponent=opponent, batchsize=batchsize, momentum=momentum)
