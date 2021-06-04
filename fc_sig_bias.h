@@ -9,10 +9,11 @@ class Fc_Sig_Bias
     struct Parameters_base
     {
         matrix<Hidden, Features> M;
+        vec<Hidden> B;
         rowvec<Hidden> V;
 
         using self = Parameters_base;
-        static constexpr auto members = std::make_tuple(&self::M, &self::V);
+        static constexpr auto members = std::make_tuple(&self::M, &self::B, &self::V);
     };
 
 public:
@@ -26,6 +27,7 @@ public:
         using OutputVector = vec<1>;
 
         InputVector input;
+        HiddenVector pre_hidden;
         HiddenVector hidden;
         OutputVector pre_out;
         OutputVector out;
@@ -47,11 +49,13 @@ public:
         grad.clear();
 
         matrix<1,1> one = { 1 };
-        auto r5 = Op_5.bwd(one);
-        auto r4 = Op_4.bwd(r5);
-        auto r3 = Op_3.bwd(r4);
-        auto r2 = Op_2.bwd(r3);
-        Op_1.bwd_param(r2);
+        auto r5 = Layer2c.bwd(one);
+        auto r4 = Layer2b.bwd(r5);
+        auto r3 = Layer2a.bwd(r4);
+
+        auto r2 = Layer1c.bwd(r3);
+        auto r1 = Layer1b.bwd(r2);
+                  Layer1a.bwd_param(r1);
         g = grad;
     }
 
@@ -61,28 +65,23 @@ public:
     }
 
 protected:
-    // Work around for not being able to have float template parameter.
-    struct equity_scale
-    {
-        constexpr static float scale = 4.0;
-        static inline float fwd(float x) { return scale * x; }
-        static inline float bwd(float y) { return scale; }
-    };
+    Linear<Features, Hidden>      Layer1a{act.input, act.pre_hidden, params.M, grad.M};
+    Bias<1, Hidden>               Layer1b{act.pre_hidden, act.hidden, params.B, grad.B};
+    Termwise<logistic, Hidden>    Layer1c{act.hidden, act.hidden};
 
-    Linear<Features, Hidden>      Op_1{act.input, act.hidden, params.M, grad.M};
-    Termwise<logistic, Hidden>    Op_2{act.hidden, act.hidden};
-
-    Linear<Hidden, 1>             Op_3{act.hidden, act.pre_out, params.V, grad.V};
-    Termwise<bipolar_sigmoid, 1>  Op_4{act.pre_out, act.pre_out};
-    Termwise<equity_scale, 1>     Op_5{act.pre_out, act.out};
+    Linear<Hidden, 1>             Layer2a{act.hidden, act.pre_out, params.V, grad.V};
+    Termwise<bipolar_sigmoid, 1>  Layer2b{act.pre_out, act.pre_out};
+    Termwise<affine<3,0>, 1>      Layer2c{act.pre_out, act.out};
 
     float feedForward()
     {
-        Op_1.fwd();
-        Op_2.fwd();
-        Op_3.fwd();
-        Op_4.fwd();
-        Op_5.fwd();
+        Layer1a.fwd();
+        Layer1b.fwd();
+        Layer1c.fwd();
+
+        Layer2a.fwd();
+        Layer2b.fwd();
+        Layer2c.fwd();
 
         return float(act.out);
     }
