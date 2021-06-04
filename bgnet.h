@@ -93,6 +93,12 @@ struct Fc_Sig_Bias_H30_I5 : public BackgammonNet<features_v5, Fc_Sig_Bias, 30>
     string netname() const { return "Fc_Sig_Bias_H30_I5"; }
 };
 
+struct Fc_Sig_Bias_H60_I5 : public BackgammonNet<features_v5, Fc_Sig_Bias, 60>
+{
+    string netname() const { return "Fc_Sig_Bias_H60_I5"; }
+};
+
+
 struct Experimental : public BackgammonNet<features_v3, ExperimentalModel, 30>
 {
     string netname() const { return "Experimental"; }
