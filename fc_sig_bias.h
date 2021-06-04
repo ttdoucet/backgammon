@@ -64,7 +64,7 @@ protected:
     // Work around for not being able to have float template parameter.
     struct equity_scale
     {
-        constexpr static float scale = 3.1;
+        constexpr static float scale = 4.0;
         static inline float fwd(float x) { return scale * x; }
         static inline float bwd(float y) { return scale; }
     };
