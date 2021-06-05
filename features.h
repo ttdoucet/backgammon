@@ -11,54 +11,79 @@ public:
     constexpr static int count = 156;
     features_v3() = delete;
 
-    static float* calc(const board &b, float* dest)
+    static void calc(board const& b, float *dest)
     {
-        float* end = compute_input(b, b.onRoll(), dest);
-        assert( (end - dest) == count);
-        return end;
+        float *ib = dest;
+        const color_t on_roll = b.onRoll();
+
+        ib = board_features(b, on_roll, ib);
+        ib = board_features(b, opponentOf(on_roll), ib);
+
+        ib = contact_features(b, on_roll, ib);
+        ib = pip_features(b, on_roll, ib);
+
+        ib = hit_features(b, on_roll, ib);
+        ib = hit_features(b, opponentOf(on_roll), ib);
+
+        assert( (ib - dest) == 156 );
     }
 
 protected:
-    static float* compute_contact(const board& b, const color_t color, float* ib) // const
+    static float contact(board const & b, color_t color)
     {
         int me = b.highestChecker(color);
         int him = opponentPoint(b.highestChecker(opponentOf(color)));
-        int contact = me - him;
-        float f = contact < 0.0f ? 0.0f : (contact / 23.0f);
+        int contact_ = me - him;
+        return  contact_ < 0.0f ? 0.0f : (contact_ / 23.0f);
+    }
+
+    static float pip_difference(board const& b, color_t color)
+    {
+        int pdiff =  b.pipCount(opponentOf(color)) - b.pipCount(color);
+        return logistic::fwd(pdiff / 27.0f);
+    }
+
+    static float hits(board const& b, color_t color)
+    {
+        return num_hits(color, b) / 36.0f;
+    }
+
+private:
+    static float *contact_features( board const& b, color_t color, float *ib)
+    {
+        float f = contact(b, color);
 
         *ib++ = f;
         *ib++ = (1.0f - f);
         return ib;
     }
 
-    static float* compute_pip(const board& b, const color_t color, float* ib) // const
+    static float *pip_features(board const& b, color_t color, float *ib)
     {
-        int pdiff = b.pipCount(opponentOf(color)) - b.pipCount(color);
-
-        float h = logistic::fwd(pdiff / 27.0f);
-        *ib++ = h;
-        *ib++ = 1.0f - h;
-        return ib;
-    }
-
-    static float* compute_hit_danger_v3(const board& b, const color_t color, float* ib) // const
-    {
-        float h = num_hits(color, b) / 36.0f;
+        float h = pip_difference(b, color);
 
         *ib++ = h;
         *ib++ = 1.0f - h;
         return ib;
     }
 
-    static float* compute_input_for(const board& b, const color_t color, float* ib) // const
+    static float *hit_features(board const& b, color_t color, float *ib)
     {
-        int i, n;
+        float h = hits(b, color);
 
+        *ib++ = h;
+        *ib++ = 1.0f - h;
+        return ib;
+    }
+
+protected:
+    static float *board_features(board const& b, color_t color, float *ib)
+    {
         *ib++ = b.checkersOnPoint(color, 0);    /* borne off */
 
-        for (i = 1; i <= 24; i++)
+        for (int i = 1; i <= 24; i++)
         {
-            n = b.checkersOnPoint(color, i);
+            int n = b.checkersOnPoint(color, i);
             *ib++ = (n == 1);                   /* blot     */
             *ib++ = (n >= 2);                   /* point    */
             *ib++ = ( (n > 2) ? (n - 2) : 0 );  /* builders */
@@ -67,115 +92,28 @@ protected:
         *ib++ = b.checkersOnBar(color);         /* on bar   */
         return ib;
     }
-
-    static float* compute_v3_inputs(const board& b, const color_t color, float* ib) // const
-    {
-        // The first two are the same as net_v2.
-        ib = compute_contact(b, color, ib);
-        ib = compute_pip(b, color, ib);
-
-        // Here we represent the hit danger and hit attack differently.
-        ib = compute_hit_danger_v3(b, color, ib);
-        ib = compute_hit_danger_v3(b, opponentOf(color), ib);
-
-        return ib;
-    }
-
-    /* Encode the board as the network input.
-     */
-    static float* compute_input(const board& b, const color_t color, float* ib) // const
-    {
-        ib = compute_input_for(b, color, ib);
-        ib = compute_input_for(b, opponentOf(color), ib);
-        ib = compute_v3_inputs(b, color, ib);
-        return ib;
-    }
 };
 
-
-class features_v5
+class features_v5 : protected features_v3
 {
 public:
     constexpr static int count = 152;
     features_v5() = delete;
 
-    static float* calc(const board &b, float* dest)
+    static void calc(board const& b, float *dest)
     {
-        float* end = compute_input(b, b.onRoll(), dest);
-        assert( (end - dest) == count);
-        return end;
-    }
+        float *ib = dest;
+        const color_t on_roll = b.onRoll();
 
-protected:
-    static float* compute_contact(const board& b, const color_t color, float* ib) // const
-    {
-        int me = b.highestChecker(color);
-        int him = opponentPoint(b.highestChecker(opponentOf(color)));
-        int contact = me - him;
-        float f = contact < 0.0f ? 0.0f : (contact / 23.0f);
+        ib = board_features(b, on_roll, ib);
+        ib = board_features(b, opponentOf(on_roll), ib);
 
-        *ib++ = f;
-//      *ib++ = (1.0f - f);
-        return ib;
-    }
+        *ib++ = contact(b, on_roll);
+        *ib++ = pip_difference(b, on_roll);
 
-    static float* compute_pip(const board& b, const color_t color, float* ib) // const
-    {
-        int pdiff = b.pipCount(opponentOf(color)) - b.pipCount(color);
+        *ib++ = hits(b, on_roll);
+        *ib++ = hits(b, opponentOf(on_roll));
 
-        float h = logistic::fwd(pdiff / 27.0f);
-        *ib++ = h;
-//      *ib++ = 1.0f - h;
-        return ib;
-    }
-
-    static float* compute_hit_danger_v5(const board& b, const color_t color, float* ib) // const
-    {
-        float h = num_hits(color, b) / 36.0f;
-
-        *ib++ = h;
-//      *ib++ = 1.0f - h;
-        return ib;
-    }
-
-    static float* compute_input_for(const board& b, const color_t color, float* ib) // const
-    {
-        int i, n;
-
-        *ib++ = b.checkersOnPoint(color, 0);    /* borne off */
-
-        for (i = 1; i <= 24; i++)
-        {
-            n = b.checkersOnPoint(color, i);
-            *ib++ = (n == 1);                   /* blot     */
-            *ib++ = (n >= 2);                   /* point    */
-            *ib++ = ( (n > 2) ? (n - 2) : 0 );  /* builders */
-        }
-
-        *ib++ = b.checkersOnBar(color);         /* on bar   */
-        return ib;
-    }
-
-    static float* compute_v5_inputs(const board& b, const color_t color, float* ib) // const
-    {
-        // The first two are the same as net_v2.
-        ib = compute_contact(b, color, ib);
-        ib = compute_pip(b, color, ib);
-
-        // Here we represent the hit danger and hit attack differently.
-        ib = compute_hit_danger_v5(b, color, ib);
-        ib = compute_hit_danger_v5(b, opponentOf(color), ib);
-
-        return ib;
-    }
-
-    /* Encode the board as the network input.
-     */
-    static float* compute_input(const board& b, const color_t color, float* ib) // const
-    {
-        ib = compute_input_for(b, color, ib);
-        ib = compute_input_for(b, opponentOf(color), ib);
-        ib = compute_v5_inputs(b, color, ib);
-        return ib;
+        assert( (ib - dest) == count );
     }
 };
