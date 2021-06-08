@@ -57,11 +57,6 @@ public:
         g = grad;
     }
 
-    void update_model(Parameters const& adj)
-    {
-        params += adj;
-    }
-
 protected:
     Linear<Features, Hidden>      Op_1{act.input, act.hidden, params.M, grad.M};
     Termwise<logistic, Hidden>    Op_2{act.hidden, act.hidden};

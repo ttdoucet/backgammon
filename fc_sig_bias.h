@@ -59,11 +59,6 @@ public:
         g = grad;
     }
 
-    void update_model(Parameters const& adj)
-    {
-        params += adj;
-    }
-
 protected:
     Linear<Features, Hidden>      Layer1a{act.input, act.pre_hidden, params.M, grad.M};
     Bias<1, Hidden>               Layer1b{act.pre_hidden, act.hidden, params.B, grad.B};

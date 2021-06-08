@@ -144,7 +144,8 @@ public:
 
             if (++seq == batchsize)
             {
-                neural.update_model(batch_grad * (-alpha));
+                neural.params += (batch_grad * (-alpha));
+
                 seq = 0;
                 batch_grad.clear();
             }
