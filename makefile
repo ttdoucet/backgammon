@@ -13,6 +13,9 @@ endif
 
 ifeq ($(sysname), Darwin)
   CXX = clang++
+  #CXX = /opt/homebrew/opt/llvm/bin/clang++
+  #CXX = g++-11
+
 endif
 
 all : bearoff/libbearoff.a  playoff train
