@@ -55,11 +55,13 @@ struct affine
 template<class Activ, int len>
 class Termwise
 {
-    using vec_t = vec<len>;
+    using src_t = vec<len>;
+    using dst_t = src_t;
+
 
 public:
-    vec_t const& src;
-    vec_t& dst;
+    src_t const& src;
+    dst_t &dst;
 
     void fwd()
     {
@@ -67,9 +69,9 @@ public:
             dst(i) = Activ::fwd( src(i) );
     }
 
-    vec_t bwd(vec_t const& upstream_d)
+    src_t bwd(dst_t const& upstream_d)
     {
-        vec_t r;
+        src_t r;
 
         for (int i = 0; i < len; i++)
             r(i) = upstream_d(i) * Activ::bwd( dst(i) );
@@ -77,27 +79,23 @@ public:
         return r;
     }
 
-    void bwd_param(vec_t const& upstream_d) {  /* no parameters */  }
+    void bwd_param(dst_t const& upstream_d) {  /* no parameters */  }
 
-    Termwise(vec_t const& src, vec_t& dest) : src{src}, dst{dest} { }
+    Termwise(src_t const& src, dst_t & dest) : src{src}, dst{dest} { }
 };
 
 template<int xdim, int ydim>
 class Linear
 {
+public:
     using src_t = vec<xdim>;
     using dst_t = vec<ydim>;
+    using param_t = matrix<ydim, xdim>;
 
-    matrix<ydim, xdim>& M;
-    matrix<ydim, xdim>& grad_M;
-    src_t const& x;
-    dst_t& y;
-
-public:
     Linear(src_t const& x,
            dst_t& y,
-           matrix<ydim,xdim>& M,
-           matrix<ydim,xdim>& grad_M
+           param_t &M,
+           param_t &grad_M
     )
         : x{x}, y{y}, M{M}, grad_M{grad_M}
     {
@@ -130,6 +128,12 @@ public:
             for (auto c = 0; c < M.Cols(); c++)
                 grad_M(r, c) += upstream_d(r) * x(c);
     }
+
+private:
+    param_t &M;
+    param_t &grad_M;
+    src_t const& x;
+    dst_t &y;
 };
 
 template<int xdim, int ydim>
@@ -139,8 +143,8 @@ class Bias
     using src_t = param_t;
     using dst_t = param_t;
 
-    param_t& B;
-    param_t& grad_B;
+    param_t &B;
+    param_t &grad_B;
 
     src_t const& x;
     dst_t& y;
@@ -148,9 +152,9 @@ class Bias
 public:
     Bias(
         src_t const& x,
-        dst_t& y,
-        param_t& B,
-        param_t& grad_B
+        dst_t &y,
+        param_t &B,
+        param_t &grad_B
     )
         : x{x},
           y{y},
