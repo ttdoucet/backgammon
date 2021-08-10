@@ -3,6 +3,8 @@
 #include "netop.h"
 #include "algebra.h"
 
+#include "stopwatch.h"
+
   /* Fully-connected two-layer network with sigmoidal activations.
    */
 template<int Features, int Hidden>
@@ -58,6 +60,14 @@ public:
     }
 
 
+public:
+    stopwatch timer;
+
+    ~Fc_Sig()
+    {
+        std::cout << "Fc_Sig feedForward: " << timer.elapsed_msec() << " msec\n";
+    }
+
 protected:
     Linear<Features, Hidden>      Op_1{act.input, act.hidden, params.M, grad.M};
     Termwise<logistic, Hidden>    Op_2{act.hidden, act.hidden};
@@ -67,11 +77,13 @@ protected:
 
     float feedForward()
     {
+        timer.start();
         Op_1.fwd();
         Op_2.fwd();        
         Op_3.fwd();
         Op_4.fwd();
         Op_5.fwd();
+        timer.stop();
 
         return float(act.out);
     }
