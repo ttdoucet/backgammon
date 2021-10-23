@@ -1,9 +1,9 @@
 [submodule "cmdline"]
 	path = cmdline
-	url = git@github.com:ttdoucet/cmdline
+	url = ../cmdline
 [submodule "matrix"]
 	path = matrix
-	url = git@github.com:ttdoucet/matrix.git
+	url = ../matrix.git
 [submodule "stopwatch"]
 	path = stopwatch
-	url = git@github.com:ttdoucet/stopwatch.git
+	url = ../stopwatch.git
