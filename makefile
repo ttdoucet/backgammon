@@ -1,21 +1,20 @@
 sysname = $(shell uname -s)
 archname = $(shell uname -m)
 
-CXXFLAGS = -Ofast -ffast-math --std=c++17 -iquote cmdline -iquote matrix -iquote stopwatch -MMD
-LDFLAGS = -L bearoff -lbearoff
+export CXXFLAGS = -Ofast -ffast-math --std=c++17 -iquote cmdline -iquote matrix -iquote stopwatch -MMD
+export LDFLAGS = -L bearoff -lbearoff
 
 ifeq ($(sysname), Linux)
   ifeq ($(archname), x86_64)
-    CXX = g++-10  -march=sandybridge
-   #CXX = clang++-10
+   export CXX = g++-10  -march=sandybridge
+   # export CXX = clang++-10
   endif
 endif
 
 ifeq ($(sysname), Darwin)
-  CXX = clang++
-  #CXX = /opt/homebrew/opt/llvm/bin/clang++
-  #CXX = g++-11
-
+  export CXX = /opt/homebrew/opt/llvm/bin/clang++
+  # export CXX = clang++
+  # export CXX = g++-11
 endif
 
 all : bearoff/libbearoff.a  playoff train

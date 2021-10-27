@@ -1,7 +1,7 @@
-CXX = clang++
-#CXX = /opt/homebrew/opt/llvm/bin/clang++
-#CXX = g++-11
-
+# The makefile in .. exports these for us now.
+# CXX = clang++
+# CXX = /opt/homebrew/opt/llvm/bin/clang++
+# CXX = g++-11
 
 CXXFLAGS = -Ofast -ffast-math --std=c++17 -iquote .. -iquote ../cmdline
 
