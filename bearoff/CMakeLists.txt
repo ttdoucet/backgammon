@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.21.3)
 
-project(bearoff LANGUAGES CXX)
+# project(bearoff LANGUAGES CXX)
 
 set(CMAKE_CXX_FLAGS "-Ofast -ffast-math --std=c++17")
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/.. cmdline)
@@ -9,7 +9,7 @@ add_executable(beargen  beargen.cpp bearoff.cpp ${CMAKE_CURRENT_SOURCE_DIR}/../m
 
 add_custom_command(
         OUTPUT bearoff.dat
-        COMMAND ./beargen > ${CMAKE_CURRENT_BINARY_DIR}/bearoff.dat
+        COMMAND ./beargen > bearoff.dat
         DEPENDS beargen
         VERBATIM)
 
