@@ -9,8 +9,9 @@ add_executable(beargen  beargen.cpp bearoff.cpp ${CMAKE_CURRENT_SOURCE_DIR}/../m
 
 add_custom_command(
         OUTPUT bearoff.dat
-        COMMAND ./beargen > ${CMAKE_CURRENT_SOURCE_DIR}/bearoff.dat
+        COMMAND ./beargen > ${CMAKE_CURRENT_BINARY_DIR}/bearoff.dat
         DEPENDS beargen
         VERBATIM)
 
 add_library(bearoff  bdata.cpp bearoff.cpp bearoff.dat)
+target_include_directories(bearoff PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
