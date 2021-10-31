@@ -61,11 +61,11 @@ public:
 
 
 public:
-    stopwatch timer;
+//  stopwatch timer;
 
     ~Fc_Sig()
     {
-        std::cout << "Fc_Sig feedForward: " << timer.elapsed_msec() << " msec\n";
+//      std::cout << "Fc_Sig feedForward: " << timer.elapsed_msec() << " msec\n";
     }
 
 protected:
@@ -77,13 +77,13 @@ protected:
 
     float feedForward()
     {
-        timer.start();
+//      timer.start();
         Op_1.fwd();
         Op_2.fwd();        
         Op_3.fwd();
         Op_4.fwd();
         Op_5.fwd();
-        timer.stop();
+//      timer.stop();
 
         return float(act.out);
     }

@@ -20,22 +20,22 @@ public:
     {
     }
 
-    stopwatch timer;
+//  stopwatch timer;
 
     ~NeuralNetPlayer()
     {
-        std::cout << "NeuralNetPlayer bearoffEquity: "
-                  << timer.elapsed_msec()
-                  << " msec\n";
+//      std::cout << "NeuralNetPlayer bearoffEquity: "
+//                << timer.elapsed_msec()
+//                << " msec\n";
     }
 
     void chooseMove(const board& b, moves& choice) override
     {
         if (isBearingOff(b))
         {
-            timer.start();
+//          timer.start();
             selectMove(b, choice, &NeuralNetPlayer::bearoffEquity);
-            timer.stop();
+//          timer.stop();
         }
         else
             selectMove(b, choice, &NeuralNetPlayer::littleE);
