@@ -8,6 +8,8 @@
 #include "bgnet.h"
 #include "bearoff/bearoff.h"
 
+#include "stopwatch.h"
+
 using std::string;
 
 class NeuralNetPlayer : public Player, public callBack
@@ -18,10 +20,23 @@ public:
     {
     }
 
+    stopwatch timer;
+
+    ~NeuralNetPlayer()
+    {
+        std::cout << "NeuralNetPlayer bearoffEquity: "
+                  << timer.elapsed_msec()
+                  << " msec\n";
+    }
+
     void chooseMove(const board& b, moves& choice) override
     {
         if (isBearingOff(b))
+        {
+            timer.start();
             selectMove(b, choice, &NeuralNetPlayer::bearoffEquity);
+            timer.stop();
+        }
         else
             selectMove(b, choice, &NeuralNetPlayer::littleE);
     }
