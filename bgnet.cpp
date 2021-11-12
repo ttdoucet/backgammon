@@ -43,11 +43,6 @@ static unique_ptr<BgNet> initBgNet(const string name)
     if (name == "Fc_Sig_Bias_H60_I5")
         return make_unique<Fc_Sig_Bias_H60_I5>();
 
-
-    if (name == "Experimental")
-        return make_unique<Experimental>();
-
-
     // Support other BgNets here. . .
 
     return nullptr;

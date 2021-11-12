@@ -7,7 +7,6 @@
 
 #include "fc_sig.h"
 #include "fc_sig_bias.h"
-#include "model.h"
 
 #include "board.h"
 #include "features.h"
@@ -96,12 +95,6 @@ struct Fc_Sig_Bias_H30_I5 : public BackgammonNet<features_v5, Fc_Sig_Bias, 30>
 struct Fc_Sig_Bias_H60_I5 : public BackgammonNet<features_v5, Fc_Sig_Bias, 60>
 {
     string netname() const { return "Fc_Sig_Bias_H60_I5"; }
-};
-
-
-struct Experimental : public BackgammonNet<features_v3, ExperimentalModel, 30>
-{
-    string netname() const { return "Experimental"; }
 };
 
 

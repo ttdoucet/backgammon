@@ -60,13 +60,13 @@ public:
     }
 
 protected:
-    Linear<Features, Hidden>      Layer1a{act.input, act.pre_hidden, params.M, grad.M};
-    Bias<1, Hidden>               Layer1b{act.pre_hidden, act.hidden, params.B, grad.B};
-    Termwise<logistic, Hidden>    Layer1c{act.hidden, act.hidden};
+    Linear<Features, Hidden>         Layer1a{act.input, act.pre_hidden, params.M, grad.M};
+    Bias<1, Hidden>                  Layer1b{act.pre_hidden, act.hidden, params.B, grad.B};
+    Termwise<logistic, Hidden, 1>    Layer1c{act.hidden, act.hidden};
 
-    Linear<Hidden, 1>             Layer2a{act.hidden, act.pre_out, params.V, grad.V};
-    Termwise<bipolar_sigmoid, 1>  Layer2b{act.pre_out, act.pre_out};
-    Termwise<affine<3,0>, 1>      Layer2c{act.pre_out, act.out};
+    Linear<Hidden, 1>                Layer2a{act.hidden, act.pre_out, params.V, grad.V};
+    Termwise<bipolar_sigmoid, 1, 1>  Layer2b{act.pre_out, act.pre_out};
+    Termwise<affine<3,0>, 1, 1>      Layer2c{act.pre_out, act.out};
 
     float feedForward()
     {

@@ -69,11 +69,11 @@ public:
     }
 
 protected:
-    Linear<Features, Hidden>      Op_1{act.input, act.hidden, params.M, grad.M};
-    Termwise<logistic, Hidden>    Op_2{act.hidden, act.hidden};
-    Linear<Hidden, 1>             Op_3{act.hidden, act.pre_out, params.V, grad.V};
-    Termwise<bipolar_sigmoid, 1>  Op_4{act.pre_out, act.pre_out};
-    Termwise<affine<3,0>, 1>      Op_5{act.pre_out, act.out};
+    Linear<Features, Hidden>        Op_1{act.input, act.hidden, params.M, grad.M};
+    Termwise<logistic, Hidden, 1>   Op_2{act.hidden, act.hidden};
+    Linear<Hidden, 1>               Op_3{act.hidden, act.pre_out, params.V, grad.V};
+    Termwise<bipolar_sigmoid, 1, 1> Op_4{act.pre_out, act.pre_out};
+    Termwise<affine<3,0>, 1, 1>     Op_5{act.pre_out, act.out};
 
     float feedForward()
     {

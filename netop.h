@@ -52,36 +52,42 @@ struct affine
  * forward and back propagation.
  */
 
-template<class Activ, int len>
+template<class Activ, int R, int C>
 class Termwise
 {
-    using src_t = vec<len>;
+    using src_t = matrix<R, C>;
     using dst_t = src_t;
 
-
 public:
-    src_t const& src;
+    src_t &src;
     dst_t &dst;
 
     void fwd()
     {
-        for (int i = 0; i < len; i++)
-            dst(i) = Activ::fwd( src(i) );
+        auto s = src.begin();
+        auto d = dst.begin();
+
+        while (s < src.end())
+            *d++ = Activ::fwd(*s++);
     }
 
-    src_t bwd(dst_t const& upstream_d)
+    src_t bwd(dst_t& upstream_d)
     {
-        src_t r;
+        src_t ret;
 
-        for (int i = 0; i < len; i++)
-            r(i) = upstream_d(i) * Activ::bwd( dst(i) );
+        auto d_p = dst.begin();
+        auto u_p = upstream_d.begin();
+        auto r_p = ret.begin();
 
-        return r;
+        while (r_p < ret.end())
+            *r_p++ = *u_p++ * Activ::bwd(*d_p++);
+
+        return ret;
     }
 
     void bwd_param(dst_t const& upstream_d) {  /* no parameters */  }
 
-    Termwise(src_t const& src, dst_t & dest) : src{src}, dst{dest} { }
+    Termwise(src_t &src, dst_t & dest) : src{src}, dst{dest} { }
 };
 
 template<int xdim, int ydim>
