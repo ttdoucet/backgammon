@@ -59,24 +59,24 @@ class Termwise
     using dst_t = src_t;
 
 public:
-    src_t &src;
+    src_t const& src;
     dst_t &dst;
 
     void fwd()
     {
-        auto s = src.begin();
+        auto s = src.cbegin();
         auto d = dst.begin();
 
-        while (s < src.end())
+        while (s < src.cend())
             *d++ = Activ::fwd(*s++);
     }
 
-    src_t bwd(dst_t& upstream_d)
+    src_t bwd(dst_t const& upstream_d)
     {
         src_t ret;
 
-        auto d_p = dst.begin();
-        auto u_p = upstream_d.begin();
+        auto d_p = dst.cbegin();
+        auto u_p = upstream_d.cbegin();
         auto r_p = ret.begin();
 
         while (r_p < ret.end())
@@ -87,7 +87,7 @@ public:
 
     void bwd_param(dst_t const& upstream_d) {  /* no parameters */  }
 
-    Termwise(src_t &src, dst_t & dest) : src{src}, dst{dest} { }
+    Termwise(src_t const& src, dst_t & dest) : src{src}, dst{dest} { }
 };
 
 template<int xdim, int ydim>
