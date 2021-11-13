@@ -52,10 +52,13 @@ struct affine
  * forward and back propagation.
  */
 
-template<class Activ, class matrix_t>
+template<class matrix_t, class Activ>
 class Termwise
 {
 public:
+    Termwise(matrix_t const& src, matrix_t & dest)
+        : src{src}, dst{dest} { }
+
     matrix_t const& src;
     matrix_t &dst;
 
@@ -83,18 +86,13 @@ public:
     }
 
     void bwd_param(matrix_t const& upstream_d) {  /* no parameters */  }
-
-    Termwise(matrix_t const& src, matrix_t & dest) : src{src}, dst{dest} { }
 };
 
-
-template<int xdim, int ydim>
+template<class src_t, class dst_t>
 class Linear
 {
 public:
-    using src_t = vec<xdim>;
-    using dst_t = vec<ydim>;
-    using param_t = matrix<ydim, xdim>;
+    using param_t = matrix<dst_t::Rows(), src_t::Rows()>;
 
     Linear(src_t const& x,
            dst_t& y,
