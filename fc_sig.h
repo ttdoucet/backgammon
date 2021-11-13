@@ -23,19 +23,17 @@ public:
     using Parameters = algebra<Parameters_base>;
     Parameters params, grad;
 
+    using InputVector  = vec<Features>;
+    using HiddenVector = vec<Hidden>;
+    using OutputVector = vec<1>;
+
     struct Activations
     {
-        using InputVector = vec<Features>;
-        using HiddenVector = vec<Hidden>;
-        using OutputVector = vec<1>;
-
         InputVector input;
         HiddenVector hidden;
         OutputVector pre_out;
         OutputVector out;
     } act;
-
-    using InputVector = typename Activations::InputVector;
 
     InputVector& input()
     {
@@ -59,31 +57,20 @@ public:
         g = grad;
     }
 
-
-public:
-//  stopwatch timer;
-
-    ~Fc_Sig()
-    {
-//      std::cout << "Fc_Sig feedForward: " << timer.elapsed_msec() << " msec\n";
-    }
-
 protected:
-    Linear<Features, Hidden>        Op_1{act.input, act.hidden, params.M, grad.M};
-    Termwise<logistic, Hidden, 1>   Op_2{act.hidden, act.hidden};
-    Linear<Hidden, 1>               Op_3{act.hidden, act.pre_out, params.V, grad.V};
-    Termwise<bipolar_sigmoid, 1, 1> Op_4{act.pre_out, act.pre_out};
-    Termwise<affine<3,0>, 1, 1>     Op_5{act.pre_out, act.out};
+    Linear<Features, Hidden>                Op_1{act.input, act.hidden, params.M, grad.M};
+    Termwise<logistic, HiddenVector>        Op_2{act.hidden, act.hidden};
+    Linear<Hidden, 1>                       Op_3{act.hidden, act.pre_out, params.V, grad.V};
+    Termwise<bipolar_sigmoid, OutputVector> Op_4{act.pre_out, act.pre_out};
+    Termwise<affine<3,0>, OutputVector>     Op_5{act.pre_out, act.out};
 
     float feedForward()
     {
-//      timer.start();
         Op_1.fwd();
         Op_2.fwd();        
         Op_3.fwd();
         Op_4.fwd();
         Op_5.fwd();
-//      timer.stop();
 
         return float(act.out);
     }
