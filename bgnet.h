@@ -6,7 +6,6 @@
 #include <memory>
 
 #include "fc_sig.h"
-//#include "fc_sig_t.h"
 
 #include "board.h"
 #include "features.h"

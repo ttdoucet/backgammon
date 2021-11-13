@@ -72,12 +72,12 @@ public:
     {
         matrix_t ret;
 
-        auto d_p = dst.cbegin();
-        auto u_p = upstream_d.cbegin();
-        auto r_p = ret.begin();
+        auto d = dst.cbegin();
+        auto u = upstream_d.cbegin();
+        auto r = ret.begin();
 
-        while (r_p < ret.end())
-            *r_p++ = *u_p++ * Activ::bwd(*d_p++);
+        while (r < ret.end())
+            *r++ = *u++ * Activ::bwd(*d++);
 
         return ret;
     }
