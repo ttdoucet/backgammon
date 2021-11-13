@@ -23,19 +23,19 @@ public:
     using Parameters = algebra<Parameters_base>;
     Parameters params, grad;
 
-    using InputVector  = vec<Features>;
-    using HiddenVector = vec<Hidden>;
-    using OutputVector = vec<1>;
+    using input_t  = vec<Features>;
+    using hidden_t = vec<Hidden>;
+    using output_t = vec<1>;
 
     struct Activations
     {
-        InputVector input;
-        HiddenVector hidden;
-        OutputVector pre_out;
-        OutputVector out;
+        input_t  input;
+        hidden_t hidden;
+        output_t pre_out;
+        output_t out;
     } act;
 
-    InputVector& input()
+    input_t& input()
     {
         return act.input;
     }
@@ -58,11 +58,11 @@ public:
     }
 
 protected:
-    Linear<InputVector, HiddenVector>       Op_1{act.input, act.hidden, params.M, grad.M};
-    Termwise<HiddenVector, logistic>        Op_2{act.hidden, act.hidden};
-    Linear<HiddenVector, OutputVector>      Op_3{act.hidden, act.pre_out, params.V, grad.V};
-    Termwise<OutputVector, bipolar_sigmoid> Op_4{act.pre_out, act.pre_out};
-    Termwise<OutputVector, affine<3,0>>     Op_5{act.pre_out, act.out};
+    Linear<input_t, hidden_t>       Op_1{act.input, act.hidden, params.M, grad.M};
+    Termwise<hidden_t, logistic>        Op_2{act.hidden, act.hidden};
+    Linear<hidden_t, output_t>      Op_3{act.hidden, act.pre_out, params.V, grad.V};
+    Termwise<output_t, bipolar_sigmoid> Op_4{act.pre_out, act.pre_out};
+    Termwise<output_t, affine<3,0>>     Op_5{act.pre_out, act.out};
 
     float feedForward()
     {
