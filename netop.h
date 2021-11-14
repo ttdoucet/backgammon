@@ -97,9 +97,9 @@ public:
     Linear(src_t const& x,
            dst_t& y,
            param_t& M,
-           param_t& grad_M
+           param_t& M_grad
     )
-        : x{x}, y{y}, M{M}, grad_M{grad_M}
+        : x{x}, y{y}, M{M}, M_grad{M_grad}
     {
         static_assert(src_t::Cols() == 1);
         static_assert(dst_t::Cols() == 1);
@@ -131,12 +131,12 @@ public:
     {
         for (auto r = 0; r < M.Rows(); r++)
             for (auto c = 0; c < M.Cols(); c++)
-                grad_M(r, c) += up_d(r) * x(c);
+                M_grad(r, c) += up_d(r) * x(c);
     }
 
 private:
     param_t &M;
-    param_t &grad_M;
+    param_t &M_grad;
     src_t const& x;
     dst_t &y;
 };
@@ -151,9 +151,9 @@ public:
         matrix_t const& x,
         matrix_t &y,
         param_t &B,
-        param_t &grad_B
+        param_t &B_grad
     )
-        : x{x}, y{y}, B{B}, grad_B{grad_B}
+        : x{x}, y{y}, B{B}, B_grad{B_grad}
     {
         for (auto& b : B)
             b = 0;
@@ -172,12 +172,12 @@ public:
 
     void bwd_param(matrix_t const& up_d)
     {
-        grad_B += up_d;
+        B_grad += up_d;
     }
 
 private:
     param_t& B;
-    param_t& grad_B;
+    param_t& B_grad;
 
     matrix_t const& x;
     matrix_t& y;
