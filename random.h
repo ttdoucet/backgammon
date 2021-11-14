@@ -41,7 +41,7 @@ public:
     {
     }
 
-    float random()
+    float next()
     {
         return distribution(generator);
     }

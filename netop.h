@@ -92,18 +92,18 @@ template<class src_t, class dst_t>
 class Linear
 {
 public:
-    using param_t = matrix<dst_t::Rows(), src_t::Rows()>;
+    using param_t = matrix<dst_t::length(), src_t::length()>;
 
     Linear(src_t const& x,
            dst_t& y,
-           param_t &M,
-           param_t &grad_M
+           param_t& M,
+           param_t& grad_M
     )
         : x{x}, y{y}, M{M}, grad_M{grad_M}
     {
-        RNG_normal rand(0, 1.0 / M.Cols());
+        RNG_normal rand(0, 1.0 / x.length());
         for (auto& m : M)
-            m = rand.random();
+            m = rand.next();
     }
 
     void fwd()
