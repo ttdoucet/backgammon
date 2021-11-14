@@ -94,13 +94,14 @@ class Linear
 public:
     using param_t = matrix<dst_t::length(), src_t::length()>;
 
-    Linear(src_t const& x,
-           dst_t& y,
-           param_t& M,
-           param_t& grad_M
+    Linear(src_t const& x, dst_t& y,
+           param_t& M, param_t& grad_M
     )
         : x{x}, y{y}, M{M}, grad_M{grad_M}
     {
+        static_assert(src_t::Cols() == 1);
+        static_assert(dst_t::Cols() == 1);
+
         RNG_normal rand(0, 1.0 / x.length());
         for (auto& m : M)
             m = rand.next();
