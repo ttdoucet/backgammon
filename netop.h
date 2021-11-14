@@ -71,12 +71,12 @@ public:
             *d++ = Activ::fwd(*s++);
     }
 
-    matrix_t bwd(matrix_t const& upstream_d)
+    matrix_t bwd(matrix_t const& up_d)
     {
         matrix_t ret;
 
         auto d = dst.cbegin();
-        auto u = upstream_d.cbegin();
+        auto u = up_d.cbegin();
         auto r = ret.begin();
 
         while (r < ret.end())
@@ -85,7 +85,7 @@ public:
         return ret;
     }
 
-    void bwd_param(matrix_t const& upstream_d) {  /* no parameters */  }
+    void bwd_param(matrix_t const& up_d) {  /* no parameters */  }
 };
 
 template<class src_t, class dst_t>
@@ -94,8 +94,10 @@ class Linear
 public:
     using param_t = matrix<dst_t::length(), src_t::length()>;
 
-    Linear(src_t const& x, dst_t& y,
-           param_t& M, param_t& grad_M
+    Linear(src_t const& x,
+           dst_t& y,
+           param_t& M,
+           param_t& grad_M
     )
         : x{x}, y{y}, M{M}, grad_M{grad_M}
     {
@@ -112,24 +114,24 @@ public:
         y = M * x;
     }
 
-    src_t bwd(dst_t const& upstream_d)
+    src_t bwd(dst_t const& up_d)
     {
-        bwd_param(upstream_d);
+        bwd_param(up_d);
 
         src_t ret;
 
         for (auto r = 0; r < y.length(); r++)
             for (auto c = 0; c < ret.length(); c++)
-                ret(c) += upstream_d(r) * M(r, c);
+                ret(c) += up_d(r) * M(r, c);
 
         return ret;
     }
 
-    void bwd_param(dst_t const& upstream_d)
+    void bwd_param(dst_t const& up_d)
     {
         for (auto r = 0; r < M.Rows(); r++)
             for (auto c = 0; c < M.Cols(); c++)
-                grad_M(r, c) += upstream_d(r) * x(c);
+                grad_M(r, c) += up_d(r) * x(c);
     }
 
 private:
@@ -139,30 +141,19 @@ private:
     dst_t &y;
 };
 
-template<int xdim, int ydim>
+template<class matrix_t>
 class Bias
 {
-    using param_t = matrix<ydim, xdim>;
-    using src_t = param_t;
-    using dst_t = param_t;
-
-    param_t &B;
-    param_t &grad_B;
-
-    src_t const& x;
-    dst_t& y;
+    using param_t = matrix_t;
 
 public:
     Bias(
-        src_t const& x,
-        dst_t &y,
+        matrix_t const& x,
+        matrix_t &y,
         param_t &B,
         param_t &grad_B
     )
-        : x{x},
-          y{y},
-          B{B},
-          grad_B{grad_B}
+        : x{x}, y{y}, B{B}, grad_B{grad_B}
     {
         for (auto& b : B)
             b = 0;
@@ -173,14 +164,21 @@ public:
         y = x + B;
     }
 
-    src_t bwd(dst_t const& upstream_d)
+    matrix_t bwd(matrix_t const& up_d)
     {
-        bwd_param(upstream_d);
-        return upstream_d;
+        bwd_param(up_d);
+        return up_d;
     }
 
-    void bwd_param(dst_t const& upstream_d)
+    void bwd_param(matrix_t const& up_d)
     {
-        grad_B += upstream_d;
+        grad_B += up_d;
     }
+
+private:
+    param_t& B;
+    param_t& grad_B;
+
+    matrix_t const& x;
+    matrix_t& y;
 };
