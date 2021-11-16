@@ -16,3 +16,6 @@ target_link_libraries(playoff common)
 
 add_executable(train train.cpp)
 target_link_libraries(train common)
+
+add_executable(convert convert.cpp)
+target_link_libraries(convert common)

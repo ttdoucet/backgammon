@@ -141,6 +141,50 @@ private:
     dst_t &y;
 };
 
+// in progress
+template<class src_t, class dst_t>
+class Linear_
+{
+public:
+    using param_t = matrix<src_t::length(), dst_t::length()>;
+
+    Linear_(src_t const& x,
+           dst_t& y,
+           param_t& M,
+           param_t& M_grad
+    )
+        : x{x}, y{y}, M{M}, M_grad{M_grad}
+    {
+        static_assert(src_t::Rows() == 1);
+        static_assert(dst_t::Rows() == 1);
+
+        RNG_normal rand(0, 1.0 / x.length());
+        for (auto& m : M)
+            m = rand.next();
+    }
+
+    void fwd()
+    {
+        y = x * M;
+    }
+
+    src_t bwd(dst_t const& up_d)
+    {
+        assert(false); // nyi
+    }
+
+    void bwd_param(dst_t const& up_d)
+    {
+        assert(false); // nyi
+    }
+
+private:
+    param_t &M;
+    param_t &M_grad;
+    src_t const& x;
+    dst_t &y;
+};
+
 template<class matrix_t>
 class Bias
 {

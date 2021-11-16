@@ -24,6 +24,9 @@ static unique_ptr<BgNet> initBgNet(const string name)
     if (name == "netv3")
         return make_unique<netv3>();
 
+    if (name == "netv3tr")
+        return make_unique<netv3tr>();
+
     // experimental, in flux
     if (name == "netv5")
         return make_unique<netv5>();
@@ -31,11 +34,23 @@ static unique_ptr<BgNet> initBgNet(const string name)
     if (name == "Fc_Sig_H60_I3")
         return make_unique<Fc_Sig_H60_I3>();
 
+    if (name == "Fc_Sig_H60_I3tr")
+        return make_unique<Fc_Sig_H60_I3tr>();
+
+
+
     if (name == "Fc_Sig_H90_I3")
         return make_unique<Fc_Sig_H90_I3>();
 
+    if (name == "Fc_Sig_H90_I3tr")
+        return make_unique<Fc_Sig_H90_I3tr>();
+
+
     if (name == "Fc_Sig_H120_I3")
         return make_unique<Fc_Sig_H120_I3>();
+
+    if (name == "Fc_Sig_H120_I3tr")
+        return make_unique<Fc_Sig_H120_I3tr>();
 
     // Support other BgNets here. . .
 

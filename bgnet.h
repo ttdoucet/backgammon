@@ -64,6 +64,12 @@ struct netv3 : public BackgammonNet<features_v3, Fc_Sig, 30>
     string netname() const { return "netv3"; }
 };
 
+struct netv3tr : public BackgammonNet<features_v3, Fc_SigTr, 30>
+{
+    string netname() const { return "netv3tr"; }
+};
+
+
 // experiment with different input representation.
 struct netv5 : public BackgammonNet<features_v5, Fc_Sig, 30>
 {
@@ -76,15 +82,33 @@ struct Fc_Sig_H60_I3 : public BackgammonNet<features_v3, Fc_Sig, 60>
     string netname() const { return "Fc_Sig_H60_I3"; }
 };
 
+struct Fc_Sig_H60_I3tr : public BackgammonNet<features_v3, Fc_SigTr, 60>
+{
+    string netname() const { return "Fc_Sig_H60_I3tr"; }
+};
+
+
 struct Fc_Sig_H90_I3 : public BackgammonNet<features_v3, Fc_Sig, 90>
 {
     string netname() const { return "Fc_Sig_H90_I3"; }
 };
 
+struct Fc_Sig_H90_I3tr : public BackgammonNet<features_v3, Fc_SigTr, 90>
+{
+    string netname() const { return "Fc_Sig_H90_I3tr"; }
+};
+
+
 struct Fc_Sig_H120_I3 : public BackgammonNet<features_v3, Fc_Sig, 120>
 {
     string netname() const { return "Fc_Sig_H120_I3"; }
 };
+
+struct Fc_Sig_H120_I3tr : public BackgammonNet<features_v3, Fc_SigTr, 120>
+{
+    string netname() const { return "Fc_Sig_H120_I3tr"; }
+};
+
 
 /* Factory */
 std::unique_ptr<BgNet> readBgNet(const std::string filename);
