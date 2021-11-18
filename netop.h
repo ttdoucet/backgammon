@@ -141,7 +141,6 @@ private:
     dst_t &y;
 };
 
-// in progress
 template<class src_t, class dst_t>
 class Linear_
 {
@@ -185,7 +184,7 @@ public:
     {
         for(auto i = 0; i < M.Rows(); i++)
             for (auto j = 0; j < M.Cols(); j++)
-                M_grad(i, j) = up_d(j) * x(i);
+                M_grad(i, j) += up_d(j) * x(i);
     }
 
 private:

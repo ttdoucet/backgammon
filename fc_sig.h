@@ -76,9 +76,6 @@ protected:
     }
 };
 
-//
-// upcoming replacement. . .
-//
 template<int Features, int Hidden>
 class Fc_SigTr
 {
@@ -118,7 +115,6 @@ public:
      */
     void gradient(Parameters& g)
     {
-#if 0
         grad.clear();
 
         matrix<1,1> one = { 1 };
@@ -128,7 +124,6 @@ public:
         auto r2 = Op_2.bwd(r3);
         Op_1.bwd_param(r2);
         g = grad;
-#endif
     }
 
 protected:
