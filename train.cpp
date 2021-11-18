@@ -230,6 +230,9 @@ private:
         if (auto p = dynamic_cast<netv3*>(&nn))
 	    return make_unique<Learner<netv3> > (*p, opts.alpha, opts.lambda, opts.wdual, opts.decay, opts.batchsize, opts.momentum);
 
+        if (auto p = dynamic_cast<netv3tr*>(&nn))
+	    return make_unique<Learner<netv3tr> > (*p, opts.alpha, opts.lambda, opts.wdual, opts.decay, opts.batchsize, opts.momentum);
+
         // experimental, in flux
         if (auto p = dynamic_cast<netv5*>(&nn))
 	    return make_unique<Learner<netv5> > (*p, opts.alpha, opts.lambda, opts.wdual, opts.decay, opts.batchsize, opts.momentum);
@@ -238,11 +241,22 @@ private:
         if (auto p = dynamic_cast<Fc_Sig_H60_I3*>(&nn))
 	    return make_unique<Learner<Fc_Sig_H60_I3> > (*p, opts.alpha, opts.lambda, opts.wdual, opts.decay, opts.batchsize, opts.momentum);
 
+        if (auto p = dynamic_cast<Fc_Sig_H60_I3tr*>(&nn))
+	    return make_unique<Learner<Fc_Sig_H60_I3tr> > (*p, opts.alpha, opts.lambda, opts.wdual, opts.decay, opts.batchsize, opts.momentum);
+
+
         if (auto p = dynamic_cast<Fc_Sig_H90_I3*>(&nn))
             return make_unique<Learner<Fc_Sig_H90_I3> > (*p, opts.alpha, opts.lambda, opts.wdual, opts.decay, opts.batchsize, opts.momentum);
 
+        if (auto p = dynamic_cast<Fc_Sig_H90_I3tr*>(&nn))
+            return make_unique<Learner<Fc_Sig_H90_I3tr> > (*p, opts.alpha, opts.lambda, opts.wdual, opts.decay, opts.batchsize, opts.momentum);
+
         if (auto p = dynamic_cast<Fc_Sig_H120_I3*>(&nn))
             return make_unique<Learner<Fc_Sig_H120_I3> > (*p, opts.alpha, opts.lambda, opts.wdual, opts.decay, opts.batchsize, opts.momentum);
+
+        if (auto p = dynamic_cast<Fc_Sig_H120_I3tr*>(&nn))
+            return make_unique<Learner<Fc_Sig_H120_I3tr> > (*p, opts.alpha, opts.lambda, opts.wdual, opts.decay, opts.batchsize, opts.momentum);
+
 
         // Support learning in additional neural net players here. . .
 

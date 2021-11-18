@@ -170,12 +170,22 @@ public:
 
     src_t bwd(dst_t const& up_d)
     {
-        assert(false); // nyi
+        bwd_param(up_d);
+
+        src_t ret;
+
+        for(auto i = 0; i < M.Rows(); i++)
+            for (auto j = 0; j < M.Cols(); j++)
+                ret(i) += up_d(j) * M(i, j);
+
+        return ret;
     }
 
     void bwd_param(dst_t const& up_d)
     {
-        assert(false); // nyi
+        for(auto i = 0; i < M.Rows(); i++)
+            for (auto j = 0; j < M.Cols(); j++)
+                M_grad(i, j) = up_d(j) * x(i);
     }
 
 private:
