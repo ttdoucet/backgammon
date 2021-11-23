@@ -86,15 +86,13 @@ struct Fc_Sig_H60_I5 : public BackgammonNet<features_v5, Fc_Sig, 60>
     string netname() const { return "Fc_Sig_H60_I5"; }
 };
 
-
-
 struct Fc_Sig_H60_I3 : public BackgammonNet<features_v3, Fc_Sig, 60>
 {
     static bool is_named(std::string name) { return name == "Fc_Sig_H60_I3"; }
     string netname() const { return "Fc_Sig_H60_I3"; }
 };
 
-struct Fc_Sig_H60_I3tr : public BackgammonNet<features_v3, Fc_SigTr, 60>
+ struct Fc_Sig_H60_I3tr : public BackgammonNet<features_v3, Fc_SigTr, 60>
 {
     static bool is_named(std::string name) { return name == "Fc_Sig_H60_I3tr"; }
     string netname() const { return "Fc_Sig_H60_I3tr"; }
@@ -129,19 +127,44 @@ struct Fc_Sig_H120_I3tr : public BackgammonNet<features_v3, Fc_SigTr, 120>
 template<typename ... NetType>
 struct nnlist
 {
-    std::unique_ptr<BgNet> initBgNet(const std::string name)
+    std::unique_ptr<BgNet> create(const std::string name)
     {
         std::unique_ptr<BgNet> p;
         ( (NetType::is_named(name) && (p = std::make_unique<NetType>())) || ... );
         return p;
-
     }
 };
 
-using net_factory = nnlist<netv3, Fc_Sig_H60_I3, Fc_Sig_H90_I3, Fc_Sig_H120_I3,
+using BgNetFactory = nnlist<netv3, Fc_Sig_H60_I3, Fc_Sig_H90_I3, Fc_Sig_H120_I3,
                            netv5, Fc_Sig_H60_I5, // Fc_Sig_H90_I5, Fc_Sig_H120_I5,
                            netv3tr, Fc_Sig_H60_I3tr, Fc_Sig_H90_I3tr, Fc_Sig_H120_I3tr>;
 
-/* Factory */
-std::unique_ptr<BgNet> readBgNet(const std::string filename);
+class BgNetReader
+{
+    std::string net_name(const std::string filename)
+    {
+        using namespace std;
+        const auto max_name_length = 30;
+        ifstream ifs(filename, ios::binary);
+        string name;
+        ifs >> setw(max_name_length) >> name;
+        return name;
+    }
 
+public:
+    std::unique_ptr<BgNet> read(const std::string filename)
+    {
+        BgNetFactory nf;
+
+        if (auto r = nf.create(filename))
+            return r;
+
+        std::string name = net_name(filename);
+
+        if (auto r = nf.create(name))
+            if (r->readFile(filename))
+                return r;
+
+        throw std::runtime_error("Error reading net file: " + filename);
+    }
+};

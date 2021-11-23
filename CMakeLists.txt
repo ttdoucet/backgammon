@@ -8,7 +8,7 @@ include_directories(cmdline matrix stopwatch)
 
 add_subdirectory(bearoff)
 
-add_library(common  hits.cpp bgnet.cpp move.cpp ttydisp.cpp human.cpp)
+add_library(common  hits.cpp move.cpp ttydisp.cpp human.cpp)
 target_link_libraries(common PUBLIC bearoff)
 
 add_executable(playoff playoff.cpp)

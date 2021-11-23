@@ -63,8 +63,10 @@ public:
 
     int run()
     {
-        std::unique_ptr<BgNet> whitenet = readBgNet(opts.white_name);
-        std::unique_ptr<BgNet> blacknet = readBgNet(opts.black_name);
+        BgNetReader bgr;
+
+        std::unique_ptr<BgNet> whitenet = bgr.read(opts.white_name);
+        std::unique_ptr<BgNet> blacknet = bgr.read(opts.black_name);
 
         NeuralNetPlayer whitePlayer(*whitenet);
         NeuralNetPlayer blackPlayer(*blacknet);

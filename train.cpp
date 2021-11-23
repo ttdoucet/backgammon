@@ -113,6 +113,8 @@ public:
 
     void run()
     {
+        BgNetReader bgr;
+
         if (file_exists(opts.output_white))
         {
             cout << "File already exists: " << opts.output_white << ", skipping.\n";
@@ -122,7 +124,7 @@ public:
         unique_ptr<BgNet> white_net, black_net;
         unique_ptr<NeuralNetPlayer> white_player, black_player;
         
-        white_net = readBgNet(opts.wlearn_fn);
+        white_net = bgr.read(opts.wlearn_fn);
         white_player = learner_for(*white_net, opts);
 
         if (opts.blearn_fn.empty() == false)
@@ -132,7 +134,7 @@ public:
                  << " against learning "
                  << name_for(opts.blearn_fn, opts.bdual)
                  << "\n";
-            black_net = readBgNet(opts.blearn_fn);
+            black_net = bgr.read(opts.blearn_fn);
             black_player = learner_for(*black_net, opts);
         }
         else if (opts.bplay_fn.empty() == false)
@@ -141,7 +143,7 @@ public:
                  << name_for(opts.wlearn_fn, opts.wdual)
                  << " against fixed " << opts.bplay_fn
                  << "\n";
-            black_net = readBgNet(opts.bplay_fn);
+            black_net = bgr.read(opts.bplay_fn);
             black_player = player_for(*black_net);
         }
         else

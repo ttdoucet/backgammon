@@ -5,4 +5,4 @@ cmake -GNinja -B build.native && cmake --build build.native
 CXX=/opt/homebrew/opt/llvm/bin/clang++ cmake -GNinja -B build.clang++-13  && cmake --build build.clang++-13
 
 # Brew installation of g++-11
-CXX=g++-11 cmake -GNinja -B build.g++-11  && cmake --build build.g++-11
+#CXX=g++-11 cmake -GNinja -B build.g++-11  && cmake --build build.g++-11

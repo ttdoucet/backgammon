@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
-train = '~/src/backgammon/train'
+#build = '~/src/backgammon/build.clang++-13'
+build = '.'
+train = f'{build}/train'
 
 games_per_round = 1_000_000
 
@@ -67,7 +69,7 @@ def initialize_net(net_type, basename='white'):
     print(cmd);
 
 
-bname = 'Fc_Sig_Bias_H60_I5'
+bname = 'Fc_Sig_H60_I5'
 
 batchsize = 1
 opponent = None
@@ -79,6 +81,6 @@ momentum = 0.0
 from_game = 0
 
 
-initialize_net('Fc_Sig_Bias_H60_I5', basename=bname);
+initialize_net('Fc_Sig_H60_I5', basename=bname);
 anneal_schedule(a_start, a_stop, rounds, basename=bname, lambda_=lmbda, frm=from_game, opponent=opponent, batchsize=batchsize, momentum=momentum)
 anneal_schedule(a_stop, a_stop/20, rounds, basename=bname, lambda_=lmbda, frm=from_game+rounds, opponent=opponent, batchsize=batchsize, momentum=momentum)
