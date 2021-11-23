@@ -124,24 +124,32 @@ struct Fc_Sig_H120_I3tr : public BackgammonNet<features_v3, Fc_SigTr, 120>
     string netname() const { return "Fc_Sig_H120_I3tr"; }
 };
 
-template<typename ... NetType>
-struct nnlist
+struct BgNetFactory
 {
-    std::unique_ptr<BgNet> create(const std::string name)
+    template<typename ... NetType>
+    struct nnlist
     {
-        std::unique_ptr<BgNet> p;
-        ( (NetType::is_named(name) && (p = std::make_unique<NetType>())) || ... );
-        return p;
+        static std::unique_ptr<BgNet> create(const std::string name)
+        {
+            std::unique_ptr<BgNet> p;
+            ( (NetType::is_named(name) && (p = std::make_unique<NetType>())) || ... );
+            return p;
+        }
+    };
+
+    static std::unique_ptr<BgNet> create(const std::string name)
+    {
+        using supported = nnlist<netv3, Fc_Sig_H60_I3, Fc_Sig_H90_I3, Fc_Sig_H120_I3,
+                                 netv5, Fc_Sig_H60_I5, // Fc_Sig_H90_I5, Fc_Sig_H120_I5,
+                                 netv3tr, Fc_Sig_H60_I3tr, Fc_Sig_H90_I3tr, Fc_Sig_H120_I3tr>;
+
+        return supported::create(name);
     }
 };
 
-using BgNetFactory = nnlist<netv3, Fc_Sig_H60_I3, Fc_Sig_H90_I3, Fc_Sig_H120_I3,
-                            netv5, Fc_Sig_H60_I5, // Fc_Sig_H90_I5, Fc_Sig_H120_I5,
-                            netv3tr, Fc_Sig_H60_I3tr, Fc_Sig_H90_I3tr, Fc_Sig_H120_I3tr>;
-
 class BgNetReader
 {
-    std::string net_name(const std::string filename)
+    static std::string net_name(const std::string filename)
     {
         using namespace std;
         const auto max_name_length = 30;
@@ -152,7 +160,7 @@ class BgNetReader
     }
 
 public:
-    std::unique_ptr<BgNet> read(const std::string filename)
+    static std::unique_ptr<BgNet> read(const std::string filename)
     {
         BgNetFactory nf;
 
