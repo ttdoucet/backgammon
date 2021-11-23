@@ -67,8 +67,8 @@ public:
         std::unique_ptr<BgNet> whitenet = bgr.read(opts.white_name);
         std::unique_ptr<BgNet> blacknet = bgr.read(opts.black_name);
 
-        NeuralNetPlayer whitePlayer(*whitenet);
-        NeuralNetPlayer blackPlayer(*blacknet);
+        PlayerNet whitePlayer(*whitenet);
+        PlayerNet blackPlayer(*blacknet);
 
         playoffSession(opts.trials, whitePlayer, blackPlayer, opts.user_seed);
         return 0;

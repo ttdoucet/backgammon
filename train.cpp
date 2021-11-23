@@ -4,7 +4,7 @@
 #include <fstream>
 
 #include "game.h"
-#include "playernet.h"
+#include "learnernet.h"
 #include "cmdline.h"
 
 using namespace std;
@@ -121,7 +121,7 @@ public:
         }
 
         unique_ptr<BgNet> white_net, black_net;
-        unique_ptr<NeuralNetPlayer> white_player, black_player;
+        unique_ptr<PlayerNet> white_player, black_player;
         
         white_net = bgr.read(opts.wlearn_fn);
         white_player = learner_for(*white_net, opts);
@@ -198,8 +198,8 @@ private:
         return ss.str();
     }
 
-    void train(NeuralNetPlayer& whitePlayer,
-               NeuralNetPlayer& blackPlayer)
+    void train(PlayerNet& whitePlayer,
+               PlayerNet& blackPlayer)
     {
         Game game(whitePlayer, blackPlayer);
 
@@ -226,7 +226,7 @@ private:
         report(numGames, whitePoints);
     }
 
-    unique_ptr<NeuralNetPlayer> learner_for(BgNet& nn, const TrainingOptions& opts)
+    unique_ptr<PlayerNet> learner_for(BgNet& nn, const TrainingOptions& opts)
     {
         if (auto p = dynamic_cast<netv3*>(&nn))
 	    return make_unique<Learner<netv3> > (*p, opts.alpha, opts.lambda, opts.wdual, opts.decay, opts.batchsize, opts.momentum);
@@ -268,9 +268,9 @@ private:
         throw runtime_error("Network not yet supported: " + nn.netname());
     }
 
-    unique_ptr<NeuralNetPlayer> player_for(BgNet& nn)
+    unique_ptr<PlayerNet> player_for(BgNet& nn)
     {
-      return make_unique<NeuralNetPlayer>(nn);
+      return make_unique<PlayerNet>(nn);
     }
 };
 
