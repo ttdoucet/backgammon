@@ -4,7 +4,6 @@
 
 #include "game.h"
 #include "playernet.h"
-#include "human.h"
 #include "cmdline.h"
 
 using namespace std;
