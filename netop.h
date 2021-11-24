@@ -11,7 +11,7 @@
 
 struct logistic
 {
-    static inline float fwd(float x) { return  1 / (1 + exp(-x)); }
+    static inline float fwd(float x) { return  1 / (1 + expf(-x)); }
     static inline float bwd(float y) { return y * (1 - y); }
 };
 
