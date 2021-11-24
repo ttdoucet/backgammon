@@ -23,10 +23,8 @@ int transpose(BgNet& pp)
 
 int main(int argc, char *argv[])
 {
-    BgNetReader bgr;
-
     auto filename = argv[1];
-    unique_ptr<BgNet> pp = bgr.read(filename);
+    unique_ptr<BgNet> pp = BgNetReader::read(filename);
 
     return transpose<netv3>(*pp) ||
            transpose<Fc_Sig_H60_I3>(*pp) ||

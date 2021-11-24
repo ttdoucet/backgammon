@@ -162,14 +162,12 @@ class BgNetReader
 public:
     static std::unique_ptr<BgNet> read(const std::string filename)
     {
-        BgNetFactory nf;
-
-        if (auto r = nf.create(filename))
+        if (auto r = BgNetFactory::create(filename))
             return r;
 
         std::string name = net_name(filename);
 
-        if (auto r = nf.create(name))
+        if (auto r = BgNetFactory::create(name))
             if (r->readFile(filename))
                 return r;
 

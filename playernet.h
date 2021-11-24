@@ -8,8 +8,6 @@
 #include "bgnet.h"
 #include "bearoff/bearoff.h"
 
-using std::string;
-
 class PlayerNet : public Player, public callBack
 {
 public:
@@ -24,13 +22,6 @@ public:
             selectMove(b, choice, &PlayerNet::bearoffEquity);
         else
             selectMove(b, choice, &PlayerNet::littleE);
-    }
-
-    void save(string filename)
-    {
-        bool okay = neural.writeFile(filename);
-        if (okay == false)
-            throw std::runtime_error(string("Error writing network: ") + filename + "\n");
     }
 
 protected:
@@ -84,5 +75,14 @@ protected:
                 bd.checkersOnPoint(black, 0)  &&
                 bd.highestChecker(white) <= 6 &&
                 bd.highestChecker(black) <= 6;
+    }
+};
+
+class PlayerNetFactory
+{
+public:
+    static auto create(BgNet& nn)
+    {
+        return std::make_unique<PlayerNet>(nn);
     }
 };

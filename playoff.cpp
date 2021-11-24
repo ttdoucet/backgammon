@@ -62,13 +62,11 @@ public:
 
     int run()
     {
-        BgNetReader bgr;
+        auto whitenet = BgNetReader::read(opts.white_name);
+        auto blacknet = BgNetReader::read(opts.black_name);
 
-        std::unique_ptr<BgNet> whitenet = bgr.read(opts.white_name);
-        std::unique_ptr<BgNet> blacknet = bgr.read(opts.black_name);
-
-        PlayerNet whitePlayer(*whitenet);
-        PlayerNet blackPlayer(*blacknet);
+        PlayerNet whitePlayer{*whitenet};
+        PlayerNet blackPlayer{*blacknet};
 
         playoffSession(opts.trials, whitePlayer, blackPlayer, opts.user_seed);
         return 0;
@@ -104,7 +102,7 @@ private:
 
     void playoffSession(int trials, Player& whitePlayer, Player& blackPlayer, uint64_t seed)
     {
-        AnnotatedGame game(whitePlayer, blackPlayer, seed, opts);
+        AnnotatedGame game{whitePlayer, blackPlayer, seed, opts};
 
         double whitePoints = 0.0;
 
@@ -163,5 +161,5 @@ int main(int argc, char *argv[])
 {
     PlayoffOptions opts;
     opts.parse(argc, argv);
-    return PlayoffSession(opts).run();
+    return PlayoffSession{opts}.run();
 }

@@ -106,14 +106,14 @@ class TrainingSession
 {
 public:
     TrainingSession(const TrainingOptions& options)
-        : opts{options}
+        : opts{options},
+          lopts_w{opts.alpha, opts.lambda, opts.wdual, opts.decay, opts.batchsize, opts.momentum},
+          lopts_b{opts.alpha, opts.lambda, opts.bdual, opts.decay, opts.batchsize, opts.momentum}
     {
     }
 
     void run()
     {
-        BgNetReader bgr;
-
         if (file_exists(opts.output_white))
         {
             cout << "File already exists: " << opts.output_white << ", skipping.\n";
@@ -123,8 +123,8 @@ public:
         unique_ptr<BgNet> white_net, black_net;
         unique_ptr<PlayerNet> white_player, black_player;
         
-        white_net = bgr.read(opts.wlearn_fn);
-        white_player = learner_for(*white_net, opts);
+        white_net = BgNetReader::read(opts.wlearn_fn);
+        white_player = LearnerNetFactory::create(*white_net, lopts_w);
 
         if (opts.blearn_fn.empty() == false)
         {
@@ -133,8 +133,8 @@ public:
                  << " against learning "
                  << name_for(opts.blearn_fn, opts.bdual)
                  << "\n";
-            black_net = bgr.read(opts.blearn_fn);
-            black_player = learner_for(*black_net, opts);
+            black_net = BgNetReader::read(opts.blearn_fn);
+            black_player = LearnerNetFactory::create(*black_net, lopts_b);
         }
         else if (opts.bplay_fn.empty() == false)
         {
@@ -142,15 +142,15 @@ public:
                  << name_for(opts.wlearn_fn, opts.wdual)
                  << " against fixed " << opts.bplay_fn
                  << "\n";
-            black_net = bgr.read(opts.bplay_fn);
-            black_player = player_for(*black_net);
+            black_net = BgNetReader::read(opts.bplay_fn);
+            black_player = PlayerNetFactory::create(*black_net);
         }
         else
         {
             cout << "self-play: "
                  << name_for(opts.wlearn_fn, opts.wdual)
                  << "\n";
-            black_player = player_for(*white_net);
+            black_player = PlayerNetFactory::create(*white_net);
         }
 
         train(*white_player, *black_player);
@@ -168,7 +168,8 @@ public:
     }
 
 private:
-    const TrainingOptions& opts;
+    TrainingOptions const& opts;
+    LearningOptions lopts_w, lopts_b;
 
     static bool file_exists(string filename)
     {
@@ -178,15 +179,15 @@ private:
 
     static void report(int numGames, double whitePoints)
     {
-                ostringstream ss;
+        ostringstream ss;
 
-                ss << "white equity/game = "
-                   << setprecision(3) << whitePoints/numGames
-                   << " (total "
-                   << setprecision(2) << whitePoints
-                   << ")\n";
+        ss << "white equity/game = "
+           << setprecision(3) << whitePoints/numGames
+           << " (total "
+           << setprecision(2) << whitePoints
+           << ")\n";
 
-                cout << ss.str();
+        cout << ss.str();
     }
 
     string name_for(string fn, bool dual)
@@ -201,7 +202,7 @@ private:
     void train(PlayerNet& whitePlayer,
                PlayerNet& blackPlayer)
     {
-        Game game(whitePlayer, blackPlayer);
+        Game game{whitePlayer, blackPlayer};
 
         int numGames;
         double whitePoints = 0.0;
@@ -224,53 +225,6 @@ private:
 
         cout << "Games: " << (numGames - 1)  << ": ";
         report(numGames, whitePoints);
-    }
-
-    unique_ptr<PlayerNet> learner_for(BgNet& nn, const TrainingOptions& opts)
-    {
-        if (auto p = dynamic_cast<netv3*>(&nn))
-	    return make_unique<Learner<netv3> > (*p, opts.alpha, opts.lambda, opts.wdual, opts.decay, opts.batchsize, opts.momentum);
-
-        if (auto p = dynamic_cast<netv3tr*>(&nn))
-	    return make_unique<Learner<netv3tr> > (*p, opts.alpha, opts.lambda, opts.wdual, opts.decay, opts.batchsize, opts.momentum);
-
-        // experimental, in flux
-        if (auto p = dynamic_cast<netv5*>(&nn))
-	    return make_unique<Learner<netv5> > (*p, opts.alpha, opts.lambda, opts.wdual, opts.decay, opts.batchsize, opts.momentum);
-
-        if (auto p = dynamic_cast<Fc_Sig_H60_I5*>(&nn))
-	    return make_unique<Learner<Fc_Sig_H60_I5> > (*p, opts.alpha, opts.lambda, opts.wdual, opts.decay, opts.batchsize, opts.momentum);
-
-
-
-        if (auto p = dynamic_cast<Fc_Sig_H60_I3*>(&nn))
-	    return make_unique<Learner<Fc_Sig_H60_I3> > (*p, opts.alpha, opts.lambda, opts.wdual, opts.decay, opts.batchsize, opts.momentum);
-
-        if (auto p = dynamic_cast<Fc_Sig_H60_I3tr*>(&nn))
-	    return make_unique<Learner<Fc_Sig_H60_I3tr> > (*p, opts.alpha, opts.lambda, opts.wdual, opts.decay, opts.batchsize, opts.momentum);
-
-
-        if (auto p = dynamic_cast<Fc_Sig_H90_I3*>(&nn))
-            return make_unique<Learner<Fc_Sig_H90_I3> > (*p, opts.alpha, opts.lambda, opts.wdual, opts.decay, opts.batchsize, opts.momentum);
-
-        if (auto p = dynamic_cast<Fc_Sig_H90_I3tr*>(&nn))
-            return make_unique<Learner<Fc_Sig_H90_I3tr> > (*p, opts.alpha, opts.lambda, opts.wdual, opts.decay, opts.batchsize, opts.momentum);
-
-        if (auto p = dynamic_cast<Fc_Sig_H120_I3*>(&nn))
-            return make_unique<Learner<Fc_Sig_H120_I3> > (*p, opts.alpha, opts.lambda, opts.wdual, opts.decay, opts.batchsize, opts.momentum);
-
-        if (auto p = dynamic_cast<Fc_Sig_H120_I3tr*>(&nn))
-            return make_unique<Learner<Fc_Sig_H120_I3tr> > (*p, opts.alpha, opts.lambda, opts.wdual, opts.decay, opts.batchsize, opts.momentum);
-
-
-        // Support learning in additional neural net players here. . .
-
-        throw runtime_error("Network not yet supported: " + nn.netname());
-    }
-
-    unique_ptr<PlayerNet> player_for(BgNet& nn)
-    {
-      return make_unique<PlayerNet>(nn);
     }
 };
 

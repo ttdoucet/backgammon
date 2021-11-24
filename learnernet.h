@@ -3,23 +3,32 @@
 
 #include "playernet.h"
 
+struct LearningOptions
+{
+    float alpha;
+    float lambda;
+    bool dual;
+    double decay;
+    int batchsize;
+    float momentum;
+
+    LearningOptions(float alpha, float lambda, bool dual, double decay, int batchsize, float momentum)
+        : alpha{alpha}, lambda{lambda}, dual{dual}, decay{decay}, batchsize{batchsize},momentum{momentum}
+    {
+    }
+};
+
 template<class Estimator>
 class TemporalDifference
 {
 public:
-    TemporalDifference(Estimator& neural,
-		       float a,
-		       float lambda,
-		       double decay,
-		       int batchsize,
-	               float momentum
-    )
+    TemporalDifference(Estimator& neural, LearningOptions const& opts)
         : neural{neural},
-          alpha{a},
-          lambda{lambda},
-          decay{decay},
-          batchsize{batchsize},
-	  momentum{momentum}
+          alpha{opts.alpha},
+          lambda{opts.lambda},
+          decay{opts.decay},
+          batchsize{opts.batchsize},
+          momentum{opts.momentum}
     {
         alpha /= decay;
         batch_grad.clear();
@@ -53,10 +62,10 @@ public:
         {
             backprop(previous - e);
 
-	    if (momentum == 0)
-		    batch_grad += grad_adj;
-	    else
-		    batch_grad += batch_grad * momentum + grad_adj * (1 - momentum);
+            if (momentum == 0)
+                    batch_grad += grad_adj;
+            else
+                    batch_grad += batch_grad * momentum + grad_adj * (1 - momentum);
 
             if (++seq == batchsize)
             {
@@ -96,7 +105,7 @@ private:
 };
 
 template<typename Estimator>
-class Learner : public PlayerNet
+class LearnerNet : public PlayerNet
 {
     Estimator& mine;
     TemporalDifference<Estimator> our_side;
@@ -104,19 +113,12 @@ class Learner : public PlayerNet
     bool dual;
 
 public:
-    Learner(Estimator& estimator,
-	    float alpha,
-	    float lambda,
-	    bool dual,
-	    double decay,
-	    int batchsize,
-	    float momentum
-     )
+    LearnerNet(Estimator& estimator, LearningOptions const& opts)
         : PlayerNet{estimator},
           mine{estimator},
-          our_side{mine, alpha, lambda, decay, batchsize, momentum},
-          opp_side{mine, alpha, lambda, decay, batchsize, momentum},
-          dual{dual}
+          our_side{mine, opts},
+          opp_side{mine, opts},
+          dual{opts.dual}
     {
     }
 
@@ -145,3 +147,35 @@ public:
     }
 };
 
+class LearnerNetFactory
+{
+    template<typename T>
+    static std::unique_ptr<LearnerNet<T>> downcast(BgNet& nn, LearningOptions const& opts)
+    {
+        if (auto p = dynamic_cast<T*>(&nn))
+            return std::make_unique<LearnerNet<T> > (*p, opts);
+        else
+            return nullptr;
+    }
+
+    template<typename ... NetType>
+    struct nnlist
+    {
+        static auto create(BgNet& nn, const LearningOptions& opts)
+        {
+            std::unique_ptr<PlayerNet> p;
+            ( (p = downcast<NetType>(nn, opts)) || ... );
+            return p;
+        }
+    };
+
+public:
+    static auto create(BgNet& nn, const LearningOptions& opts)
+    {
+        using supported = nnlist<netv3, Fc_Sig_H60_I3, Fc_Sig_H90_I3, Fc_Sig_H120_I3,
+                                 netv5, Fc_Sig_H60_I5, // Fc_Sig_H90_I5, Fc_Sig_H120_I5,
+                                 netv3tr, Fc_Sig_H60_I3tr, Fc_Sig_H90_I3tr, Fc_Sig_H120_I3tr>;
+
+        return supported::create(nn, opts);
+    }
+};
