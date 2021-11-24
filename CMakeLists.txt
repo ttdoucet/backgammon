@@ -19,3 +19,6 @@ target_link_libraries(train common)
 
 add_executable(convert convert.cpp)
 target_link_libraries(convert common)
+
+add_executable(etest etest.cpp)
+

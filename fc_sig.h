@@ -141,11 +141,12 @@ protected:
 
     float feedForward()
     {
-        timer.start();
         Op_1.fwd();
+
+        timer.start();
+        Op_2.fwd();
         timer.stop();
 
-        Op_2.fwd();
         Op_3.fwd();
         Op_4.fwd();
         Op_5.fwd();
