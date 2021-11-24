@@ -126,16 +126,25 @@ public:
         g = grad;
     }
 
+    ~Fc_SigTr()
+    {
+        std::cout << "timer: " << timer.elapsed_msec() << "msec\n";
+    }
+
 protected:
     Linear_<input_t, hidden_t>           Op_1{act.input, act.hidden, params.M, grad.M};
     Termwise<hidden_t, logistic>         Op_2{act.hidden, act.hidden};
     Linear_<hidden_t, output_t>          Op_3{act.hidden, act.pre_out, params.V, grad.V};
     Termwise<output_t, bipolar_sigmoid>  Op_4{act.pre_out, act.pre_out};
     Termwise<output_t, affine<3,0>>      Op_5{act.pre_out, act.out};
+    stopwatch timer;
 
     float feedForward()
     {
+        timer.start();
         Op_1.fwd();
+        timer.stop();
+
         Op_2.fwd();
         Op_3.fwd();
         Op_4.fwd();
