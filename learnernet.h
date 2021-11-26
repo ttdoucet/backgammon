@@ -13,8 +13,10 @@ struct LearningOptions
     float momentum;
 
     LearningOptions(float alpha, float lambda, bool dual, double decay, int batchsize, float momentum)
-        : alpha{alpha}, lambda{lambda}, dual{dual}, decay{decay}, batchsize{batchsize},momentum{momentum}
+        : alpha{alpha / batchsize},
+          lambda{lambda}, dual{dual}, decay{decay}, batchsize{batchsize},momentum{momentum}
     {
+        assert(alpha > 0);
     }
 };
 
