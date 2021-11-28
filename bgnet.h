@@ -124,6 +124,13 @@ struct Fc_Sig_H120_I3tr : public BackgammonNet<features_v3, Fc_SigTr, 120>
     string netname() const { return "Fc_Sig_H120_I3tr"; }
 };
 
+struct Fc_Sig_H240_I3tr : public BackgammonNet<features_v3, Fc_SigTr, 240>
+{
+    static bool is_named(std::string name) { return name == "Fc_Sig_H240_I3tr"; }
+    string netname() const { return "Fc_Sig_H240_I3tr"; }
+};
+
+
 struct BgNetFactory
 {
     template<typename ... NetType>
@@ -141,7 +148,9 @@ struct BgNetFactory
     {
         using supported = nnlist<netv3, Fc_Sig_H60_I3, Fc_Sig_H90_I3, Fc_Sig_H120_I3,
                                  netv5, Fc_Sig_H60_I5, // Fc_Sig_H90_I5, Fc_Sig_H120_I5,
-                                 netv3tr, Fc_Sig_H60_I3tr, Fc_Sig_H90_I3tr, Fc_Sig_H120_I3tr>;
+                                 netv3tr, Fc_Sig_H60_I3tr, Fc_Sig_H90_I3tr, Fc_Sig_H120_I3tr,
+                                 Fc_Sig_H240_I3tr
+                                 >;
 
         return supported::create(name);
     }

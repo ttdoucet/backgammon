@@ -176,7 +176,9 @@ public:
     {
         using supported = nnlist<netv3, Fc_Sig_H60_I3, Fc_Sig_H90_I3, Fc_Sig_H120_I3,
                                  netv5, Fc_Sig_H60_I5, // Fc_Sig_H90_I5, Fc_Sig_H120_I5,
-                                 netv3tr, Fc_Sig_H60_I3tr, Fc_Sig_H90_I3tr, Fc_Sig_H120_I3tr>;
+                                 netv3tr, Fc_Sig_H60_I3tr, Fc_Sig_H90_I3tr, Fc_Sig_H120_I3tr,
+                                 Fc_Sig_H240_I3tr
+                                 >;
 
         return supported::create(nn, opts);
     }
