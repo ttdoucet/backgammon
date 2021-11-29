@@ -11,7 +11,7 @@ public:
     constexpr static int count = 156;
     features_v3() = delete;
 
-    static void calc(board const& b, float *dest)
+    static float* calc(board const& b, float *dest)
     {
         float *ib = dest;
         const color_t on_roll = b.onRoll();
@@ -26,6 +26,7 @@ public:
         ib = hit_features(b, opponentOf(on_roll), ib);
 
         assert( (ib - dest) == 156 );
+        return ib;
     }
 
 protected:
@@ -100,7 +101,7 @@ public:
     constexpr static int count = 152;
     features_v5() = delete;
 
-    static void calc(board const& b, float *dest)
+    static float* calc(board const& b, float *dest)
     {
         float *ib = dest;
         const color_t on_roll = b.onRoll();
@@ -115,5 +116,25 @@ public:
         *ib++ = hits(b, opponentOf(on_roll));
 
         assert( (ib - dest) == count );
+        return ib;
+    }
+};
+
+class features_v5b : protected features_v5
+{
+public:
+    constexpr static int count = 153;
+    features_v5b() = delete;
+
+    static float* calc(board const& b, float *dest)
+    {
+        float *ib = dest;
+        const color_t on_roll = b.onRoll();
+
+        ib = features_v5::calc(b, dest);
+        *ib++ = 1.0f;  // bias
+
+        assert( (ib - dest) == count );
+        return ib;
     }
 };
