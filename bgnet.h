@@ -65,6 +65,20 @@ struct netv3 : public BackgammonNet<features_v3, Fc_Sig, 30>
     string netname() const { return "netv3"; }
 };
 
+struct netv1 : public BackgammonNet<features_v1, Fc_SigTr, 30>
+{
+    static bool is_named(std::string name) { return name == "netv1"; }
+    string netname() const { return "netv1"; }
+};
+
+struct Fc_Sig_H60_I1 : public BackgammonNet<features_v1, Fc_SigTr, 60>
+{
+    static bool is_named(std::string name) { return name == "Fc_Sig_H60_I1"; }
+    string netname() const { return "Fc_Sig_H60_I1"; }
+};
+
+
+
 struct netv3tr : public BackgammonNet<features_v3, Fc_SigTr, 30>
 {
     static bool is_named(std::string name) { return name == "netv3tr"; }
@@ -156,7 +170,8 @@ struct BgNetFactory
                                  netv5, Fc_Sig_H60_I5, // Fc_Sig_H90_I5, Fc_Sig_H120_I5,
                                  netv3tr, Fc_Sig_H60_I3tr, Fc_Sig_H90_I3tr, Fc_Sig_H120_I3tr,
                                  Fc_Sig_H240_I3tr,
-                                 Fc_Sig_H60_I5B
+                                 Fc_Sig_H60_I5B,
+                                 netv1, Fc_Sig_H60_I1
                                  >;
 
         return supported::create(name);
