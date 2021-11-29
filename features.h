@@ -128,8 +128,7 @@ public:
 
     static float* calc(board const& b, float *dest)
     {
-        float *ib = dest;
-        ib = features_v5::calc(b, dest);
+        float *ib = features_v5::calc(b, dest);
         *ib++ = 1.0f;  // bias
 
         assert( (ib - dest) == count );
