@@ -130,6 +130,48 @@ protected:
     }
 };
 
+class features_v3n : public features_v3
+{
+public:
+    constexpr static int count = features_v3::count;
+
+    static float* calc(board const& b, float *dest)
+    {
+        const color_t on_roll = b.onRoll();
+        float *ib = dest;
+
+        ib = board_features_n(b, on_roll, ib);
+        ib = board_features_n(b, opponentOf(on_roll), ib);
+
+        ib = contact_features(b, on_roll, ib);
+        ib = pip_features(b, on_roll, ib);
+
+        ib = hit_features(b, on_roll, ib);
+        ib = hit_features(b, opponentOf(on_roll), ib);
+
+        assert( (ib - dest) == count );
+        return ib;
+    }
+
+protected:
+    static float *board_features_n(board const& b, color_t color, float *ib)
+    {
+        *ib++ = b.checkersOnPoint(color, 0) / 15.0f; /* borne off */
+
+        for (int i = 1; i <= 24; i++)
+        {
+            int n = b.checkersOnPoint(color, i);
+            *ib++ = (n == 1);                           /* blot     */
+            *ib++ = (n >= 2);                           /* point    */
+            *ib++ = ( (n > 2) ? ((n - 2)/13.0f) : 0 );  /* builders */
+        }
+
+        *ib++ = b.checkersOnBar(color) / 15.0f; /* on bar   */
+        return ib;
+    }
+
+};
+
 class features_v5 : protected features_v3
 {
 public:

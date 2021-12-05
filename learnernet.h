@@ -179,7 +179,8 @@ public:
                                  netv3tr, Fc_Sig_H60_I3tr, Fc_Sig_H90_I3tr, Fc_Sig_H120_I3tr,
                                  Fc_Sig_H240_I3tr,
                                  Fc_Sig_H60_I5B,
-                                 netv1, Fc_Sig_H60_I1
+                                 netv1, Fc_Sig_H60_I1,
+                                 Fc_Sig_H30_I3N, Fc_Sig_H60_I3N, Fc_Sig_H90_I3N, Fc_Sig_H120_I3N
                                  >;
 
         return supported::create(nn, opts);

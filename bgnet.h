@@ -151,6 +151,32 @@ struct Fc_Sig_H240_I3tr : public BackgammonNet<features_v3, Fc_SigTr, 240>
 };
 
 
+struct Fc_Sig_H30_I3N : public BackgammonNet<features_v3n, Fc_SigTr, 30>
+{
+    static bool is_named(std::string name) { return name == "Fc_Sig_H30_I3N"; }
+    string netname() const { return "Fc_Sig_H30_I3N"; }
+};
+
+struct Fc_Sig_H60_I3N : public BackgammonNet<features_v3n, Fc_SigTr, 60>
+{
+    static bool is_named(std::string name) { return name == "Fc_Sig_H60_I3N"; }
+    string netname() const { return "Fc_Sig_H60_I3N"; }
+};
+
+struct Fc_Sig_H90_I3N : public BackgammonNet<features_v3n, Fc_SigTr, 90>
+{
+    static bool is_named(std::string name) { return name == "Fc_Sig_H90_I3N"; }
+    string netname() const { return "Fc_Sig_H90_I3N"; }
+};
+
+struct Fc_Sig_H120_I3N : public BackgammonNet<features_v3n, Fc_SigTr, 120>
+{
+    static bool is_named(std::string name) { return name == "Fc_Sig_H120_I3N"; }
+    string netname() const { return "Fc_Sig_H120_I3N"; }
+};
+
+
+
 struct BgNetFactory
 {
     template<typename ... NetType>
@@ -171,7 +197,8 @@ struct BgNetFactory
                                  netv3tr, Fc_Sig_H60_I3tr, Fc_Sig_H90_I3tr, Fc_Sig_H120_I3tr,
                                  Fc_Sig_H240_I3tr,
                                  Fc_Sig_H60_I5B,
-                                 netv1, Fc_Sig_H60_I1
+                                 netv1, Fc_Sig_H60_I1,
+                                 Fc_Sig_H30_I3N, Fc_Sig_H60_I3N, Fc_Sig_H90_I3N, Fc_Sig_H120_I3N
                                  >;
 
         return supported::create(name);
