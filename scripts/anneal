@@ -30,7 +30,7 @@ def anneal_schedule(a_start, a_stop, rounds, frm=0, lambda_=0.85, basename='whit
         print('# momentum:', momentum)
 
     if batchsize > 1:
-        print("batch size:", batchsize)
+        print("# batch size:", batchsize)
 
     print("#")
 
@@ -69,18 +69,19 @@ def initialize_net(net_type, basename='white'):
     print(cmd);
 
 
-bname = 'Fc_Sig_H30_I3N'
+netname = 'Fc_Sig_H30_I3N'
+bname = 'Fc_Sig_H30_I3N-200m-a0.2-b50'
 
-batchsize = 1
+batchsize = 50
 opponent = None
-a_start = 0.001
+a_start = 0.2
 a_stop = a_start / 20
-rounds = 400
+rounds = 200
 lmbda = 0.85
 momentum = 0.0
 from_game = 0
 
 
-initialize_net(bname, basename=bname);
+initialize_net(netname, basename=bname);
 anneal_schedule(a_start, a_stop, rounds, basename=bname, lambda_=lmbda, frm=from_game, opponent=opponent, batchsize=batchsize, momentum=momentum)
 anneal_schedule(a_stop, a_stop/20, rounds, basename=bname, lambda_=lmbda, frm=from_game+rounds, opponent=opponent, batchsize=batchsize, momentum=momentum)
