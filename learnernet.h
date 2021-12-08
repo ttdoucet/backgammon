@@ -84,7 +84,7 @@ private:
     float lambda; // Temporal discount.
     float alpha;  // Learning rate.
     double decay; // Rate to decay learning rate.
-    int batchsize; // number of games per batch
+    int batchsize; // number of games per parameter update
     float momentum; // exponential decay factor for gradient
 
     typename Estimator::Parameters grad_sum;
