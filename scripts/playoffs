@@ -1,23 +1,13 @@
 #!/usr/bin/env python3
 import sys
 import os
+import pandas as pd
+import glob
+import re
 
 opponent = '~/src/backgammon/nets/drc.w'
 playoff_cmd = '~/src/backgammon/playoff'
 trials = 100_000
-
-def usage():
-    print("playoff CSV-file from [to]")
-    print("")
-    print("  Perform playoffs and append results to CSV file.")
-    print("")
-    print("  The CSV file need not exist initially.")
-    print("")
-    print("  The sequences numbers 'from' and 'to' are numbers, and")
-    print("  the net files to use are derived from those numbers")
-    print("  and the sequence values.")
-    print("")
-    sys.exit(-1)
 
 def playoff(csv, player, opponent):
     cmd = f'{playoff_cmd} -e 1000 -n {trials} {player} {opponent} 2>>{csv}'
@@ -42,19 +32,54 @@ def playoffs(csv, bname, start, stop):
         playoff(csv, player, opponent)
 
 
+def sequence(names):
+    def seqno(name):
+        v = re.findall(r'\d+', name)
+        return int(v[-1])
+    return [seqno(name) for name in names]
+
+def new_stuff(filename):
+    if os.path.isfile(filename):
+        playoffs = pd.read_csv(filename)
+        seq = sequence(playoffs['white'].values)
+        last_playoff = max(seq)
+    else:
+        last_playoff = 0
+
+    files = glob.glob('*.w')
+    if len(files) > 0:
+        latest_file = max(sequence(files))
+    else:
+        latest_file = 0
+    return last_playoff + 1, latest_file
+
 def main(args):
     n = len(args)
-    if n < 3 or n > 4:
-        usage()
 
-    csv = args[1]
-    bname = os.path.splitext(csv)[0]
-    start = int(args[2])
-    if n == 4:
-        stop = int(args[3])
+    if n == 1:
+        csvfiles = glob.glob('*.csv')
+        if len(csvfiles) == 1:
+            csv = csvfiles[0]
+        else:
+            print("error: more than one csv file present")
+            return
     else:
+        csv = args[1]
+
+    bname = os.path.splitext(csv)[0]
+
+    if n <= 2:
+        start, stop = new_stuff(csv)
+        print("playoff from", start, "to", stop)
+
+    if n == 3:
+        start = int(args[2])
         stop = start
-        
+
+    if n == 4:
+        start = int(args[2])
+        stop = int(args[3])
+
     playoffs(csv, bname, start, stop)
 
 main(sys.argv)
