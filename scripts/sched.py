@@ -4,17 +4,20 @@
 #    x Create a new network conveniently.
 #    x Figure out where to specify games per round.
 #    x Make the train command customizable.
-#    - Add ability to execute commands in addition to printing them.
-#    - Make sure Sched_const works.
+#    x Make sure Sched_const works.
+#    x Add ability to execute commands in addition to printing them.
 #    - Write Anneal schedule.
 #    - Write convenient routines.
 
+import os
+
 class Trainer:
-    def __init__(self, kind, basename=None, last=None, traincmd=None):
+    def __init__(self, kind, basename=None, last=None, traincmd=None, execute=None):
         self.kind = kind
         self.last = last
         self.basename = basename if basename else kind
         self.traincmd = traincmd if traincmd else "train"
+        self.execute = execute if execute else False
 
         self.alpha = 0.0005
         self.lambda_ = 0.85
@@ -50,6 +53,8 @@ class Trainer:
                 cmd += f' -p {self.momentum}'
             self.last += 1
         print(cmd)
+        if self.execute:
+            os.system(cmd)
 
 class Sched_const:
     def train(self, trainer, rounds, games):
@@ -62,12 +67,14 @@ class Sched_anneal:
     def train(self, trainer, rounds, games):
         pass
 
-
 sched_M200 = Sched_anneal(1.0 / 20.0, 200_000_000)
 sched_fixed = Sched_const();
-t = Trainer(kind='Fc_Sig_H60_I3N', basename="experiment", last=None, traincmd="./train")
+t = Trainer(kind='Fc_Sig_H60_I3N',
+            basename="experiment",
+            last=None, traincmd="./train",
+            execute=False)
 
 t.preamble()
 sched_fixed.train(t, 1, 0)
-sched_fixed.train(t, 25, 1_000_000)
+sched_fixed.train(t, 25, 1000)
 
