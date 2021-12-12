@@ -1,9 +1,3 @@
-#!/usr/bin/env python3
-
-# Stuff to do:
-#    - Write convenience routines.
-
-
 import os
 
 class Trainer:
@@ -86,16 +80,5 @@ sched_M400 = Sched_anneal(1.0 / 20.0, 400)
 
 #sched_fixed = Sched_const();
 
-t = Trainer(kind='Fc_Sig_H60_I3N',
-            basename="experiment",
-            last=None,
-            traincmd="./train",
-            execute=False)
-t.alpha = 0.001
-#t.batchsize=16
-#t.momentum=0.9
-
-sched_M200.train(t, 200, 1_000_000)
-sched_M200.train(t, 200, 1_000_000)
 
 
