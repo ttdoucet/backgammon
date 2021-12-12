@@ -1,13 +1,8 @@
 #!/usr/bin/env python3
 
 # Stuff to do:
-#    x Create a new network conveniently.
-#    x Figure out where to specify games per round.
-#    x Make the train command customizable.
-#    x Make sure Sched_const works.
-#    x Add ability to execute commands in addition to printing them.
-#    - Write Anneal schedule.
-#    - Write convenient routines.
+#    - Write convenience routines.
+
 
 import os
 
@@ -24,34 +19,31 @@ class Trainer:
         self.batchsize = 1
         self.momentum = 0
         self.dual = True
-        self.every = 1000
 
-    def preamble(self):
-        print("")
-        print("# alpha:", self.alpha)
-        print("# lambda:", self.lambda_)
-        if self.momentum:
-            print('# momentum:', self.momentum)
+    def init_net(self):
+        cmd = f"{self.traincmd} --games 0 -w {self.kind} -o {self.basename}-0.w"
+        print("# Initialize a new random network.")
+        print("#")
+        print(cmd);
+        if self.execute:
+            os.system(cmd)
+        self.last = 0
+        
+    def train(self, games, extra=None):
+        fromfile = f'{self.basename}-{self.last}.w'
+        tofile = f'{self.basename}-{self.last+1}.w'
+        cmd  = f'{self.traincmd} --alpha {self.alpha} ' \
+               f'--lambda {self.lambda_} ' \
+               f'--games {games} '
+        if extra is not None:
+            cmd += f'{extra} '
+        cmd += f'-w {fromfile} -o {tofile}'
+
         if self.batchsize > 1:
-            print("# batch size:", self.batchsize)
-
-    def train(self, games):
-        if self.last is None:
-            cmd = f"{self.traincmd} --games 0 -w {self.kind} -o {self.basename}-0.w"
-            self.last = 0
-        else:
-            fromfile = f'{self.basename}-{self.last}.w'
-            tofile = f'{self.basename}-{self.last+1}.w'
-            cmd  = f'{self.traincmd} --alpha {self.alpha} ' \
-                   f'--lambda {self.lambda_} ' \
-                   f'--games {games} ' \
-                   f'-d -e {self.every} ' \
-                   f'-w {fromfile} -o {tofile}'
-            if self.batchsize > 1:
-                cmd += f' --batch-size {self.batchsize}'
-            if self.momentum:
-                cmd += f' -p {self.momentum}'
-            self.last += 1
+            cmd += f' --batch-size {self.batchsize}'
+        if self.momentum:
+            cmd += f' -p {self.momentum}'
+        self.last += 1
         print(cmd)
         if self.execute:
             os.system(cmd)
@@ -62,19 +54,48 @@ class Sched_const:
             trainer.train(games);
 
 class Sched_anneal:
-    def __init__(self, rate, over):
-        pass
-    def train(self, trainer, rounds, games):
-        pass
+    def __init__(self, ratio, rounds):
+        self.decay = ratio ** (1 / rounds)
 
-sched_M200 = Sched_anneal(1.0 / 20.0, 200_000_000)
-sched_fixed = Sched_const();
+    def train(self, trainer, rounds, games):
+        if trainer.last is None:
+            trainer.init_net();
+
+        print("")
+        print("# initial alpha:", trainer.alpha)
+        print("# final alpha:", trainer.alpha * (self.decay ** rounds))
+        print("# lambda:", trainer.lambda_)
+        print("# games per round:", games)
+        print("# rounds:", rounds)
+        print("# decay per round:", self.decay)
+        if trainer.momentum:
+            print('# momentum:', trainer.momentum)
+        if trainer.batchsize > 1:
+            print("# batch size:", trainer.batchsize)
+        print("#")
+
+        for i in range(rounds):
+            trainer.train(games, f'--alpha-end {trainer.alpha * self.decay}')
+            trainer.alpha *= self.decay
+
+
+sched_M50 =  Sched_anneal(1.0 / 20.0,  50)
+sched_M100 = Sched_anneal(1.0 / 20.0, 100)
+sched_M200 = Sched_anneal(1.0 / 20.0, 200)
+sched_M400 = Sched_anneal(1.0 / 20.0, 400)
+
+#sched_fixed = Sched_const();
+
 t = Trainer(kind='Fc_Sig_H60_I3N',
             basename="experiment",
-            last=None, traincmd="./train",
+            last=None,
+            traincmd="./train",
             execute=False)
+t.alpha = 0.001
+#t.batchsize=16
+#t.momentum=0.9
 
-t.preamble()
-sched_fixed.train(t, 1, 0)
-sched_fixed.train(t, 25, 1000)
+sched_M200.train(t, 200, 1_000_000)
+sched_M200.train(t, 200, 1_000_000)
+
 
