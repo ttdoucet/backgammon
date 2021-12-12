@@ -29,6 +29,8 @@ class Trainer:
         cmd  = f'{self.traincmd} --alpha {self.alpha} ' \
                f'--lambda {self.lambda_} ' \
                f'--games {games} '
+        if self.dual:
+            cmd += '-d '
         if extra is not None:
             cmd += f'{extra} '
         cmd += f'-w {fromfile} -o {tofile}'
