@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.21.4)
+cmake_minimum_required(VERSION 3.16.3)
 project(bg LANGUAGES CXX)
 
 set(CMAKE_INCLUDE_FLAG_CXX "-iquote")
