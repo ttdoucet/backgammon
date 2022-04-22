@@ -1,6 +1,8 @@
 # Currently the fastest
+CXX=g++-12 CXXFLAGS="-march=native" cmake -GNinja -B build.g++-12 && cmake --build build.g++-12
 CXX=g++-10 CXXFLAGS="-march=native" cmake -GNinja -B build.g++-10 && cmake --build build.g++-10
-CXX=clang++-12 CXXFLAGS="-march=native" cmake -GNinja  -B build.clang++-12 && cmake --build build.clang++-12
+CXX=clang++-14 CXXFLAGS="-march=native" cmake -GNinja  -B build.clang++-14 && cmake --build build.clang++-14
+
 # CXX=clang++-11 CXXFLAGS="-march=native" cmake -GNinja  -B build.clang++-11 && cmake --build build.clang++-11
 # CXX=clang++-10 CXXFLAGS="-march=native" cmake -GNinja  -B build.clang++-10 && cmake --build build.clang++-10
 
